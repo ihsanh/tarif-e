@@ -26,6 +26,9 @@
                 <button class="btn btn-tertiary" onclick="showScreen('my-ingredients-screen')">
                     🗂️ Malzemelerim
                 </button>
+                <button class="btn" style="background: #F6AD55; color: white;" onclick="loadShoppingLists(); showScreen('shopping-lists-screen');">
+                    🛒 Alışveriş Listelerim
+                </button>
             </div>
 
             <div class="status-bar">
@@ -33,7 +36,30 @@
                 <button class="btn-settings" onclick="showScreen('settings-screen')">⚙️</button>
             </div>
         </div>
+        <!-- Alışveriş Listelerim Ekranı -->
+        <div id="shopping-lists-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
 
+            <h2>🛒 Alışveriş Listelerim</h2>
+            <div id="shopping-lists-container"></div>
+        </div>
+
+        <!-- Alışveriş Listesi Detay Ekranı -->
+        <div id="shopping-detail-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('shopping-lists-screen')">← Geri</button>
+
+            <div id="shopping-detail-header"></div>
+            <div id="shopping-detail-items"></div>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-success" id="complete-list-btn" onclick="completeShoppingList()">
+                    ✅ Alışverişi Tamamla
+                </button>
+                <button class="btn" style="background: #FC8181; color: white;" onclick="deleteShoppingList()">
+                    🗑️ Listeyi Sil
+                </button>
+            </div>
+        </div>
         <!-- Kamera Ekranı -->
         <div id="camera-screen" class="screen">
             <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
@@ -78,13 +104,42 @@
         <!-- Malzemelerim Ekranı -->
         <div id="my-ingredients-screen" class="screen">
             <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
-            
+
             <h2>Malzemelerim</h2>
             <div id="my-ingredients-list" class="ingredients-list"></div>
-            
+
             <button class="btn btn-success" onclick="getTarifFromMyIngredients()">
                 🍽️ Bu Malzemelerden Tarif Öner
             </button>
+        </div>
+
+        <!-- Malzeme Düzenleme Modal -->
+        <div id="edit-ingredient-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Malzeme Düzenle</h3>
+
+                <div class="form-group">
+                    <label>Malzeme:</label>
+                    <input type="text" id="edit-ingredient-name" class="input" readonly>
+
+                    <label>Miktar:</label>
+                    <input type="number" id="edit-ingredient-amount" class="input" step="0.1" min="0">
+
+                    <label>Birim:</label>
+                    <select id="edit-ingredient-unit" class="input">
+                        <option value="adet">Adet</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="gram">Gram</option>
+                        <option value="litre">Litre</option>
+                        <option value="ml">Mililitre</option>
+                    </select>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-success" onclick="saveIngredientUpdate()">💾 Kaydet</button>
+                        <button class="btn btn-secondary" onclick="closeEditModal()">❌ İptal</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Tarif Ekranı -->

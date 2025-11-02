@@ -190,6 +190,10 @@ function updateManualIngredientsList() {
     container.innerHTML = html;
 }
 
+// Global değişkenler
+let currentEditingIngredient = null;
+
+// Malzemeleri listelerken düzenle butonu ekle
 async function loadMyIngredients() {
     console.log('🔄 Malzemeler yükleniyor...');
 
@@ -222,7 +226,14 @@ async function loadMyIngredients() {
                 <div class="ingredient-item">
                     <span class="ingredient-name">${item.name}</span>
                     <span class="ingredient-amount">${item.miktar} ${item.birim}</span>
-                    <button class="ingredient-remove" onclick="deleteIngredient(${item.id})">Sil</button>
+                    <div class="ingredient-actions">
+                        <button class="btn-edit" onclick="editIngredient(${item.id}, '${item.name}', ${item.miktar}, '${item.birim}')">
+                            ✏️ Düzenle
+                        </button>
+                        <button class="ingredient-remove" onclick="deleteIngredient(${item.id})">
+                            🗑️ Sil
+                        </button>
+                    </div>
                 </div>
             `;
         });
@@ -241,6 +252,75 @@ async function loadMyIngredients() {
         `;
     }
 }
+
+// Malzeme düzenleme modalını aç
+function editIngredient(id, name, miktar, birim) {
+    currentEditingIngredient = id;
+
+    document.getElementById('edit-ingredient-name').value = name;
+    document.getElementById('edit-ingredient-amount').value = miktar;
+    document.getElementById('edit-ingredient-unit').value = birim;
+
+    document.getElementById('edit-ingredient-modal').style.display = 'flex';
+}
+
+// Modal'ı kapat
+function closeEditModal() {
+    document.getElementById('edit-ingredient-modal').style.display = 'none';
+    currentEditingIngredient = null;
+}
+
+// Güncellemeyi kaydet
+async function saveIngredientUpdate() {
+    if (!currentEditingIngredient) return;
+
+    const miktar = parseFloat(document.getElementById('edit-ingredient-amount').value);
+    const birim = document.getElementById('edit-ingredient-unit').value;
+
+    if (!miktar || miktar <= 0) {
+        alert('Lütfen geçerli bir miktar girin');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/malzeme/${currentEditingIngredient}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                miktar: miktar,
+                birim: birim
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ Malzeme güncellendi!');
+            closeEditModal();
+            loadMyIngredients(); // Listeyi yenile
+        } else {
+            alert('❌ Güncelleme başarısız');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Hata: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Modal dışına tıklayınca kapat
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('edit-ingredient-modal');
+    if (e.target === modal) {
+        closeEditModal();
+    }
+});
 
 // Malzemelerimden tarif öner
 function getTarifFromMyIngredients() {
@@ -363,19 +443,20 @@ async function createShoppingList() {
         const data = await response.json();
         console.log('📥 Response data:', data);
 
-        if (data.success) {
-            if (data.eksik_malzemeler.length === 0) {
-                alert('🎉 Harika! Tüm malzemeler evinizde var!');
-            } else {
-                let message = '✅ Alışveriş listesi oluşturuldu!\n\n';
-                message += `📋 Almanız gereken ${data.eksik_malzemeler.length} malzeme:\n\n`;
-                data.eksik_malzemeler.forEach(item => {
-                    message += `• ${item.name} - ${item.miktar} ${item.birim}\n`;
-                });
-                message += `\n💾 Liste ID: ${data.liste_id}`;
-                alert(message);
-            }
+    if (data.success) {
+        if (data.eksik_malzemeler.length === 0) {
+            alert('🎉 Harika! Tüm malzemeler evinizde var!');
         } else {
+            let message = '✅ Alışveriş listesi oluşturuldu!\n\n';
+            message += `📋 ${data.eksik_malzemeler.length} eksik malzeme bulundu.\n\n`;
+            message += 'Alışveriş listelerime gitmek ister misiniz?';
+
+            if (confirm(message)) {
+                loadShoppingLists();
+                showScreen('shopping-lists-screen');
+            }
+        }
+    } else {
             console.error('❌ Backend success:false döndü');
             alert('❌ Alışveriş listesi oluşturulamadı: ' + (data.message || 'Bilinmeyen hata'));
         }
@@ -477,4 +558,254 @@ async function deleteIngredient(ingredientId) {
         showLoading(false);
     }
 }
+
+// Global değişken
+let currentShoppingListId = null;
+
+// Alışveriş listelerini yükle
+async function loadShoppingLists() {
+    console.log('🛒 Alışveriş listeleri yükleniyor...');
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/alisveris/listeler`);
+        const data = await response.json();
+
+        const container = document.getElementById('shopping-lists-container');
+
+        if (!data.listeler || data.listeler.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🛒</div>
+                    <p>Henüz alışveriş listeniz yok</p>
+                    <p style="font-size: 0.9em; color: #718096;">Tarif önerisi alıp liste oluşturun</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        data.listeler.forEach(liste => {
+            const progress = liste.toplam_urun > 0
+                ? (liste.tamamlanan_urun / liste.toplam_urun * 100).toFixed(0)
+                : 0;
+
+            const statusClass = liste.durum === 'tamamlandi' ? 'completed' : '';
+            const statusBadge = liste.durum === 'tamamlandi'
+                ? '<span class="shopping-list-status status-completed">✅ Tamamlandı</span>'
+                : '<span class="shopping-list-status status-active">📝 Aktif</span>';
+
+            const tarih = new Date(liste.olusturma_tarihi).toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            html += `
+                <div class="shopping-list-card ${statusClass}" onclick="loadShoppingDetail(${liste.id})">
+                    <div class="shopping-list-header">
+                        <div>
+                            <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 5px;">
+                                ${liste.notlar || 'Alışveriş Listesi'}
+                            </div>
+                            <div class="shopping-list-date">📅 ${tarih}</div>
+                        </div>
+                        ${statusBadge}
+                    </div>
+
+                    <div class="shopping-list-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="shopping-list-summary">
+                        📦 ${liste.tamamlanan_urun} / ${liste.toplam_urun} ürün alındı
+                        ${progress > 0 ? `(${progress}%)` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Listeler yüklenirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Alışveriş listesi detayını yükle
+async function loadShoppingDetail(listeId) {
+    currentShoppingListId = listeId;
+    console.log(`📋 Liste detayı yükleniyor: ${listeId}`);
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/alisveris/${listeId}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            alert('Liste bulunamadı');
+            return;
+        }
+
+        const liste = data.liste;
+
+        // Header
+        const tarih = new Date(liste.olusturma_tarihi).toLocaleDateString('tr-TR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const headerContainer = document.getElementById('shopping-detail-header');
+        headerContainer.innerHTML = `
+            <div class="detail-header-card">
+                <h3>${liste.notlar || 'Alışveriş Listesi'}</h3>
+                <p style="color: #718096;">📅 ${tarih}</p>
+                <p style="color: #718096;">
+                    Durum: ${liste.durum === 'tamamlandi' ? '✅ Tamamlandı' : '📝 Aktif'}
+                </p>
+            </div>
+        `;
+
+        // Items
+        const itemsContainer = document.getElementById('shopping-detail-items');
+        let itemsHtml = '';
+
+        liste.urunler.forEach(urun => {
+            const checkedClass = urun.alinma_durumu ? 'checked' : '';
+            const checked = urun.alinma_durumu ? 'checked' : '';
+
+            itemsHtml += `
+                <div class="shopping-item ${checkedClass}">
+                    <input
+                        type="checkbox"
+                        class="shopping-checkbox"
+                        ${checked}
+                        onchange="toggleShoppingItem(${urun.id}, this.checked)"
+                    >
+                    <div class="shopping-item-info">
+                        <div class="shopping-item-name">${urun.name}</div>
+                        <div class="shopping-item-amount">${urun.miktar} ${urun.birim}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        itemsContainer.innerHTML = itemsHtml;
+
+        // Tamamla butonu
+        const completeBtn = document.getElementById('complete-list-btn');
+        if (liste.durum === 'tamamlandi') {
+            completeBtn.style.display = 'none';
+        } else {
+            completeBtn.style.display = 'block';
+        }
+
+        showScreen('shopping-detail-screen');
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Liste yüklenirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Alışveriş ürünü durumunu değiştir
+async function toggleShoppingItem(urunId, checked) {
+    try {
+        const response = await fetch(`${API_BASE}/api/alisveris/urun/${urunId}/durum`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                alinma_durumu: checked
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Liste detayını yenile
+            loadShoppingDetail(currentShoppingListId);
+        }
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Durum güncellenemedi');
+    }
+}
+
+// Alışverişi tamamla
+async function completeShoppingList() {
+    if (!currentShoppingListId) return;
+
+    if (!confirm('Bu listeyi tamamlamak istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/alisveris/${currentShoppingListId}/tamamla`, {
+            method: 'PUT'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ Liste tamamlandı!');
+            showScreen('shopping-lists-screen');
+            loadShoppingLists();
+        }
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Liste tamamlanamadı');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Alışveriş listesini sil
+async function deleteShoppingList() {
+    if (!currentShoppingListId) return;
+
+    if (!confirm('Bu listeyi silmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/alisveris/${currentShoppingListId}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ Liste silindi!');
+            showScreen('shopping-lists-screen');
+            loadShoppingLists();
+        }
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Liste silinemedi');
+    } finally {
+        showLoading(false);
+    }
+}
+
 console.log('✅ Tarif-e hazır!');

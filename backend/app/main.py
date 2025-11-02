@@ -401,6 +401,210 @@ async def ayarlar_getir():
     }
 
 
+@app.put("/api/malzeme/{malzeme_id}")
+async def malzeme_guncelle(
+        malzeme_id: int,
+        miktar: float = Body(...),
+        birim: str = Body(...),
+        db: Session = Depends(get_db)
+):
+    """
+    Malzeme miktarını güncelle
+    """
+    from .database import KullaniciMalzeme
+
+    malzeme = db.query(KullaniciMalzeme).filter(
+        KullaniciMalzeme.id == malzeme_id,
+        KullaniciMalzeme.user_id == 1
+    ).first()
+
+    if not malzeme:
+        raise HTTPException(status_code=404, detail="Malzeme bulunamadı")
+
+    malzeme.miktar = miktar
+    malzeme.birim = birim
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Malzeme güncellendi",
+        "malzeme": {
+            "id": malzeme.id,
+            "miktar": malzeme.miktar,
+            "birim": malzeme.birim
+        }
+    }
+
+
+@app.get("/api/alisveris/listeler")
+async def alisveris_listeler(db: Session = Depends(get_db)):
+    """
+    Kullanıcının tüm alışveriş listelerini getir
+    """
+    from .database import AlisverisListesi, AlisverisUrunu, Malzeme
+
+    # Kullanıcının listelerini çek (en yeni önce)
+    listeler = db.query(AlisverisListesi).filter(
+        AlisverisListesi.user_id == 1
+    ).order_by(AlisverisListesi.olusturma_tarihi.desc()).all()
+
+    result = []
+    for liste in listeler:
+        # Liste ürünlerini çek
+        urunler = db.query(AlisverisUrunu).filter(
+            AlisverisUrunu.liste_id == liste.id
+        ).all()
+
+        urun_listesi = []
+        tamamlanan_sayisi = 0
+
+        for urun in urunler:
+            malzeme = db.query(Malzeme).filter(Malzeme.id == urun.malzeme_id).first()
+            if malzeme:
+                urun_listesi.append({
+                    "id": urun.id,
+                    "name": malzeme.name,
+                    "miktar": urun.miktar,
+                    "birim": urun.birim,
+                    "alinma_durumu": urun.alinma_durumu
+                })
+                if urun.alinma_durumu:
+                    tamamlanan_sayisi += 1
+
+        result.append({
+            "id": liste.id,
+            "olusturma_tarihi": liste.olusturma_tarihi.isoformat(),
+            "durum": liste.durum,
+            "notlar": liste.notlar,
+            "toplam_urun": len(urun_listesi),
+            "tamamlanan_urun": tamamlanan_sayisi,
+            "urunler": urun_listesi
+        })
+
+    return {
+        "success": True,
+        "listeler": result
+    }
+
+
+@app.get("/api/alisveris/{liste_id}")
+async def alisveris_detay(liste_id: int, db: Session = Depends(get_db)):
+    """
+    Alışveriş listesi detayı
+    """
+    from .database import AlisverisListesi, AlisverisUrunu, Malzeme
+
+    liste = db.query(AlisverisListesi).filter(
+        AlisverisListesi.id == liste_id,
+        AlisverisListesi.user_id == 1
+    ).first()
+
+    if not liste:
+        raise HTTPException(status_code=404, detail="Liste bulunamadı")
+
+    # Liste ürünlerini çek
+    urunler = db.query(AlisverisUrunu).filter(
+        AlisverisUrunu.liste_id == liste.id
+    ).all()
+
+    urun_listesi = []
+    for urun in urunler:
+        malzeme = db.query(Malzeme).filter(Malzeme.id == urun.malzeme_id).first()
+        if malzeme:
+            urun_listesi.append({
+                "id": urun.id,
+                "name": malzeme.name,
+                "miktar": urun.miktar,
+                "birim": urun.birim,
+                "alinma_durumu": urun.alinma_durumu
+            })
+
+    return {
+        "success": True,
+        "liste": {
+            "id": liste.id,
+            "olusturma_tarihi": liste.olusturma_tarihi.isoformat(),
+            "durum": liste.durum,
+            "notlar": liste.notlar,
+            "urunler": urun_listesi
+        }
+    }
+
+
+@app.put("/api/alisveris/urun/{urun_id}/durum")
+async def alisveris_urun_durum(urun_id: int, alinma_durumu: bool = Body(...), db: Session = Depends(get_db)):
+    """
+    Alışveriş ürünü durumunu güncelle (alındı/alınmadı)
+    """
+    from .database import AlisverisUrunu
+
+    urun = db.query(AlisverisUrunu).filter(
+        AlisverisUrunu.id == urun_id
+    ).first()
+
+    if not urun:
+        raise HTTPException(status_code=404, detail="Ürün bulunamadı")
+
+    urun.alinma_durumu = alinma_durumu
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Durum güncellendi"
+    }
+
+
+@app.put("/api/alisveris/{liste_id}/tamamla")
+async def alisveris_tamamla(liste_id: int, db: Session = Depends(get_db)):
+    """
+    Alışveriş listesini tamamla
+    """
+    from .database import AlisverisListesi
+
+    liste = db.query(AlisverisListesi).filter(
+        AlisverisListesi.id == liste_id,
+        AlisverisListesi.user_id == 1
+    ).first()
+
+    if not liste:
+        raise HTTPException(status_code=404, detail="Liste bulunamadı")
+
+    liste.durum = "tamamlandi"
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Liste tamamlandı"
+    }
+
+
+@app.delete("/api/alisveris/{liste_id}")
+async def alisveris_sil(liste_id: int, db: Session = Depends(get_db)):
+    """
+    Alışveriş listesini sil
+    """
+    from .database import AlisverisListesi, AlisverisUrunu
+
+    liste = db.query(AlisverisListesi).filter(
+        AlisverisListesi.id == liste_id,
+        AlisverisListesi.user_id == 1
+    ).first()
+
+    if not liste:
+        raise HTTPException(status_code=404, detail="Liste bulunamadı")
+
+    # Önce ürünleri sil
+    db.query(AlisverisUrunu).filter(AlisverisUrunu.liste_id == liste_id).delete()
+
+    # Sonra listeyi sil
+    db.delete(liste)
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Liste silindi"
+    }
+
 @app.post("/api/ayarlar")
 async def ayarlar_guncelle(ai_mode: str):
     """Kullanıcı ayarlarını güncelle"""
