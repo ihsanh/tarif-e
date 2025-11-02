@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍳 Tarif-e - Akıllı Mutfak Asistanı</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🍳 Tarif-e</h1>
+            <p class="subtitle">Akıllı Mutfak Asistanı</p>
+        </header>
+
+        <!-- Ana Menü -->
+        <div id="main-menu" class="screen active">
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="showScreen('camera-screen')">
+                    📷 Fotoğraf Çek
+                </button>
+                <button class="btn btn-secondary" onclick="showScreen('manual-screen')">
+                    ✍️ Manuel Ekle
+                </button>
+                <button class="btn btn-tertiary" onclick="showScreen('my-ingredients-screen')">
+                    🗂️ Malzemelerim
+                </button>
+            </div>
+
+            <div class="status-bar">
+                <span id="ai-status">🤖 AI: Aktif</span>
+                <button class="btn-settings" onclick="showScreen('settings-screen')">⚙️</button>
+            </div>
+        </div>
+
+        <!-- Kamera Ekranı -->
+        <div id="camera-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            
+            <div class="camera-container">
+                <input type="file" id="photo-input" accept="image/*" capture="environment" style="display: none;">
+                <button class="btn btn-camera" onclick="document.getElementById('photo-input').click()">
+                    📸 Fotoğraf Çek
+                </button>
+                <div id="photo-preview"></div>
+            </div>
+
+            <div id="detected-ingredients"></div>
+
+            <button id="get-recipe-btn" class="btn btn-success" style="display: none;" onclick="getTarifOnerisi()">
+                🍽️ Tarif Öner
+            </button>
+        </div>
+
+        <!-- Manuel Ekleme Ekranı -->
+        <div id="manual-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            
+            <h2>Malzeme Ekle</h2>
+            
+            <div class="form-group">
+                <input type="text" id="ingredient-name" placeholder="Malzeme adı (örn: domates)" class="input">
+                <input type="number" id="ingredient-amount" placeholder="Miktar" class="input" value="1">
+                <select id="ingredient-unit" class="input">
+                    <option value="adet">Adet</option>
+                    <option value="kg">Kilogram</option>
+                    <option value="gram">Gram</option>
+                    <option value="litre">Litre</option>
+                    <option value="ml">Mililitre</option>
+                </select>
+                <button class="btn btn-primary" onclick="addManualIngredient()">➕ Ekle</button>
+            </div>
+
+            <div id="manual-ingredients-list"></div>
+        </div>
+
+        <!-- Malzemelerim Ekranı -->
+        <div id="my-ingredients-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            
+            <h2>Malzemelerim</h2>
+            <div id="my-ingredients-list" class="ingredients-list"></div>
+            
+            <button class="btn btn-success" onclick="getTarifFromMyIngredients()">
+                🍽️ Bu Malzemelerden Tarif Öner
+            </button>
+        </div>
+
+        <!-- Tarif Ekranı -->
+        <div id="recipe-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            
+            <div id="recipe-content"></div>
+        </div>
+
+        <!-- Ayarlar Ekranı -->
+        <div id="settings-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            
+            <h2>⚙️ Ayarlar</h2>
+            
+            <div class="settings-group">
+                <h3>🤖 AI Kullanım Modu</h3>
+                <select id="ai-mode-select" class="input" onchange="updateAIMode()">
+                    <option value="auto">Otomatik (Her zaman AI)</option>
+                    <option value="manual">Manuel (AI kullanma)</option>
+                    <option value="hybrid">Hibrit (Gerektiğinde)</option>
+                    <option value="off">Kapalı (Sadece offline)</option>
+                </select>
+                <p class="help-text">Otomatik: En hızlı ve kolay, internet gerekli</p>
+            </div>
+
+            <div class="settings-group">
+                <h3>🔒 Gizlilik</h3>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="data-sharing" checked>
+                    Anonim kullanım verisi paylaş (uygulamayı geliştirmek için)
+                </label>
+            </div>
+
+            <div class="settings-group">
+                <h3>ℹ️ Bilgiler</h3>
+                <p>Versiyon: 0.1.0</p>
+                <p>AI Kota: <span id="ai-quota">10</span> / ay (Free tier)</p>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Yükleniyor...</p>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

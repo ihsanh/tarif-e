@@ -1,0 +1,136 @@
+📦 tarif-e/
+│
+├── 📄 README.md                         # Ana dokümantasyon
+├── 📄 PROJE_OZETI.md                    # Bu özet dosya
+├── 📄 .gitignore                        # Git ignore
+├── 🚀 start.sh                          # Başlatma scripti (Linux/Mac)
+│
+├── 📁 backend/                          # Python Backend
+│   ├── 📁 app/
+│   │   ├── 📄 __init__.py
+│   │   ├── 🐍 main.py                  # FastAPI ana uygulama
+│   │   ├── ⚙️  config.py                # Ayarlar
+│   │   ├── 🗄️  database.py              # SQLAlchemy modelleri
+│   │   │
+│   │   ├── 📁 services/
+│   │   │   ├── 📄 __init__.py
+│   │   │   └── 🤖 ai_service.py        # Gemini AI entegrasyonu
+│   │   │
+│   │   ├── 📁 models/                  # (Gelecek: Pydantic modelleri)
+│   │   ├── 📁 routes/                  # (Gelecek: API routes)
+│   │   └── 📁 utils/                   # (Gelecek: Utilities)
+│   │
+│   ├── 📄 requirements.txt              # Python paketleri
+│   ├── 📄 .env.example                  # Örnek environment
+│   └── 📝 .env                          # (Siz oluşturacaksınız)
+│
+├── 📁 frontend/                         # Web Arayüzü
+│   ├── 🌐 index.html                    # Ana sayfa
+│   │
+│   ├── 📁 css/
+│   │   └── 🎨 style.css                 # Tüm stiller
+│   │
+│   ├── 📁 js/
+│   │   └── ⚡ app.js                    # JavaScript logic
+│   │
+│   └── 📁 assets/
+│       └── 📁 images/                   # Görseller için
+│
+├── 📁 data/                             # Veritabanı
+│   └── 🗄️  tarif_e.db                   # (İlk çalıştırmada oluşur)
+│
+├── 📁 docs/                             # Dokümantasyon
+│   └── 📚 KURULUM.md                    # Detaylı kurulum kılavuzu
+│
+└── 📁 tests/                            # Test dosyaları (boş)
+
+
+═══════════════════════════════════════════════════════════
+
+📊 İSTATİSTİKLER
+
+Toplam Dosya:        14
+Python Dosyası:      5 (~800 satır)
+JavaScript:          1 (~350 satır)
+HTML:                1 (~200 satır)
+CSS:                 1 (~400 satır)
+Markdown:            3 (~500 satır)
+Config:              3 (~50 satır)
+─────────────────────────────────────────────────────────
+TOPLAM:              ~2300 satır kod
+
+
+═══════════════════════════════════════════════════════════
+
+🔑 CORE DOSYALAR
+
+1. backend/app/main.py           → FastAPI uygulaması
+2. backend/app/database.py       → Veri modelleri
+3. backend/app/services/ai_service.py → AI entegrasyonu
+4. frontend/index.html           → Kullanıcı arayüzü
+5. frontend/js/app.js            → Frontend logic
+
+
+═══════════════════════════════════════════════════════════
+
+🎯 ÖZELLİKLER
+
+✅ TAMAMLANAN
+├── FastAPI backend
+├── SQLAlchemy ORM
+├── Google Gemini AI
+├── Responsive web UI
+├── Fotoğraf upload
+├── Malzeme tanıma
+├── Tarif önerisi
+├── Ayarlar yönetimi
+└── API dokümantasyonu
+
+📝 GELECEK
+├── User authentication
+├── Fiş okuma (OCR)
+├── Barkod tarama
+├── Fiyat takibi
+├── Menü planlama
+└── Mobil app
+
+
+═══════════════════════════════════════════════════════════
+
+🚀 BAŞLATMA
+
+Linux/Mac:
+  ./start.sh
+
+Windows:
+  cd backend
+  python -m venv venv
+  venv\Scripts\activate
+  pip install -r requirements.txt
+  uvicorn app.main:app --reload
+
+Tarayıcı:
+  http://localhost:8000
+
+Mobil (aynı WiFi):
+  http://[IP]:8000
+
+
+═══════════════════════════════════════════════════════════
+
+📱 KULLANIM AKIŞI
+
+1. Fotoğraf Çek / Manuel Ekle
+   ↓
+2. AI Malzemeleri Tanır
+   ↓
+3. Tarif Öner
+   ↓
+4. Tarifi Görüntüle
+   ↓
+5. Alışveriş Listesi Oluştur
+
+
+═══════════════════════════════════════════════════════════
+
+Made with 💚 using Python + FastAPI + Gemini AI
