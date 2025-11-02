@@ -17,15 +17,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('photo-input').addEventListener('change', handlePhotoSelect);
 });
 
-// Ekran değiştirme
 function showScreen(screenId) {
     // Tüm ekranları gizle
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
     });
-    
+
     // Seçilen ekranı göster
     document.getElementById(screenId).classList.add('active');
+
+    // Malzemelerim ekranına geçildiğinde yeniden yükle
+    if (screenId === 'my-ingredients-screen') {
+        loadMyIngredients();
+    }
 }
 
 // Loading göster/gizle
@@ -186,38 +190,55 @@ function updateManualIngredientsList() {
     container.innerHTML = html;
 }
 
-// Malzemelerimi yükle
 async function loadMyIngredients() {
+    console.log('🔄 Malzemeler yükleniyor...');
+
     try {
         const response = await fetch(`${API_BASE}/api/malzeme/liste`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
-        
+        console.log('✅ Malzemeler:', data);
+
         const container = document.getElementById('my-ingredients-list');
-        
-        if (data.malzemeler.length === 0) {
+
+        if (!data.malzemeler || data.malzemeler.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">🗂️</div>
                     <p>Malzeme listeniz boş</p>
+                    <p style="font-size: 0.9em; color: #718096;">Manuel Ekle'den malzeme ekleyin</p>
                 </div>
             `;
             return;
         }
-        
+
         let html = '';
         data.malzemeler.forEach(item => {
             html += `
                 <div class="ingredient-item">
                     <span class="ingredient-name">${item.name}</span>
                     <span class="ingredient-amount">${item.miktar} ${item.birim}</span>
+                    <button class="ingredient-remove" onclick="deleteIngredient(${item.id})">Sil</button>
                 </div>
             `;
         });
-        
+
         container.innerHTML = html;
-        
+
     } catch (error) {
-        console.error('Error loading ingredients:', error);
+        console.error('❌ Error loading ingredients:', error);
+        const container = document.getElementById('my-ingredients-list');
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
+                <p>Malzemeler yüklenirken hata oluştu</p>
+                <p style="font-size: 0.9em; color: #718096;">${error.message}</p>
+            </div>
+        `;
     }
 }
 
@@ -311,34 +332,57 @@ function displayRecipe(recipe) {
 
 // Alışveriş listesi oluştur
 async function createShoppingList() {
-    if (!currentRecipe) return;
-    
+    if (!currentRecipe) {
+        console.error('❌ currentRecipe yok!');
+        return;
+    }
+
+    console.log('🛒 Alışveriş listesi oluşturuluyor...');
+    console.log('📋 Current recipe:', currentRecipe);
+    console.log('📦 Malzemeler:', currentRecipe.malzemeler);
+
     showLoading(true);
-    
+
     try {
+        const requestBody = {
+            malzemeler: currentRecipe.malzemeler
+        };
+
+        console.log('📤 Gönderilen request:', requestBody);
+
         const response = await fetch(`${API_BASE}/api/alisveris/olustur`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                tarif_ids: [1]  // TODO: Gerçek tarif ID'si
-            })
+            body: JSON.stringify(requestBody)
         });
-        
+
+        console.log('📥 Response status:', response.status);
+
         const data = await response.json();
-        
+        console.log('📥 Response data:', data);
+
         if (data.success) {
-            let message = '✅ Alışveriş listesi oluşturuldu!\n\nEksik malzemeler:\n';
-            data.eksik_malzemeler.forEach(item => {
-                message += `• ${item.name} - ${item.miktar} ${item.birim}\n`;
-            });
-            alert(message);
+            if (data.eksik_malzemeler.length === 0) {
+                alert('🎉 Harika! Tüm malzemeler evinizde var!');
+            } else {
+                let message = '✅ Alışveriş listesi oluşturuldu!\n\n';
+                message += `📋 Almanız gereken ${data.eksik_malzemeler.length} malzeme:\n\n`;
+                data.eksik_malzemeler.forEach(item => {
+                    message += `• ${item.name} - ${item.miktar} ${item.birim}\n`;
+                });
+                message += `\n💾 Liste ID: ${data.liste_id}`;
+                alert(message);
+            }
+        } else {
+            console.error('❌ Backend success:false döndü');
+            alert('❌ Alışveriş listesi oluşturulamadı: ' + (data.message || 'Bilinmeyen hata'));
         }
-        
+
     } catch (error) {
-        console.error('Error:', error);
-        alert('Alışveriş listesi oluşturulamadı');
+        console.error('❌ Catch bloğunda hata:', error);
+        alert('❌ Hata: ' + error.message);
     } finally {
         showLoading(false);
     }
@@ -405,4 +449,32 @@ function formatDate(date) {
     return new Date(date).toLocaleDateString('tr-TR');
 }
 
+// Malzeme silme
+async function deleteIngredient(ingredientId) {
+    if (!confirm('Bu malzemeyi silmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/malzeme/${ingredientId}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Listeyi yenile
+            loadMyIngredients();
+            alert('Malzeme silindi!');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Malzeme silinirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
 console.log('✅ Tarif-e hazır!');
