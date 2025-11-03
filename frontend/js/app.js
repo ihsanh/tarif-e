@@ -1282,7 +1282,7 @@ async function addRecipeToFavorites() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/favori`, {
+        const response = await fetch(`${API_BASE}/api/favoriler/ekle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1317,7 +1317,7 @@ async function loadFavorites() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/favoriler`);
+        const response = await fetch(`${API_BASE}/api/favoriler/liste`);
         const data = await response.json();
 
         const container = document.getElementById('favorites-container');
@@ -1386,7 +1386,7 @@ async function loadFavoriteDetail(favoriId) {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/favoriler`);
+        const response = await fetch(`${API_BASE}/api/favoriler/${favoriId}`);
         const data = await response.json();
 
         if (!data.favoriler) {
@@ -1476,7 +1476,7 @@ async function deleteFavoriteRecipe() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/favori/${currentFavoriteId}`, {
+        const response = await fetch(`${API_BASE}/api/tarif/favoriler/${currentFavoriteId}`, {
             method: 'DELETE'
         });
 
