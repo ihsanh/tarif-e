@@ -4,7 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v5 - Alışveriş listesi oluşturma düzeltme">
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v6 - Favori Tarif Fonksiyonu Eklendi">
+      <change afterPath="$PROJECT_DIR$/backend/TESTING_GUIDE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/alisveris.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/base.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/malzeme.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/tarif.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/routes/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/routes/alisveris.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/routes/health.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/routes/malzeme.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/alisveris.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/malzeme.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/tarif.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/utils/helpers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/utils/validators.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/pytest.ini" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/test_requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/tests/conftest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/tests/test_malzeme.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/tests/test_regression.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/tests/test_tarif.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621167590023040165696964646806.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621171460988896258067876207094.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621172160681102176618794925990.jpg" afterDir="false" />
@@ -12,12 +36,12 @@
       <change afterPath="$PROJECT_DIR$/backend/uploads/20220619_102432.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/atatürk-vektörel-siyah-beyaz-çizim.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/istockphoto-1055675982-170667a.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Tarif-e.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Tarif-e.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,12 +78,49 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.Tarif-e Backend.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/app/models",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\models" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Tarif-e Backend" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Tarif-e" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONPATH" value="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (Tarif-e) (2)" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/app/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.Tarif-e Backend" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -116,7 +177,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762171503088</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="v6 - Favori Tarif Fonksiyonu Eklendi">
+      <option name="closed" value="true" />
+      <created>1762174122114</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1762174122114</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -126,6 +195,18 @@
     <MESSAGE value="v3 - Alışveriş listesi oluşturma" />
     <MESSAGE value="v4 - Alışveriş listesi oluşturma düzeltme" />
     <MESSAGE value="v5 - Alışveriş listesi oluşturma düzeltme" />
-    <option name="LAST_COMMIT_MESSAGE" value="v5 - Alışveriş listesi oluşturma düzeltme" />
+    <MESSAGE value="v6 - Favori Tarif Fonksiyonu Eklendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v6 - Favori Tarif Fonksiyonu Eklendi" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/backend/app/utils/__init__.py</url>
+          <line>3</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
