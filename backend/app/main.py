@@ -1,8 +1,9 @@
 """
-Tarif-e FastAPI Ana Uygulama
+Tarif-e FastAPI Ana Uygulama - Güncellenmiş Versiyon
 """
 import sys
 from pathlib import Path
+import logging # Logging eklendi
 
 # Backend klasörünü Python path'ine ekle
 backend_dir = Path(__file__).parent.parent
@@ -23,8 +24,17 @@ from app.routes import (
     tarif_router,
     alisveris_router
 )
+from app.logger_config import configure_logging
+
+# Loglamayı başlat
+configure_logging()
+
+# Logger kurulumu
+logger = logging.getLogger(__name__) # Uvicorn'un ana logger'ını kullanmak yaygın bir pratik
 
 # Veritabanını başlat
+# Not: init_db fonksiyonu init_db.py veya database.py içinde çağrılmalıdır.
+# Burada Base.metadata.create_all(bind=engine) çağrısı doğru yerdir.
 Base.metadata.create_all(bind=engine)
 
 # FastAPI app
@@ -82,18 +92,20 @@ async def ayarlar_getir():
 @app.on_event("startup")
 async def startup_event():
     """Uygulama başlarken"""
-    print("=" * 50)
-    print(f"🍳 {settings.APP_NAME} başlatılıyor...")
-    print(f"📊 Debug modu: {settings.DEBUG}")
-    print(f"🤖 AI aktif: {settings.AI_MODE != 'off'}")
-    print(f"⚙️  AI modu: {settings.AI_MODE}")
-    print(f"🌐 Server: http://{settings.HOST}:{settings.PORT}")
-    print(f"📚 Docs: http://{settings.HOST}:{settings.PORT}/docs")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info(f"🍳 {settings.APP_NAME} başlatılıyor...")
+    logger.info(f"📊 Debug modu: {settings.DEBUG}")
+    logger.info(f"🤖 AI aktif: {settings.AI_MODE != 'off'}")
+    logger.info(f"⚙️  AI modu: {settings.AI_MODE}")
+    # HOST ve PORT bilgileri uvicorn tarafından zaten loglanacağı için bu bilgiyi DEBUG seviyesine düşürebiliriz
+    logger.debug(f"🌐 Server: http://{settings.HOST}:{settings.PORT}")
+    logger.info(f"📚 Docs: http://{settings.HOST}:{settings.PORT}/docs")
+    logger.info("=" * 50)
 
 
 if __name__ == "__main__":
     import uvicorn
+    # uvicorn.run zaten loglama yaptığı için burada sadece çalıştırma kodunu bıraktık.
     uvicorn.run(
         "app.main:app",
         host=settings.HOST,

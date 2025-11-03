@@ -1,81 +1,88 @@
 """
-Alışveriş Routes
+Alışveriş Routes - Güncellenmiş Versiyon
 """
 from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import AlisverisListesi, AlisverisUrunu, Malzeme, KullaniciMalzeme
 from app.schemas.alisveris import AlisverisOlustur, AlisverisUrunDurum
+import logging
+import traceback
 
+logger = logging.getLogger(__name__)
+
+# Router tanımı
 router = APIRouter(prefix="/api/alisveris", tags=["Alışveriş"])
 
 
 @router.post("/olustur")
 async def alisveris_olustur(request: AlisverisOlustur, db: Session = Depends(get_db)):
     """Tarifteki malzemelerden alışveriş listesi oluştur"""
-    print("=" * 50)
-    print("🛒 Alışveriş listesi oluşturuluyor...")
-    print(f"📦 Gelen malzemeler: {request.malzemeler}")
-    
+    user_id = 1 # Kimlik doğrulama sonrası güncellenecek
+    logger.info(f"Kullanıcı {user_id} için alışveriş listesi oluşturuluyor.")
+    logger.debug(f"Gelen malzemeler: {request.malzemeler}")
+
     try:
         tarif_malzemeleri = request.malzemeler
-        print(f"📋 Tarif malzemeleri sayısı: {len(tarif_malzemeleri)}")
 
         if not tarif_malzemeleri:
-            print("❌ Malzeme listesi boş!")
+            logger.warning("Alışveriş listesi oluşturma: Malzeme listesi boş geldi.")
             raise HTTPException(status_code=400, detail="Malzeme listesi boş")
 
         user_malzemeler = db.query(KullaniciMalzeme).filter(
-            KullaniciMalzeme.user_id == 1
+            KullaniciMalzeme.user_id == user_id
         ).all()
 
         user_malzeme_dict = {}
         for um in user_malzemeler:
             malzeme = db.query(Malzeme).filter(Malzeme.id == um.malzeme_id).first()
             if malzeme:
+                # Malzeme adı veritabanında olduğu gibi (lower() olmadan) kullanılmalıdır
                 user_malzeme_dict[malzeme.name.lower()] = um.miktar
 
-        print(f"🏠 Evdeki malzemeler: {list(user_malzeme_dict.keys())}")
+        logger.info(f"Evdeki {len(user_malzeme_dict)} malzeme kontrol ediliyor.")
 
         eksik_malzemeler = []
 
         for item in tarif_malzemeleri:
-            print(f"   İşleniyor: {item}")
+            # Buradaki veri ayrıştırma mantığı karmaşık ve kırılgan. Daha güvenilir bir
+            # veri yapısı (örn. JSON) tavsiye edilir.
             parts = item.split('-')
             if len(parts) >= 2:
                 malzeme_adi = parts[0].strip().lower()
                 miktar_birim = parts[1].strip()
 
-                miktar_parts = miktar_birim.split()
                 try:
-                    miktar = float(miktar_parts[0]) if miktar_parts else 1
+                    miktar_parts = miktar_birim.split()
+                    miktar = float(miktar_parts[0]) if miktar_parts and miktar_parts[0].replace('.', '', 1).isdigit() else 1
                     birim = miktar_parts[1] if len(miktar_parts) > 1 else "adet"
-                except:
+                except Exception:
                     miktar = 1
                     birim = "adet"
 
+                # Miktar karşılaştırması olmadan sadece evde var mı yok mu kontrolü
                 if malzeme_adi not in user_malzeme_dict:
                     eksik_malzemeler.append({
                         "name": malzeme_adi,
                         "miktar": miktar,
                         "birim": birim
                     })
-                    print(f"      ❌ Eksik: {malzeme_adi}")
+                    logger.debug(f"Eksik malzeme bulundu: {malzeme_adi}")
                 else:
-                    print(f"      ✅ Var: {malzeme_adi}")
+                    logger.debug(f"Evde mevcut: {malzeme_adi}")
 
-        print(f"📝 Toplam eksik malzeme: {len(eksik_malzemeler)}")
+
+        logger.info(f"Toplam {len(eksik_malzemeler)} eksik malzeme tespit edildi.")
 
         alisveris_listesi = AlisverisListesi(
-            user_id=1,
+            user_id=user_id,
             durum="aktif",
             notlar=f"{len(eksik_malzemeler)} eksik malzeme"
         )
         db.add(alisveris_listesi)
-        db.commit()
-        db.refresh(alisveris_listesi)
+        db.flush() # ID almak için commit öncesi flush
 
-        print(f"✅ Liste oluşturuldu, ID: {alisveris_listesi.id}")
+        logger.info(f"Yeni alışveriş listesi oluşturuldu, ID: {alisveris_listesi.id}")
 
         for item in eksik_malzemeler:
             malzeme = db.query(Malzeme).filter(Malzeme.name == item["name"]).first()
@@ -83,8 +90,7 @@ async def alisveris_olustur(request: AlisverisOlustur, db: Session = Depends(get
             if not malzeme:
                 malzeme = Malzeme(name=item["name"], category="genel")
                 db.add(malzeme)
-                db.commit()
-                db.refresh(malzeme)
+                db.flush() # ID almak için commit öncesi flush
 
             alisveris_urunu = AlisverisUrunu(
                 liste_id=alisveris_listesi.id,
@@ -96,9 +102,7 @@ async def alisveris_olustur(request: AlisverisOlustur, db: Session = Depends(get
             db.add(alisveris_urunu)
 
         db.commit()
-
-        print("✅ Alışveriş listesi başarıyla kaydedildi!")
-        print("=" * 50)
+        logger.info("Alışveriş listesi ve ürünleri başarıyla veritabanına kaydedildi.")
 
         return {
             "success": True,
@@ -108,29 +112,28 @@ async def alisveris_olustur(request: AlisverisOlustur, db: Session = Depends(get
         }
 
     except Exception as e:
-        print(f"❌ HATA: {e}")
-        import traceback
-        traceback.print_exc()
-        print("=" * 50)
-        raise HTTPException(status_code=500, detail=str(e))
+        db.rollback()
+        logger.error(f"Alışveriş listesi oluşturulurken kritik hata: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Alışveriş listesi oluşturulurken bir sunucu hatası oluştu.")
 
 
 @router.get("/listeler")
 async def alisveris_listeler(db: Session = Depends(get_db)):
     """Kullanıcının tüm alışveriş listelerini getir"""
+    user_id = 1 # Kimlik doğrulama sonrası güncellenecek
     listeler = db.query(AlisverisListesi).filter(
-        AlisverisListesi.user_id == 1
+        AlisverisListesi.user_id == user_id
     ).order_by(AlisverisListesi.olusturma_tarihi.desc()).all()
-    
+
     result = []
     for liste in listeler:
         urunler = db.query(AlisverisUrunu).filter(
             AlisverisUrunu.liste_id == liste.id
         ).all()
-        
+
         urun_listesi = []
         tamamlanan_sayisi = 0
-        
+
         for urun in urunler:
             malzeme = db.query(Malzeme).filter(Malzeme.id == urun.malzeme_id).first()
             if malzeme:
@@ -143,7 +146,7 @@ async def alisveris_listeler(db: Session = Depends(get_db)):
                 })
                 if urun.alinma_durumu:
                     tamamlanan_sayisi += 1
-        
+
         result.append({
             "id": liste.id,
             "olusturma_tarihi": liste.olusturma_tarihi.isoformat(),
@@ -153,7 +156,7 @@ async def alisveris_listeler(db: Session = Depends(get_db)):
             "tamamlanan_urun": tamamlanan_sayisi,
             "urunler": urun_listesi
         })
-    
+
     return {
         "success": True,
         "listeler": result
@@ -167,14 +170,14 @@ async def alisveris_detay(liste_id: int, db: Session = Depends(get_db)):
         AlisverisListesi.id == liste_id,
         AlisverisListesi.user_id == 1
     ).first()
-    
+
     if not liste:
         raise HTTPException(status_code=404, detail="Liste bulunamadı")
-    
+
     urunler = db.query(AlisverisUrunu).filter(
         AlisverisUrunu.liste_id == liste.id
     ).all()
-    
+
     urun_listesi = []
     for urun in urunler:
         malzeme = db.query(Malzeme).filter(Malzeme.id == urun.malzeme_id).first()
@@ -186,7 +189,7 @@ async def alisveris_detay(liste_id: int, db: Session = Depends(get_db)):
                 "birim": urun.birim,
                 "alinma_durumu": urun.alinma_durumu
             })
-    
+
     return {
         "success": True,
         "liste": {
@@ -212,18 +215,18 @@ async def alisveris_urun_ekle(
         AlisverisListesi.id == liste_id,
         AlisverisListesi.user_id == 1
     ).first()
-    
+
     if not liste:
         raise HTTPException(status_code=404, detail="Liste bulunamadı")
-    
+
     malzeme = db.query(Malzeme).filter(Malzeme.name == malzeme_adi.lower()).first()
-    
+
     if not malzeme:
         malzeme = Malzeme(name=malzeme_adi.lower(), category="genel")
         db.add(malzeme)
         db.commit()
         db.refresh(malzeme)
-    
+
     urun = AlisverisUrunu(
         liste_id=liste_id,
         malzeme_id=malzeme.id,
@@ -233,14 +236,14 @@ async def alisveris_urun_ekle(
     )
     db.add(urun)
     db.commit()
-    
+
     toplam_urun = db.query(AlisverisUrunu).filter(
         AlisverisUrunu.liste_id == liste_id
     ).count()
-    
+
     liste.notlar = f"{toplam_urun} ürün"
     db.commit()
-    
+
     return {
         "success": True,
         "message": "Ürün eklendi"
@@ -255,25 +258,24 @@ async def alisveris_urun_durum(
 ):
     """Alışveriş ürünü durumunu güncelle"""
     alinma_durumu = request.get("alinma_durumu")
-    
-    print("=" * 50)
-    print(f"📦 Ürün durumu güncelleme isteği")
-    print(f"   Ürün ID: {urun_id}")
-    print(f"   Yeni durum: {alinma_durumu}")
-    
+
+    logger.info(f"Ürün durumu güncelleme isteği. Ürün ID: {urun_id}, Yeni durum: {alinma_durumu}")
+
     urun = db.query(AlisverisUrunu).filter(AlisverisUrunu.id == urun_id).first()
-    
+
     if not urun:
-        print(f"❌ Ürün {urun_id} bulunamadı")
-        print("=" * 50)
+        logger.warning(f"Ürün ID {urun_id} bulunamadı.")
         raise HTTPException(status_code=404, detail="Ürün bulunamadı")
-    
-    print(f"   Eski durum: {urun.alinma_durumu}")
-    urun.alinma_durumu = alinma_durumu
-    db.commit()
-    print(f"   ✅ Yeni durum kaydedildi: {urun.alinma_durumu}")
-    print("=" * 50)
-    
+
+    try:
+        urun.alinma_durumu = alinma_durumu
+        db.commit()
+        logger.info(f"Ürün ID {urun_id} durumu başarıyla kaydedildi: {alinma_durumu}")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Ürün durumu güncellenirken hata: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Durum güncellenirken sunucu hatası.")
+
     return {
         "success": True,
         "message": "Durum güncellendi"
@@ -284,27 +286,27 @@ async def alisveris_urun_durum(
 async def alisveris_urun_sil(urun_id: int, db: Session = Depends(get_db)):
     """Alışveriş listesinden ürün sil"""
     urun = db.query(AlisverisUrunu).filter(AlisverisUrunu.id == urun_id).first()
-    
+
     if not urun:
         raise HTTPException(status_code=404, detail="Ürün bulunamadı")
-    
+
     liste_id = urun.liste_id
-    
+
     db.delete(urun)
     db.commit()
-    
+
     toplam_urun = db.query(AlisverisUrunu).filter(
         AlisverisUrunu.liste_id == liste_id
     ).count()
-    
+
     liste = db.query(AlisverisListesi).filter(
         AlisverisListesi.id == liste_id
     ).first()
-    
+
     if liste:
         liste.notlar = f"{toplam_urun} ürün" if toplam_urun > 0 else "Liste boş"
         db.commit()
-    
+
     return {
         "success": True,
         "message": "Ürün silindi"
@@ -318,13 +320,13 @@ async def alisveris_tamamla(liste_id: int, db: Session = Depends(get_db)):
         AlisverisListesi.id == liste_id,
         AlisverisListesi.user_id == 1
     ).first()
-    
+
     if not liste:
         raise HTTPException(status_code=404, detail="Liste bulunamadı")
-    
+
     liste.durum = "tamamlandi"
     db.commit()
-    
+
     return {
         "success": True,
         "message": "Liste tamamlandı"
@@ -338,14 +340,14 @@ async def alisveris_sil(liste_id: int, db: Session = Depends(get_db)):
         AlisverisListesi.id == liste_id,
         AlisverisListesi.user_id == 1
     ).first()
-    
+
     if not liste:
         raise HTTPException(status_code=404, detail="Liste bulunamadı")
-    
+
     db.query(AlisverisUrunu).filter(AlisverisUrunu.liste_id == liste_id).delete()
     db.delete(liste)
     db.commit()
-    
+
     return {
         "success": True,
         "message": "Liste silindi"

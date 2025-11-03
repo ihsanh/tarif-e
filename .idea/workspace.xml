@@ -4,49 +4,35 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v6 - Favori Tarif Fonksiyonu Eklendi">
-      <change afterPath="$PROJECT_DIR$/backend/TESTING_GUIDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/alisveris.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/malzeme.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/tarif.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routes/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routes/alisveris.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routes/health.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routes/malzeme.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/alisveris.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/malzeme.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/tarif.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/utils/helpers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/utils/validators.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/pytest.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/test_requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/tests/conftest.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/tests/test_malzeme.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/tests/test_regression.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/tests/test_tarif.py" afterDir="false" />
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v7 - refactor ve test suite eklemesi">
+      <change afterPath="$PROJECT_DIR$/backend/app/logger_config.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621167590023040165696964646806.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621171460988896258067876207094.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621172160681102176618794925990.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/20220403_124646.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/20220619_102432.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/uploads/atatürk-vektörel-siyah-beyaz-çizim.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/istockphoto-1055675982-170667a.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Tarif-e.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Tarif-e.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/alisveris.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/health.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/health.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/malzeme.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/services/ai_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/ai_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <excluded-from-favorite>
@@ -185,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762174122114</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="v7 - refactor ve test suite eklemesi">
+      <option name="closed" value="true" />
+      <created>1762190432091</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1762190432091</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -196,7 +190,8 @@
     <MESSAGE value="v4 - Alışveriş listesi oluşturma düzeltme" />
     <MESSAGE value="v5 - Alışveriş listesi oluşturma düzeltme" />
     <MESSAGE value="v6 - Favori Tarif Fonksiyonu Eklendi" />
-    <option name="LAST_COMMIT_MESSAGE" value="v6 - Favori Tarif Fonksiyonu Eklendi" />
+    <MESSAGE value="v7 - refactor ve test suite eklemesi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v7 - refactor ve test suite eklemesi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

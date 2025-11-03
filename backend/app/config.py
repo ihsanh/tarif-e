@@ -28,7 +28,8 @@ class Settings(BaseSettings):
     # AI Settings
     AI_MODE: str = "auto"  # auto, manual, hybrid, off
     MAX_FREE_AI_REQUESTS: int = 10
-    
+    LOG_LEVEL: str = "DEBUG"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

@@ -5,6 +5,11 @@ import google.generativeai as genai
 from PIL import Image
 from typing import List, Optional
 from ..config import settings
+import logging # Logging modülü dahil edildi
+import traceback # Hata izini loglamak için eklendi
+
+# Logger nesnesi oluşturma
+logger = logging.getLogger(__name__)
 
 
 class AIService:
@@ -17,10 +22,10 @@ class AIService:
             # Gemini 2.5 Flash - hem görüntü hem metin için en yeni model
             self.model = genai.GenerativeModel('gemini-2.5-flash')
             self.enabled = True
-            print("✅ Gemini AI aktif: gemini-2.5-flash")
+            logger.info("Gemini AI aktif: gemini-2.5-flash") # print yerine logger.info
         else:
             self.enabled = False
-            print("⚠️  Warning: GEMINI_API_KEY not found. AI features disabled.")
+            logger.warning("GEMINI_API_KEY not found. AI features disabled.") # print yerine logger.warning
 
     def malzeme_tani(self, image_path: str) -> List[str]:
         """
@@ -59,23 +64,23 @@ class AIService:
 
             # Response ve parts kontrolü (text'e erişmeden önce)
             if not response:
-                print("⚠️  AI response None")
+                logger.warning("AI response None") # print yerine logger.warning
                 return []
 
             # Parts kontrolü - text property'sine erişmeden
             if not hasattr(response, 'parts') or not response.parts:
-                print("⚠️  AI response parts boş")
+                logger.warning("AI response parts boş") # print yerine logger.warning
                 return []
 
             # Şimdi güvenle text'e erişebiliriz
             try:
                 text = response.text.strip().lower()
             except (IndexError, AttributeError) as e:
-                print(f"⚠️  Response text alınamadı: {e}")
+                logger.warning(f"Response text alınamadı: {e}") # print yerine logger.warning
                 return []
 
             if not text:
-                print("⚠️  AI boş yanıt döndü")
+                logger.warning("AI boş yanıt döndü") # print yerine logger.warning
                 return []
 
             # Eğer "yok", "bulunmamaktadır", "görünmüyor" gibi kelimeler varsa boş döndür
@@ -93,10 +98,10 @@ class AIService:
             ]
 
             if any(keyword in text for keyword in negative_keywords):
-                print(f"⚠️  AI malzeme bulamadı: {text[:100]}")
+                logger.warning(f"AI malzeme bulamadı: {text[:100]}") # print yerine logger.warning
                 return []
 
-            # Satırlara böl ve temizle
+            # Satırlara böl ve temizle... (Değişmedi)
             malzemeler = []
             for line in text.split('\n'):
                 cleaned = line.strip().lower()
@@ -121,16 +126,14 @@ class AIService:
 
             # Boş ise boş liste döndür
             if not malzemeler:
-                print("⚠️  Malzeme listesi boş")
+                logger.warning("Malzeme listesi boş") # print yerine logger.warning
                 return []
 
-            print(f"✅ {len(malzemeler)} malzeme bulundu: {malzemeler}")
+            logger.info(f"{len(malzemeler)} malzeme bulundu: {malzemeler}") # print yerine logger.info
             return malzemeler
 
         except Exception as e:
-            print(f"❌ Error in malzeme_tani: {e}")
-            import traceback
-            traceback.print_exc()
+            logger.error(f"Error in malzeme_tani: {e}\n{traceback.format_exc()}") # print yerine logger.error ve traceback eklendi
             return []
 
     def tarif_oner(self, malzemeler: List[str], preferences: Optional[dict] = None) -> dict:
@@ -195,7 +198,7 @@ class AIService:
             return tarif
 
         except Exception as e:
-            print(f"❌ Error in tarif_oner: {e}")
+            logger.error(f"Error in tarif_oner: {e}\n{traceback.format_exc()}") # print yerine logger.error ve traceback eklendi
             return self._get_fallback_recipe(malzemeler)
 
     def _parse_tarif_response(self, response_text: str) -> dict:
