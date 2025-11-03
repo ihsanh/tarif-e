@@ -17,8 +17,9 @@
         <!-- Ana Menü -->
         <div id="main-menu" class="screen active">
             <div class="button-group">
-                <button class="btn btn-primary" onclick="showScreen('camera-screen')">
-                    📷 Fotoğraf Çek
+                <button class="btn btn-primary" onclick="showScreen('camera-screen')" id="photo-menu-btn">
+                    <span id="photo-icon">📷</span>
+                    <span id="photo-text">Fotoğraf Çek</span>
                 </button>
                 <button class="btn btn-secondary" onclick="showScreen('manual-screen')">
                     ✍️ Manuel Ekle
@@ -44,37 +45,83 @@
             <div id="shopping-lists-container"></div>
         </div>
 
-        <!-- Alışveriş Listesi Detay Ekranı -->
-        <div id="shopping-detail-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('shopping-lists-screen')">← Geri</button>
+<!-- Alışveriş Listesi Detay Ekranı -->
+<div id="shopping-detail-screen" class="screen">
+    <button class="btn-back" onclick="showScreen('shopping-lists-screen')">← Geri</button>
 
-            <div id="shopping-detail-header"></div>
-            <div id="shopping-detail-items"></div>
+    <div id="shopping-detail-header"></div>
+    <div id="shopping-detail-items"></div>
 
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button class="btn btn-success" id="complete-list-btn" onclick="completeShoppingList()">
-                    ✅ Alışverişi Tamamla
-                </button>
-                <button class="btn" style="background: #FC8181; color: white;" onclick="deleteShoppingList()">
-                    🗑️ Listeyi Sil
-                </button>
+    <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn" style="background: #48BB78; color: white;" onclick="showAddItemModal()">
+            ➕ Ürün Ekle
+        </button>
+        <button class="btn btn-success" id="complete-list-btn" onclick="completeShoppingList()">
+            ✅ Alışverişi Tamamla
+        </button>
+        <button class="btn" style="background: #FC8181; color: white;" onclick="deleteShoppingList()">
+            🗑️ Listeyi Sil
+        </button>
+    </div>
+</div>
+
+<!-- Alışveriş Listesine Ürün Ekleme Modal -->
+        <div id="add-item-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Ürün Ekle</h3>
+
+                <div class="form-group">
+                    <label>Malzeme Adı:</label>
+                    <input type="text" id="add-item-name" class="input" placeholder="örn: yumurta">
+
+                    <label>Miktar:</label>
+                    <input type="number" id="add-item-amount" class="input" step="0.1" min="0" value="1">
+
+                    <label>Birim:</label>
+                    <select id="add-item-unit" class="input">
+                        <option value="adet">Adet</option>
+                        <option value="kg">Kilogram</option>
+                        <option value="gram">Gram</option>
+                        <option value="litre">Litre</option>
+                        <option value="ml">Mililitre</option>
+                        <option value="paket">Paket</option>
+                        <option value="kutu">Kutu</option>
+                        <option value="demet">Demet</option>
+                    </select>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-success" onclick="addItemToShoppingList()">💾 Ekle</button>
+                        <button class="btn btn-secondary" onclick="closeAddItemModal()">❌ İptal</button>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Kamera Ekranı -->
+        <!-- Fotoğraf Çek/Yükle Ekranı -->
         <div id="camera-screen" class="screen">
             <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
-            
+
+            <h2 id="camera-screen-title">📷 Fotoğraf Çek</h2>
+
             <div class="camera-container">
-                <input type="file" id="photo-input" accept="image/*" capture="environment" style="display: none;">
-                <button class="btn btn-camera" onclick="document.getElementById('photo-input').click()">
-                    📸 Fotoğraf Çek
-                </button>
-                <div id="photo-preview"></div>
+                <input
+                    type="file"
+                    id="photo-input"
+                    accept="image/*"
+                    capture="environment"
+                    style="display: none;"
+                    onchange="handlePhotoSelect(event)"
+                >
+                <label for="photo-input" class="camera-button" id="camera-label">
+                    <span id="camera-label-icon">📷</span>
+                    <span id="camera-label-text">Fotoğraf Çek</span>
+                </label>
+
+                <div id="photo-preview" class="photo-preview"></div>
+                <div id="detected-ingredients" class="detected-ingredients"></div>
             </div>
 
-            <div id="detected-ingredients"></div>
-
-            <button id="get-recipe-btn" class="btn btn-success" style="display: none;" onclick="getTarifOnerisi()">
+            <button id="get-recipe-btn" class="btn btn-success" onclick="getRecipeFromPhoto()" style="display: none;">
                 🍽️ Tarif Öner
             </button>
         </div>

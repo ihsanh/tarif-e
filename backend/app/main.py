@@ -132,7 +132,7 @@ async def malzeme_tani(file: UploadFile = File(...)):
 @app.post("/api/malzeme/ekle")
 async def malzeme_ekle(malzeme: MalzemeEkle, db: Session = Depends(get_db)):
     """
-    Manuel malzeme ekleme
+    Manuel malzeme ekleme - Varsa miktarı artır
     """
     from .database import Malzeme, KullaniciMalzeme
 
@@ -149,24 +149,38 @@ async def malzeme_ekle(malzeme: MalzemeEkle, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_malzeme)
 
-    # Kullanıcı malzemesini ekle (şimdilik user_id=1 sabit)
-    kullanici_malzeme = KullaniciMalzeme(
-        user_id=1,  # TODO: Gerçek user authentication
-        malzeme_id=db_malzeme.id,
-        miktar=malzeme.miktar,
-        birim=malzeme.birim
-    )
-    db.add(kullanici_malzeme)
+    # Kullanıcının bu malzemesi var mı kontrol et
+    kullanici_malzeme = db.query(KullaniciMalzeme).filter(
+        KullaniciMalzeme.user_id == 1,
+        KullaniciMalzeme.malzeme_id == db_malzeme.id
+    ).first()
+
+    if kullanici_malzeme:
+        # Varsa miktarı artır
+        kullanici_malzeme.miktar += malzeme.miktar
+        message = f"{malzeme.name} miktarı güncellendi ({kullanici_malzeme.miktar} {kullanici_malzeme.birim})"
+    else:
+        # Yoksa yeni ekle
+        kullanici_malzeme = KullaniciMalzeme(
+            user_id=1,
+            malzeme_id=db_malzeme.id,
+            miktar=malzeme.miktar,
+            birim=malzeme.birim
+        )
+        db.add(kullanici_malzeme)
+        message = f"{malzeme.name} eklendi"
+
     db.commit()
+    db.refresh(kullanici_malzeme)
 
     return {
         "success": True,
-        "message": f"{malzeme.name} eklendi",
+        "message": message,
         "malzeme": {
-            "id": db_malzeme.id,
+            "id": kullanici_malzeme.id,
             "name": db_malzeme.name,
-            "miktar": malzeme.miktar,
-            "birim": malzeme.birim
+            "miktar": kullanici_malzeme.miktar,
+            "birim": kullanici_malzeme.birim
         }
     }
 
@@ -532,21 +546,34 @@ async def alisveris_detay(liste_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/api/alisveris/urun/{urun_id}/durum")
-async def alisveris_urun_durum(urun_id: int, alinma_durumu: bool = Body(...), db: Session = Depends(get_db)):
+async def alisveris_urun_durum(urun_id: int, request: dict, db: Session = Depends(get_db)):
     """
     Alışveriş ürünü durumunu güncelle (alındı/alınmadı)
     """
     from .database import AlisverisUrunu
+
+    alinma_durumu = request.get("alinma_durumu")
+
+    print("=" * 50)
+    print(f"📦 Ürün durumu güncelleme isteği")
+    print(f"   Ürün ID: {urun_id}")
+    print(f"   Yeni durum: {alinma_durumu}")
+    print(f"   Request: {request}")
 
     urun = db.query(AlisverisUrunu).filter(
         AlisverisUrunu.id == urun_id
     ).first()
 
     if not urun:
+        print(f"❌ Ürün {urun_id} bulunamadı")
+        print("=" * 50)
         raise HTTPException(status_code=404, detail="Ürün bulunamadı")
 
+    print(f"   Eski durum: {urun.alinma_durumu}")
     urun.alinma_durumu = alinma_durumu
     db.commit()
+    print(f"   ✅ Yeni durum kaydedildi: {urun.alinma_durumu}")
+    print("=" * 50)
 
     return {
         "success": True,
@@ -605,16 +632,113 @@ async def alisveris_sil(liste_id: int, db: Session = Depends(get_db)):
         "message": "Liste silindi"
     }
 
+
+@app.post("/api/alisveris/{liste_id}/urun")
+async def alisveris_urun_ekle(
+        liste_id: int,
+        malzeme_adi: str = Body(...),
+        miktar: float = Body(...),
+        birim: str = Body(...),
+        db: Session = Depends(get_db)
+):
+    """
+    Alışveriş listesine yeni ürün ekle
+    """
+    from .database import AlisverisListesi, AlisverisUrunu, Malzeme
+
+    # Liste var mı kontrol et
+    liste = db.query(AlisverisListesi).filter(
+        AlisverisListesi.id == liste_id,
+        AlisverisListesi.user_id == 1
+    ).first()
+
+    if not liste:
+        raise HTTPException(status_code=404, detail="Liste bulunamadı")
+
+    # Malzeme var mı kontrol et
+    malzeme = db.query(Malzeme).filter(Malzeme.name == malzeme_adi.lower()).first()
+
+    if not malzeme:
+        malzeme = Malzeme(name=malzeme_adi.lower(), category="genel")
+        db.add(malzeme)
+        db.commit()
+        db.refresh(malzeme)
+
+    # Ürünü ekle
+    urun = AlisverisUrunu(
+        liste_id=liste_id,
+        malzeme_id=malzeme.id,
+        miktar=miktar,
+        birim=birim,
+        alinma_durumu=False
+    )
+    db.add(urun)
+    db.commit()
+
+    # Liste notlarını güncelle
+    toplam_urun = db.query(AlisverisUrunu).filter(
+        AlisverisUrunu.liste_id == liste_id
+    ).count()
+
+    liste.notlar = f"{toplam_urun} ürün"
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Ürün eklendi"
+    }
+
+
+@app.delete("/api/alisveris/urun/{urun_id}")
+async def alisveris_urun_sil(urun_id: int, db: Session = Depends(get_db)):
+    """
+    Alışveriş listesinden ürün sil
+    """
+    from .database import AlisverisUrunu, AlisverisListesi
+
+    urun = db.query(AlisverisUrunu).filter(AlisverisUrunu.id == urun_id).first()
+
+    if not urun:
+        raise HTTPException(status_code=404, detail="Ürün bulunamadı")
+
+    liste_id = urun.liste_id
+
+    db.delete(urun)
+    db.commit()
+
+    # Liste notlarını güncelle
+    toplam_urun = db.query(AlisverisUrunu).filter(
+        AlisverisUrunu.liste_id == liste_id
+    ).count()
+
+    liste = db.query(AlisverisListesi).filter(
+        AlisverisListesi.id == liste_id
+    ).first()
+
+    if liste:
+        liste.notlar = f"{toplam_urun} ürün" if toplam_urun > 0 else "Liste boş"
+        db.commit()
+
+    return {
+        "success": True,
+        "message": "Ürün silindi"
+    }
+
+
+class AyarlarGuncelle(BaseModel):
+    ai_mode: str
+
+
 @app.post("/api/ayarlar")
-async def ayarlar_guncelle(ai_mode: str):
+async def ayarlar_guncelle(ayarlar: AyarlarGuncelle):
     """Kullanıcı ayarlarını güncelle"""
-    if ai_mode not in ["auto", "manual", "hybrid", "off"]:
+    if ayarlar.ai_mode not in ["auto", "manual", "hybrid", "off"]:
         raise HTTPException(status_code=400, detail="Geçersiz AI modu")
 
     # TODO: Veritabanına kaydet
     return {
         "success": True,
-        "ai_mode": ai_mode
+        "ai_mode": ayarlar.ai_mode
     }
 
 

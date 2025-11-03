@@ -25,12 +25,6 @@ class AIService:
     def malzeme_tani(self, image_path: str) -> List[str]:
         """
         Fotoğraftan malzemeleri tanı
-
-        Args:
-            image_path: Görüntü dosyasının yolu
-
-        Returns:
-            Tanınan malzemelerin listesi
         """
         if not self.enabled:
             return []
@@ -42,34 +36,101 @@ class AIService:
             # Prompt
             prompt = """
             Bu resimde hangi yiyecek malzemeleri var?
-            
-            Kurallar:
-            - Sadece malzeme isimlerini listele
+
+            ÇOK ÖNEMLİ KURALLAR:
+            - SADECE yiyecek malzemesi varsa listele
+            - Eğer resimde yiyecek malzemesi YOKSA, kesinlikle boş yanıt ver (hiçbir şey yazma)
+            - Açıklama yapma, sadece malzeme isimlerini yaz
             - Her satıra bir malzeme
             - Türkçe isimler kullan
             - Sade isimler (örn: "domates" not "kırmızı domates")
             - Belirsizsen ekleme
-            
-            Format:
+
+            YANIT FORMATI (sadece malzeme isimleri, başka hiçbir şey):
             domates
             biber
             soğan
+
+            Eğer resimde yiyecek malzemesi yoksa hiçbir şey yazma, boş bırak.
             """
 
             # AI'ya sor
             response = self.model.generate_content([prompt, img])
 
-            # Sonucu parse et
-            malzemeler = [
-                line.strip().lower()
-                for line in response.text.strip().split('\n')
-                if line.strip() and not line.startswith('-')
+            # Response ve parts kontrolü (text'e erişmeden önce)
+            if not response:
+                print("⚠️  AI response None")
+                return []
+
+            # Parts kontrolü - text property'sine erişmeden
+            if not hasattr(response, 'parts') or not response.parts:
+                print("⚠️  AI response parts boş")
+                return []
+
+            # Şimdi güvenle text'e erişebiliriz
+            try:
+                text = response.text.strip().lower()
+            except (IndexError, AttributeError) as e:
+                print(f"⚠️  Response text alınamadı: {e}")
+                return []
+
+            if not text:
+                print("⚠️  AI boş yanıt döndü")
+                return []
+
+            # Eğer "yok", "bulunmamaktadır", "görünmüyor" gibi kelimeler varsa boş döndür
+            negative_keywords = [
+                'yok',
+                'bulunmamaktadır',
+                'bulunmuyor',
+                'görünmüyor',
+                'tespit edilemedi',
+                'tanınamadı',
+                'herhangi bir',
+                'hiçbir',
+                'resimde',
+                'fotoğrafta'
             ]
 
+            if any(keyword in text for keyword in negative_keywords):
+                print(f"⚠️  AI malzeme bulamadı: {text[:100]}")
+                return []
+
+            # Satırlara böl ve temizle
+            malzemeler = []
+            for line in text.split('\n'):
+                cleaned = line.strip().lower()
+
+                # Boş satır atla
+                if not cleaned:
+                    continue
+
+                # Çok kısa veya uzun satırları atla
+                if len(cleaned) < 3 or len(cleaned) > 50:
+                    continue
+
+                # Tire, yıldız gibi işaretlerle başlayanları temizle
+                if cleaned.startswith('-'):
+                    cleaned = cleaned[1:].strip()
+                if cleaned.startswith('*'):
+                    cleaned = cleaned[1:].strip()
+
+                # Hala geçerliyse ekle
+                if cleaned and len(cleaned) >= 3:
+                    malzemeler.append(cleaned)
+
+            # Boş ise boş liste döndür
+            if not malzemeler:
+                print("⚠️  Malzeme listesi boş")
+                return []
+
+            print(f"✅ {len(malzemeler)} malzeme bulundu: {malzemeler}")
             return malzemeler
 
         except Exception as e:
             print(f"❌ Error in malzeme_tani: {e}")
+            import traceback
+            traceback.print_exc()
             return []
 
     def tarif_oner(self, malzemeler: List[str], preferences: Optional[dict] = None) -> dict:
