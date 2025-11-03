@@ -194,6 +194,20 @@ def get_db():
         db.close()
 
 
+class FavoriTarif(Base):
+    __tablename__ = "favori_tarifler"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, default=1)
+    baslik = Column(String)
+    aciklama = Column(Text, nullable=True)
+    malzemeler = Column(Text)  # JSON string olarak
+    adimlar = Column(Text)  # JSON string olarak
+    sure = Column(Integer, nullable=True)
+    zorluk = Column(String, nullable=True)
+    kategori = Column(String, nullable=True)
+    eklenme_tarihi = Column(DateTime, default=datetime.utcnow)
+
 # Script olarak çalıştırıldığında
 if __name__ == "__main__":
     init_db()

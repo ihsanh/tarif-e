@@ -387,39 +387,56 @@ function getTarifFromMyIngredients() {
     getTarifOnerisi();
 }
 
-// Tarif önerisi al
 async function getTarifOnerisi() {
-    if (currentIngredients.length === 0) {
-        alert('Lütfen en az bir malzeme ekleyin');
-        return;
-    }
-    
     showLoading(true);
-    
+
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/oner`, {
+        const response = await fetch(`${API_BASE}/api/malzeme/liste`);
+        const data = await response.json();
+
+        if (!data.malzemeler || data.malzemeler.length === 0) {
+            alert('Lütfen önce malzeme ekleyin');
+            showLoading(false);
+            return;
+        }
+
+        // Sadece malzeme isimlerini al
+        const malzemeIsimleri = data.malzemeler.map(m => m.name);
+        currentIngredients = malzemeIsimleri;
+
+        console.log('🍽️ Tarif isteniyor, malzemeler:', malzemeIsimleri);
+
+        // Tarif iste
+        const tarifResponse = await fetch(`${API_BASE}/api/tarif/oner`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                malzemeler: currentIngredients
+                malzemeler: malzemeIsimleri
             })
         });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            currentRecipe = data.tarif;
-            displayRecipe(data.tarif);
+
+        const tarifData = await tarifResponse.json();
+        console.log('📖 Tarif geldi:', tarifData);
+
+        if (tarifData.success && tarifData.tarif) {
+            currentRecipe = tarifData.tarif;
+
+            // Önce ekranı göster, sonra içeriği doldur
             showScreen('recipe-screen');
+
+            // Biraz bekle ki DOM hazır olsun
+            setTimeout(() => {
+                displayRecipe(tarifData.tarif);
+            }, 100);
         } else {
-            alert('Tarif önerisi alınamadı');
+            alert('❌ Tarif önerilemedi');
         }
-        
+
     } catch (error) {
         console.error('Error:', error);
-        alert('Bir hata oluştu: ' + error.message);
+        alert('Tarif önerilirken hata oluştu: ' + error.message);
     } finally {
         showLoading(false);
     }
@@ -468,45 +485,56 @@ async function getRecipeFromPhoto() {
     }
 }
 
-// Tarif göster
+// Tarifi göster
 function displayRecipe(recipe) {
-    const container = document.getElementById('recipe-content');
-    
-    let malzemelerHtml = '';
-    recipe.malzemeler.forEach(m => {
-        malzemelerHtml += `<li>${m}</li>`;
-    });
-    
-    let adimlarHtml = '';
-    recipe.adimlar.forEach((adim, index) => {
-        adimlarHtml += `<li>${adim}</li>`;
-    });
-    
+    console.log('📖 Tarif gösteriliyor:', recipe);
+
+    const container = document.getElementById('recipe-details');
+
+    if (!container) {
+        console.error('❌ recipe-details elementi bulunamadı!');
+        alert('Tarif ekranı yüklenemedi. Sayfayı yenileyin.');
+        return;
+    }
+
+    if (!recipe) {
+        console.error('❌ Recipe objesi boş!');
+        container.innerHTML = '<p>Tarif yüklenemedi</p>';
+        return;
+    }
+
+    // Malzemeler
+    let malzemelerHtml = '<h3>📋 Malzemeler:</h3><ul>';
+    if (recipe.malzemeler && Array.isArray(recipe.malzemeler)) {
+        recipe.malzemeler.forEach(malzeme => {
+            malzemelerHtml += `<li>${malzeme}</li>`;
+        });
+    }
+    malzemelerHtml += '</ul>';
+
+    // Adımlar
+    let adimlarHtml = '<h3>👨‍🍳 Hazırlanışı:</h3><ol>';
+    if (recipe.adimlar && Array.isArray(recipe.adimlar)) {
+        recipe.adimlar.forEach(adim => {
+            adimlarHtml += `<li>${adim}</li>`;
+        });
+    }
+    adimlarHtml += '</ol>';
+
+    // Bilgiler
+    const sure = recipe.sure ? `⏱️ ${recipe.sure} dakika` : '';
+    const zorluk = recipe.zorluk ? `📊 ${recipe.zorluk}` : '';
+
     container.innerHTML = `
-        <h2 class="recipe-title">${recipe.baslik}</h2>
-        
-        <div class="recipe-meta">
-            <span>⏱️ ${recipe.sure} dk</span>
-            <span>📊 ${recipe.zorluk}</span>
-            <span>🍽️ ${recipe.kategori}</span>
-        </div>
-        
-        <p style="margin-bottom: 20px; color: #4A5568;">${recipe.aciklama}</p>
-        
-        <div class="recipe-section">
-            <h3>🥗 Malzemeler</h3>
-            <ul>${malzemelerHtml}</ul>
-        </div>
-        
-        <div class="recipe-section">
-            <h3>👨‍🍳 Yapılışı</h3>
-            <ol>${adimlarHtml}</ol>
-        </div>
-        
-        <div style="margin-top: 30px;">
-            <button class="btn btn-success" onclick="createShoppingList()">
-                🛒 Alışveriş Listesi Oluştur
-            </button>
+        <div class="recipe-card">
+            <h2>${recipe.baslik || 'Tarif'}</h2>
+            <p class="recipe-description">${recipe.aciklama || ''}</p>
+            <div class="recipe-meta">
+                ${sure ? `<span>${sure}</span>` : ''}
+                ${zorluk ? `<span>${zorluk}</span>` : ''}
+            </div>
+            ${malzemelerHtml}
+            ${adimlarHtml}
         </div>
     `;
 }
@@ -1199,5 +1227,275 @@ document.addEventListener('click', (e) => {
         closeAddItemModal();
     }
 });
+
+// Yeni tarif öner (aynı malzemelerle)
+async function getNewRecipe() {
+    if (!currentIngredients || currentIngredients.length === 0) {
+        alert('Malzeme bilgisi bulunamadı');
+        return;
+    }
+
+    if (!confirm('Aynı malzemelerle yeni bir tarif önerilsin mi?')) {
+        return;
+    }
+
+    console.log('🔄 Yeni tarif öneriliyor, malzemeler:', currentIngredients);
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/tarif/oner`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                malzemeler: currentIngredients
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.tarif) {
+            currentRecipe = data.tarif;
+            displayRecipe(data.tarif);
+            alert('✅ Yeni tarif önerildi!');
+        } else {
+            alert('❌ Yeni tarif önerilemedi');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Tarif önerilirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Tarifi favorilere ekle
+async function addRecipeToFavorites() {
+    if (!currentRecipe) {
+        alert('Önce bir tarif seçin');
+        return;
+    }
+
+    console.log('⭐ Tarif favorilere ekleniyor:', currentRecipe);
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/tarif/favori`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tarif: currentRecipe
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('⭐ Tarif favorilere eklendi!');
+        } else {
+            alert('❌ Tarif eklenemedi');
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Tarif eklenirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Global değişken
+let currentFavoriteId = null;
+
+// Favori tarifleri yükle
+async function loadFavorites() {
+    console.log('⭐ Favori tarifler yükleniyor...');
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/tarif/favoriler`);
+        const data = await response.json();
+
+        const container = document.getElementById('favorites-container');
+
+        if (!data.favoriler || data.favoriler.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⭐</div>
+                    <p>Henüz favori tarifiniz yok</p>
+                    <p style="font-size: 0.9em; color: #718096;">
+                        Beğendiğiniz tarifleri favorilere ekleyin
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        data.favoriler.forEach(fav => {
+            const tarih = new Date(fav.eklenme_tarihi).toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const sure = fav.sure ? `⏱️ ${fav.sure} dk` : '';
+            const zorluk = fav.zorluk ? `📊 ${fav.zorluk}` : '';
+            const malzemeSayisi = fav.malzemeler ? `📋 ${fav.malzemeler.length} malzeme` : '';
+
+            html += `
+                <div class="favorite-card" onclick="loadFavoriteDetail(${fav.id})">
+                    <div class="favorite-card-header">
+                        <div style="flex: 1;">
+                            <div class="favorite-card-title">${fav.baslik}</div>
+                            <div class="favorite-card-date">⭐ ${tarih}</div>
+                        </div>
+                    </div>
+
+                    ${fav.aciklama ? `
+                        <div class="favorite-card-description">${fav.aciklama}</div>
+                    ` : ''}
+
+                    <div class="favorite-card-meta">
+                        ${malzemeSayisi ? `<span class="favorite-card-badge">${malzemeSayisi}</span>` : ''}
+                        ${sure ? `<span class="favorite-card-badge">${sure}</span>` : ''}
+                        ${zorluk ? `<span class="favorite-card-badge">${zorluk}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Favoriler yüklenirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Favori tarif detayını göster
+async function loadFavoriteDetail(favoriId) {
+    currentFavoriteId = favoriId;
+    console.log(`📖 Favori tarif detayı yükleniyor: ${favoriId}`);
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/tarif/favoriler`);
+        const data = await response.json();
+
+        if (!data.favoriler) {
+            alert('Tarif bulunamadı');
+            return;
+        }
+
+        const favori = data.favoriler.find(f => f.id === favoriId);
+
+        if (!favori) {
+            alert('Tarif bulunamadı');
+            return;
+        }
+
+        // Tarifi göster
+        const container = document.getElementById('favorite-recipe-details');
+
+        // Malzemeler
+        let malzemelerHtml = '<h3>📋 Malzemeler:</h3><ul>';
+        if (favori.malzemeler && Array.isArray(favori.malzemeler)) {
+            favori.malzemeler.forEach(malzeme => {
+                malzemelerHtml += `<li>${malzeme}</li>`;
+            });
+        }
+        malzemelerHtml += '</ul>';
+
+        // Adımlar
+        let adimlarHtml = '<h3>👨‍🍳 Hazırlanışı:</h3><ol>';
+        if (favori.adimlar && Array.isArray(favori.adimlar)) {
+            favori.adimlar.forEach(adim => {
+                adimlarHtml += `<li>${adim}</li>`;
+            });
+        }
+        adimlarHtml += '</ol>';
+
+        const sure = favori.sure ? `⏱️ ${favori.sure} dakika` : '';
+        const zorluk = favori.zorluk ? `📊 ${favori.zorluk}` : '';
+
+        container.innerHTML = `
+            <div class="recipe-card">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <h2 style="margin: 0;">${favori.baslik}</h2>
+                    <span style="font-size: 1.5em;">⭐</span>
+                </div>
+                ${favori.aciklama ? `<p class="recipe-description">${favori.aciklama}</p>` : ''}
+                <div class="recipe-meta">
+                    ${sure ? `<span>${sure}</span>` : ''}
+                    ${zorluk ? `<span>${zorluk}</span>` : ''}
+                </div>
+                ${malzemelerHtml}
+                ${adimlarHtml}
+            </div>
+        `;
+
+        // currentRecipe'yi set et (alışveriş listesi için)
+        currentRecipe = favori;
+
+        showScreen('favorite-detail-screen');
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Tarif yüklenirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Favoriden alışveriş listesi oluştur
+async function createShoppingListFromFavorite() {
+    if (!currentRecipe) {
+        alert('Tarif bilgisi bulunamadı');
+        return;
+    }
+
+    // Mevcut createShoppingList fonksiyonunu kullan
+    await createShoppingList();
+}
+
+// Favori tarifi sil
+async function deleteFavoriteRecipe() {
+    if (!currentFavoriteId) return;
+
+    if (!confirm('Bu tarifi favorilerden çıkarmak istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetch(`${API_BASE}/api/tarif/favori/${currentFavoriteId}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('✅ Tarif favorilerden çıkarıldı!');
+            showScreen('favorites-screen');
+            loadFavorites();
+        } else {
+            alert('❌ Tarif silinemedi');
+        }
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Tarif silinirken hata oluştu');
+    } finally {
+        showLoading(false);
+    }
+}
 
 console.log('✅ Tarif-e hazır!');

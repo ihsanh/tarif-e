@@ -269,29 +269,6 @@ async def tarif_oner(request: TarifOner):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/tarif/{tarif_id}")
-async def tarif_detay(tarif_id: int, db: Session = Depends(get_db)):
-    """
-    Tarif detayı
-
-    - TODO: Veritabanından tarif getir
-    """
-    # Mock data
-    return {
-        "id": tarif_id,
-        "baslik": "Menemen",
-        "aciklama": "Klasik Türk kahvaltısı",
-        "malzemeler": ["domates", "biber", "soğan", "yumurta"],
-        "adimlar": [
-            "Soğanı kavurun",
-            "Biber ve domatesi ekleyin",
-            "Yumurtaları ekleyin"
-        ],
-        "sure": 15,
-        "zorluk": "kolay"
-    }
-
-
 @app.post("/api/alisveris/olustur")
 async def alisveris_olustur(request: dict, db: Session = Depends(get_db)):
     print("🔥 alışveris YÜKLENDI! 🔥")
@@ -724,6 +701,145 @@ async def alisveris_urun_sil(urun_id: int, db: Session = Depends(get_db)):
         "message": "Ürün silindi"
     }
 
+
+import json
+
+
+class TarifFavori(BaseModel):
+    tarif: dict
+
+
+import json
+from typing import List, Optional
+from pydantic import BaseModel
+
+
+# Pydantic model
+class TarifFavori(BaseModel):
+    tarif: dict
+
+
+# Favorilere ekle
+# ÖNCE spesifik route'lar
+
+# Favorilere ekle
+@app.post("/api/tarif/favori")
+async def tarif_favori_ekle(request: TarifFavori, db: Session = Depends(get_db)):
+    """
+    Tarifi favorilere ekle
+    """
+    from .database import FavoriTarif
+
+    tarif = request.tarif
+
+    print("=" * 50)
+    print("⭐ Favori ekleniyor...")
+    print(f"   Tarif: {tarif.get('baslik')}")
+
+    try:
+        favori = FavoriTarif(
+            user_id=1,
+            baslik=tarif.get('baslik', 'İsimsiz Tarif'),
+            aciklama=tarif.get('aciklama'),
+            malzemeler=json.dumps(tarif.get('malzemeler', []), ensure_ascii=False),
+            adimlar=json.dumps(tarif.get('adimlar', []), ensure_ascii=False),
+            sure=tarif.get('sure'),
+            zorluk=tarif.get('zorluk'),
+            kategori=tarif.get('kategori')
+        )
+
+        db.add(favori)
+        db.commit()
+        db.refresh(favori)
+
+        print(f"✅ Favori eklendi, ID: {favori.id}")
+        print("=" * 50)
+
+        return {
+            "success": True,
+            "message": "Tarif favorilere eklendi",
+            "favori_id": favori.id
+        }
+    except Exception as e:
+        print(f"❌ Hata: {e}")
+        print("=" * 50)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Favorileri listele - ÖNEMLİ: Bu /api/tarif/{tarif_id}'den ÖNCE olmali
+@app.get("/api/tarif/favoriler")
+async def tarif_favoriler(db: Session = Depends(get_db)):
+    """
+    Favori tarifleri listele
+    """
+    from .database import FavoriTarif
+
+    print("=" * 50)
+    print("⭐ Favoriler listeleniyor...")
+
+    try:
+        favoriler = db.query(FavoriTarif).filter(
+            FavoriTarif.user_id == 1
+        ).order_by(FavoriTarif.eklenme_tarihi.desc()).all()
+
+        print(f"   Bulunan favori sayısı: {len(favoriler)}")
+
+        result = []
+        for fav in favoriler:
+            result.append({
+                "id": fav.id,
+                "baslik": fav.baslik,
+                "aciklama": fav.aciklama,
+                "malzemeler": json.loads(fav.malzemeler) if fav.malzemeler else [],
+                "adimlar": json.loads(fav.adimlar) if fav.adimlar else [],
+                "sure": fav.sure,
+                "zorluk": fav.zorluk,
+                "kategori": fav.kategori,
+                "eklenme_tarihi": fav.eklenme_tarihi.isoformat()
+            })
+
+        print(f"✅ {len(result)} favori döndürülüyor")
+        print("=" * 50)
+
+        return {
+            "success": True,
+            "favoriler": result
+        }
+    except Exception as e:
+        print(f"❌ Hata: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 50)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Favoriden sil
+@app.delete("/api/tarif/favori/{favori_id}")
+async def tarif_favori_sil(favori_id: int, db: Session = Depends(get_db)):
+    """
+    Favori tarifi sil
+    """
+    from .database import FavoriTarif
+
+    print(f"🗑️ Favori siliniyor: {favori_id}")
+
+    favori = db.query(FavoriTarif).filter(
+        FavoriTarif.id == favori_id,
+        FavoriTarif.user_id == 1
+    ).first()
+
+    if not favori:
+        raise HTTPException(status_code=404, detail="Favori bulunamadı")
+
+    db.delete(favori)
+    db.commit()
+
+    print(f"✅ Favori silindi")
+
+    return {
+        "success": True,
+        "message": "Favori silindi"
+    }
 
 class AyarlarGuncelle(BaseModel):
     ai_mode: str

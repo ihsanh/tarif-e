@@ -30,6 +30,9 @@
                 <button class="btn" style="background: #F6AD55; color: white;" onclick="loadShoppingLists(); showScreen('shopping-lists-screen');">
                     🛒 Alışveriş Listelerim
                 </button>
+                <button class="btn" style="background: #F59E0B; color: white;" onclick="loadFavorites(); showScreen('favorites-screen');">
+                    ⭐ Favori Tariflerim
+                </button>
             </div>
 
             <div class="status-bar">
@@ -192,8 +195,44 @@
         <!-- Tarif Ekranı -->
         <div id="recipe-screen" class="screen">
             <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
-            
-            <div id="recipe-content"></div>
+
+            <div id="recipe-details"></div>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="getNewRecipe()">
+                    🔄 Yeni Tarif Öner
+                </button>
+                <button class="btn" style="background: #F6AD55; color: white;" onclick="addRecipeToFavorites()">
+                    ⭐ Favorilere Ekle
+                </button>
+                <button class="btn btn-success" onclick="createShoppingList()">
+                    🛒 Alışveriş Listesi Oluştur
+                </button>
+            </div>
+        </div>
+
+        <!-- Favori Tarifler Ekranı -->
+        <div id="favorites-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+
+            <h2>⭐ Favori Tariflerim</h2>
+            <div id="favorites-container"></div>
+        </div>
+
+        <!-- Favori Tarif Detay Ekranı -->
+        <div id="favorite-detail-screen" class="screen">
+            <button class="btn-back" onclick="showScreen('favorites-screen')">← Favorilere Dön</button>
+
+            <div id="favorite-recipe-details"></div>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="createShoppingListFromFavorite()">
+                    🛒 Alışveriş Listesi Oluştur
+                </button>
+                <button class="btn" style="background: #FC8181; color: white;" onclick="deleteFavoriteRecipe()">
+                    🗑️ Favorilerden Çıkar
+                </button>
+            </div>
         </div>
 
         <!-- Ayarlar Ekranı -->

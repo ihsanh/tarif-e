@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v4 - Alışveriş listesi oluşturma düzeltme">
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v5 - Alışveriş listesi oluşturma düzeltme">
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621167590023040165696964646806.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621171460988896258067876207094.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621172160681102176618794925990.jpg" afterDir="false" />
@@ -13,8 +13,8 @@
       <change afterPath="$PROJECT_DIR$/backend/uploads/atatürk-vektörel-siyah-beyaz-çizim.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/istockphoto-1055675982-170667a.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/services/ai_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/ai_service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
@@ -25,6 +25,19 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="REMOTE">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="origin/master" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -95,7 +108,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762115536934</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="v5 - Alışveriş listesi oluşturma düzeltme">
+      <option name="closed" value="true" />
+      <created>1762171503088</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1762171503088</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -104,6 +125,7 @@
     <MESSAGE value="v2" />
     <MESSAGE value="v3 - Alışveriş listesi oluşturma" />
     <MESSAGE value="v4 - Alışveriş listesi oluşturma düzeltme" />
-    <option name="LAST_COMMIT_MESSAGE" value="v4 - Alışveriş listesi oluşturma düzeltme" />
+    <MESSAGE value="v5 - Alışveriş listesi oluşturma düzeltme" />
+    <option name="LAST_COMMIT_MESSAGE" value="v5 - Alışveriş listesi oluşturma düzeltme" />
   </component>
 </project>
