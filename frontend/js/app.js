@@ -1379,7 +1379,6 @@ async function loadFavorites() {
     }
 }
 
-// Favori tarif detayını göster
 async function loadFavoriteDetail(favoriId) {
     currentFavoriteId = favoriId;
     console.log(`📖 Favori tarif detayı yükleniyor: ${favoriId}`);
@@ -1387,19 +1386,30 @@ async function loadFavoriteDetail(favoriId) {
 
     try {
         const response = await fetch(`${API_BASE}/api/favoriler/${favoriId}`);
+
+        // HTTP hata kontrolü
+        if (!response.ok) {
+            console.error(`❌ HTTP Error: ${response.status} ${response.statusText}`);
+            if (response.status === 404) {
+                alert('Tarif bulunamadı');
+            } else if (response.status === 500) {
+                alert('Sunucu hatası oluştu');
+            } else {
+                alert(`Hata: ${response.status}`);
+            }
+            return;
+        }
+
         const data = await response.json();
+        console.log('📦 Backend response:', data);
 
-        if (!data.favoriler) {
+        if (!data || !data.success || !data.favori) {
+            console.error('❌ Geçersiz response:', data);
             alert('Tarif bulunamadı');
             return;
         }
 
-        const favori = data.favoriler.find(f => f.id === favoriId);
-
-        if (!favori) {
-            alert('Tarif bulunamadı');
-            return;
-        }
+        const favori = data.favori;
 
         // Tarifi göster
         const container = document.getElementById('favorite-recipe-details');
@@ -1410,6 +1420,8 @@ async function loadFavoriteDetail(favoriId) {
             favori.malzemeler.forEach(malzeme => {
                 malzemelerHtml += `<li>${malzeme}</li>`;
             });
+        } else {
+            malzemelerHtml += '<li>Malzeme bilgisi yok</li>';
         }
         malzemelerHtml += '</ul>';
 
@@ -1419,6 +1431,8 @@ async function loadFavoriteDetail(favoriId) {
             favori.adimlar.forEach(adim => {
                 adimlarHtml += `<li>${adim}</li>`;
             });
+        } else {
+            adimlarHtml += '<li>Hazırlanış bilgisi yok</li>';
         }
         adimlarHtml += '</ol>';
 
@@ -1428,7 +1442,7 @@ async function loadFavoriteDetail(favoriId) {
         container.innerHTML = `
             <div class="recipe-card">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                    <h2 style="margin: 0;">${favori.baslik}</h2>
+                    <h2 style="margin: 0;">${favori.baslik || 'İsimsiz Tarif'}</h2>
                     <span style="font-size: 1.5em;">⭐</span>
                 </div>
                 ${favori.aciklama ? `<p class="recipe-description">${favori.aciklama}</p>` : ''}
@@ -1445,10 +1459,10 @@ async function loadFavoriteDetail(favoriId) {
         currentRecipe = favori;
 
         showScreen('favorite-detail-screen');
-
     } catch (error) {
-        console.error('❌ Error:', error);
-        alert('Tarif yüklenirken hata oluştu');
+        console.error('❌ Favori detay hatası:', error);
+        console.error('❌ Hata detayı:', error.message);
+        alert('Tarif yüklenirken hata oluştu: ' + error.message);
     } finally {
         showLoading(false);
     }

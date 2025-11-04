@@ -15,7 +15,6 @@ from sqlalchemy.exc import IntegrityError # Spesifik DB hataları için
 
 # Logger nesnesi oluşturma
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 router = APIRouter(prefix="/api/malzeme", tags=["Malzeme"])
 

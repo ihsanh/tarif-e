@@ -106,7 +106,7 @@ class TestBackwardCompatibility:
 
 class TestEdgeCases:
     """Kenar durumlar - Beklenmedik inputlar"""
-    
+
     def test_cok_uzun_malzeme_adi(self, client):
         """Çok uzun malzeme adı"""
         long_name = "a" * 1000
@@ -114,27 +114,49 @@ class TestEdgeCases:
             "/api/malzeme/ekle",
             json={"name": long_name, "miktar": 1, "birim": "adet"}
         )
-        # Başarılı olmalı (database sınırı yoksa)
-        assert response.status_code in [200, 400, 422]
-    
-    
+        # 422 beklenir (max_length=100 validasyonu)
+        assert response.status_code == 422
+
     def test_ozel_karakterler_malzeme_adi(self, client):
         """Özel karakterlerle malzeme adı"""
         response = client.post(
             "/api/malzeme/ekle",
             json={"name": "domates🍅", "miktar": 1, "birim": "adet"}
         )
+        # Emoji'ler geçerli, başarılı olmalı
         assert response.status_code == 200
-    
-    
+
     def test_bos_alisveris_listesi(self, client):
         """Boş malzeme listesiyle alışveriş listesi oluşturma"""
         response = client.post(
             "/api/alisveris/olustur",
             json={"malzemeler": []}
         )
-        # 400 Bad Request beklenir
-        assert response.status_code == 400
+        # 422 Unprocessable Entity beklenir (Pydantic validation)
+        assert response.status_code == 422
+        data = response.json()
+        assert "detail" in data
+
+    def test_negatif_miktar_alisveris(self, client):
+        """Negatif miktarla ürün ekleme"""
+        # Önce bir liste oluştur
+        list_response = client.post(
+            "/api/alisveris/olustur",
+            json={"malzemeler": ["test - 1 adet"]}
+        )
+        liste_id = list_response.json()["liste_id"]
+
+        # Negatif miktar ile ürün eklemeye çalış
+        response = client.post(
+            f"/api/alisveris/{liste_id}/urun",
+            json={
+                "malzeme_adi": "test",
+                "miktar": -5,
+                "birim": "adet"
+            }
+        )
+        # 422 beklenir (gt=0 validasyonu)
+        assert response.status_code == 422
 
 
 class TestPerformance:

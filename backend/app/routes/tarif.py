@@ -14,7 +14,6 @@ from sqlalchemy.exc import IntegrityError # Spesifik DB hataları için
 
 # Logger nesnesi oluşturma
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 router = APIRouter(prefix="/api", tags=["Tarif"])
 
@@ -102,15 +101,15 @@ async def tarif_favori_ekle(request: TarifFavori, db: Session = Depends(get_db))
 @router.get("/favoriler/liste")
 async def tarif_favoriler(db: Session = Depends(get_db)):
     """Favori tarifleri listele"""
-    user_id = 1 # Kimlik doğrulama sonrası güncellenecek
-    logger.info(f"Kullanıcı ID {user_id} için favori liste isteği.")
+    logger.info(f"Favori liste isteği.")
 
     try:
-        favoriler = db.query(FavoriTarif).filter(
-            FavoriTarif.user_id == user_id
-        ).order_by(FavoriTarif.eklenme_tarihi.desc()).all()
+        # GEÇICI: user_id filtresi olmadan
+        favoriler = db.query(FavoriTarif).order_by(
+            FavoriTarif.eklenme_tarihi.desc()
+        ).all()
 
-        logger.info(f"Kullanıcı için {len(favoriler)} adet favori bulundu.")
+        logger.info(f"Toplam {len(favoriler)} adet favori bulundu.")
 
         result = []
         for fav in favoriler:
@@ -118,7 +117,6 @@ async def tarif_favoriler(db: Session = Depends(get_db)):
                 "id": fav.id,
                 "baslik": fav.baslik,
                 "aciklama": fav.aciklama,
-                # JSON alanların okunması
                 "malzemeler": json.loads(fav.malzemeler) if fav.malzemeler else [],
                 "adimlar": json.loads(fav.adimlar) if fav.adimlar else [],
                 "sure": fav.sure,
@@ -136,6 +134,51 @@ async def tarif_favoriler(db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Favori listelenirken hata: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Favori listesi alınırken bir sunucu hatası oluştu.")
+
+
+@router.get("/favoriler/{favori_id}")
+async def tarif_favori_detay(favori_id: int, db: Session = Depends(get_db)):
+    """Favori tarif detayını getir"""
+    logger.info(f"Favori detay isteği: ID {favori_id}")
+
+    try:
+        # GEÇICI: user_id filtresi olmadan
+        favori = db.query(FavoriTarif).filter(
+            FavoriTarif.id == favori_id
+            # KALDIRDIK: FavoriTarif.user_id == user_id
+        ).first()
+
+        if not favori:
+            logger.warning(f"Favori ID {favori_id} veritabanında bulunamadı.")
+            raise HTTPException(status_code=404, detail="Favori bulunamadı")
+
+        # DEBUG: User ID'yi logla
+        logger.info(f"Favori bulundu! ID: {favori.id}, User ID: {favori.user_id}")
+
+        result = {
+            "id": favori.id,
+            "baslik": favori.baslik,
+            "aciklama": favori.aciklama,
+            "malzemeler": json.loads(favori.malzemeler) if favori.malzemeler else [],
+            "adimlar": json.loads(favori.adimlar) if favori.adimlar else [],
+            "sure": favori.sure,
+            "zorluk": favori.zorluk,
+            "kategori": favori.kategori,
+            "eklenme_tarihi": favori.eklenme_tarihi.isoformat()
+        }
+
+        logger.info(f"Favori detayı döndürülüyor: {favori.baslik}")
+
+        return {
+            "success": True,
+            "favori": result
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Favori detay alınırken hata: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Favori detayı alınırken bir sunucu hatası oluştu.")
 
 
 @router.delete("/favoriler/{favori_id}")
@@ -161,3 +204,4 @@ async def tarif_favori_sil(favori_id: int, db: Session = Depends(get_db)):
         "success": True,
         "message": "Favori silindi"
     }
+

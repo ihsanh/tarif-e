@@ -22,12 +22,12 @@ async def alisveris_olustur(request: AlisverisOlustur, db: Session = Depends(get
     logger.info(f"Kullanıcı {user_id} için alışveriş listesi oluşturuluyor.")
     logger.debug(f"Gelen malzemeler: {request.malzemeler}")
 
-    try:
-        tarif_malzemeleri = request.malzemeler
+    tarif_malzemeleri = request.malzemeler
 
-        if not tarif_malzemeleri:
-            logger.warning("Alışveriş listesi oluşturma: Malzeme listesi boş geldi.")
-            raise HTTPException(status_code=400, detail="Malzeme listesi boş")
+    if not tarif_malzemeleri:
+        logger.warning("Alışveriş listesi oluşturma: Malzeme listesi boş geldi.")
+        raise HTTPException(status_code=400, detail="Malzeme listesi boş")
+    try:
 
         user_malzemeler = db.query(KullaniciMalzeme).filter(
             KullaniciMalzeme.user_id == user_id
