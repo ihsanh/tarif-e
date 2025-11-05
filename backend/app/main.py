@@ -3,7 +3,7 @@ Tarif-e FastAPI Ana Uygulama - Güncellenmiş Versiyon
 """
 import sys
 from pathlib import Path
-import logging # Logging eklendi
+import logging
 
 # Backend klasörünü Python path'ine ekle
 backend_dir = Path(__file__).parent.parent
@@ -22,7 +22,8 @@ from app.routes import (
     health_router,
     malzeme_router,
     tarif_router,
-    alisveris_router
+    alisveris_router,
+    auth_router
 )
 from app.logger_config import configure_logging
 
@@ -61,6 +62,7 @@ if frontend_path.exists():
 
 # Routes
 app.include_router(health_router)
+app.include_router(auth_router)
 app.include_router(malzeme_router)
 app.include_router(tarif_router)
 app.include_router(alisveris_router)

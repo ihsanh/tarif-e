@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="app.js güncellendi - favori listeleme hataası gitti">
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="test düzeltmelrei ve favori detay gözlem düzeltmesi">
+      <change afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/routes/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/utils/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/migrate_users.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621167590023040165696964646806.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621171460988896258067876207094.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/17621172160681102176618794925990.jpg" afterDir="false" />
@@ -12,15 +17,13 @@
       <change afterPath="$PROJECT_DIR$/backend/uploads/20220619_102432.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/backend/uploads/istockphoto-1055675982-170667a.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/alisveris.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/alisveris.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/tarif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_regression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,12 +71,15 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/app/models&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/app/routes&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\routes" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\utils" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\schemas" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\models" />
     </key>
   </component>
@@ -196,7 +202,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762200629573</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="test düzeltmelrei ve favori detay gözlem düzeltmesi">
+      <option name="closed" value="true" />
+      <created>1762274611091</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1762274611091</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -210,7 +224,8 @@
     <MESSAGE value="v7 - refactor ve test suite eklemesi" />
     <MESSAGE value="v8 - logger eklendi" />
     <MESSAGE value="app.js güncellendi - favori listeleme hataası gitti" />
-    <option name="LAST_COMMIT_MESSAGE" value="app.js güncellendi - favori listeleme hataası gitti" />
+    <MESSAGE value="test düzeltmelrei ve favori detay gözlem düzeltmesi" />
+    <option name="LAST_COMMIT_MESSAGE" value="test düzeltmelrei ve favori detay gözlem düzeltmesi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -219,6 +234,11 @@
           <url>file://$PROJECT_DIR$/backend/app/utils/__init__.py</url>
           <line>3</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/backend/app/models/__init__.py</url>
+          <line>3</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

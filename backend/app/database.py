@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from app.config import settings
 from app.models import Base
-import logging # Logging eklendi
+import logging
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
