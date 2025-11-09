@@ -27,7 +27,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     """Yeni kullanıcı kaydı"""
     logger.info(f"Kayıt isteği: {user_data.username} ({user_data.email})")
-    
+
     # Email kontrolü
     existing_email = db.query(User).filter(User.email == user_data.email).first()
     if existing_email:
@@ -36,7 +36,7 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Bu email adresi zaten kayıtlı"
         )
-    
+
     # Username kontrolü
     existing_username = db.query(User).filter(User.username == user_data.username.lower()).first()
     if existing_username:
@@ -45,7 +45,7 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Bu kullanıcı adı zaten alınmış"
         )
-    
+
     # Yeni kullanıcı oluştur
     try:
         new_user = User(
@@ -55,26 +55,26 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
             full_name=user_data.full_name,
             is_active=True
         )
-        
+
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
-        
+
         logger.info(f"✅ Yeni kullanıcı oluşturuldu: {new_user.username} (ID: {new_user.id})")
-        
+
         # Token oluştur
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": new_user.id, "username": new_user.username},
+            data={"sub": str(new_user.id), "username": new_user.username},
             expires_delta=access_token_expires
         )
-        
+
         return {
             "access_token": access_token,
             "token_type": "bearer",
             "user": UserResponse.from_orm(new_user)
         }
-        
+
     except Exception as e:
         db.rollback()
         logger.error(f"Kullanıcı oluşturulurken hata: {e}")
@@ -91,12 +91,12 @@ async def login(
 ):
     """Kullanıcı girişi"""
     logger.info(f"Giriş isteği: {form_data.username}")
-    
+
     # Kullanıcıyı bul (username veya email ile)
     user = db.query(User).filter(
         (User.username == form_data.username.lower()) | (User.email == form_data.username)
     ).first()
-    
+
     if not user:
         logger.warning(f"Kullanıcı bulunamadı: {form_data.username}")
         raise HTTPException(
@@ -104,7 +104,7 @@ async def login(
             detail="Kullanıcı adı veya şifre hatalı",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Şifre kontrolü
     if not verify_password(form_data.password, user.hashed_password):
         logger.warning(f"Hatalı şifre denemesi: {form_data.username}")
@@ -113,7 +113,7 @@ async def login(
             detail="Kullanıcı adı veya şifre hatalı",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Aktif kullanıcı kontrolü
     if not user.is_active:
         logger.warning(f"Pasif kullanıcı giriş denemesi: {form_data.username}")
@@ -121,16 +121,16 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Hesabınız aktif değil"
         )
-    
+
     # Token oluştur
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.id, "username": user.username},
+        data={"sub": str(user.id), "username": user.username},
         expires_delta=access_token_expires
     )
-    
+
     logger.info(f"✅ Başarılı giriş: {user.username} (ID: {user.id})")
-    
+
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -141,14 +141,14 @@ async def login(
 @router.get("/me", response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)):
     """Mevcut kullanıcı bilgilerini getir"""
-    logger.info(f"Profil isteği: {current_user.username}")
+    logger.info(f"Profil isteği: {current_user.id}")
     return UserResponse.from_orm(current_user)
 
 
 @router.post("/logout")
 async def logout(current_user: User = Depends(get_current_user)):
     """Kullanıcı çıkışı (frontend'de token silinecek)"""
-    logger.info(f"Çıkış: {current_user.username}")
+    logger.info(f"Çıkış: {current_user.id}")
     return {
         "success": True,
         "message": "Başarıyla çıkış yapıldı"

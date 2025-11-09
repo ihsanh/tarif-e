@@ -1,13 +1,13 @@
 """
-Tarif-e FastAPI Ana Uygulama - Güncellenmiş Versiyon
+Tarif-e FastAPI Ana Uygulama
 """
 import sys
 from pathlib import Path
-import logging
 
 # Backend klasörünü Python path'ine ekle
-backend_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(backend_dir))
+BACKEND_DIR = Path(__file__).parent.parent.resolve()
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -23,19 +23,10 @@ from app.routes import (
     malzeme_router,
     tarif_router,
     alisveris_router,
-    auth_router
+    auth_router  # YENİ
 )
-from app.logger_config import configure_logging
-
-# Loglamayı başlat
-configure_logging()
-
-# Logger kurulumu
-logger = logging.getLogger(__name__) # Uvicorn'un ana logger'ını kullanmak yaygın bir pratik
 
 # Veritabanını başlat
-# Not: init_db fonksiyonu init_db.py veya database.py içinde çağrılmalıdır.
-# Burada Base.metadata.create_all(bind=engine) çağrısı doğru yerdir.
 Base.metadata.create_all(bind=engine)
 
 # FastAPI app
@@ -54,23 +45,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Static files
-frontend_path = Path(__file__).parent.parent.parent / "frontend"
-if frontend_path.exists():
-    app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
+# Frontend path
+frontend_path = BACKEND_DIR.parent / "frontend"
 
-
-# Routes
+# API Routes (önce bunlar)
 app.include_router(health_router)
-app.include_router(auth_router)
+app.include_router(auth_router)  # YENİ - Authentication
 app.include_router(malzeme_router)
 app.include_router(tarif_router)
 app.include_router(alisveris_router)
 
 
-@app.get("/")
-async def ana_sayfa():
+# HTML Pages (API route'larından sonra)
+@app.get("/login.html")
+async def login_page():
+    """Login sayfası"""
+    login_path = frontend_path / "login.html"
+    if login_path.exists():
+        return FileResponse(login_path)
+    return {"error": "Login sayfası bulunamadı", "path": str(login_path)}
+
+
+@app.get("/token_test.html")
+async def token_test_page():
+    """Token test sayfası"""
+    test_path = frontend_path / "token_test.html"
+    if test_path.exists():
+        return FileResponse(test_path)
+    return {"error": "Token test sayfası bulunamadı", "path": str(test_path)}
+
+
+@app.get("/index.html")
+async def index_page():
     """Ana sayfa"""
+    index_path = frontend_path / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    return {"error": "Ana sayfa bulunamadı"}
+
+
+@app.get("/")
+async def root():
+    """Root - Ana sayfaya yönlendir"""
     index_path = frontend_path / "index.html"
     if index_path.exists():
         return FileResponse(index_path)
@@ -79,6 +95,11 @@ async def ana_sayfa():
         "docs": "/docs",
         "health": "/api/health"
     }
+
+
+# Static files (CSS, JS, images) - en sonda
+if frontend_path.exists():
+    app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
 
 
 @app.get("/api/ayarlar")
@@ -94,20 +115,21 @@ async def ayarlar_getir():
 @app.on_event("startup")
 async def startup_event():
     """Uygulama başlarken"""
-    logger.info("=" * 50)
-    logger.info(f"🍳 {settings.APP_NAME} başlatılıyor...")
-    logger.info(f"📊 Debug modu: {settings.DEBUG}")
-    logger.info(f"🤖 AI aktif: {settings.AI_MODE != 'off'}")
-    logger.info(f"⚙️  AI modu: {settings.AI_MODE}")
-    # HOST ve PORT bilgileri uvicorn tarafından zaten loglanacağı için bu bilgiyi DEBUG seviyesine düşürebiliriz
-    logger.debug(f"🌐 Server: http://{settings.HOST}:{settings.PORT}")
-    logger.info(f"📚 Docs: http://{settings.HOST}:{settings.PORT}/docs")
-    logger.info("=" * 50)
+    print("=" * 50)
+    print(f"🍳 {settings.APP_NAME} başlatılıyor...")
+    print(f"📊 Debug modu: {settings.DEBUG}")
+    print(f"🤖 AI aktif: {settings.AI_MODE != 'off'}")
+    print(f"⚙️  AI modu: {settings.AI_MODE}")
+    print(f"🌐 Server: http://{settings.HOST}:{settings.PORT}")
+    print(f"📚 Docs: http://{settings.HOST}:{settings.PORT}/docs")
+    print(f"🔐 Login: http://{settings.HOST}:{settings.PORT}/login.html")
+    print(f"🧪 Token Test: http://{settings.HOST}:{settings.PORT}/token_test.html")
+    print(f"📁 Frontend: {frontend_path}")
+    print("=" * 50)
 
 
 if __name__ == "__main__":
     import uvicorn
-    # uvicorn.run zaten loglama yaptığı için burada sadece çalıştırma kodunu bıraktık.
     uvicorn.run(
         "app.main:app",
         host=settings.HOST,

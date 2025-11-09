@@ -10,7 +10,9 @@ from app.services.ai_service import ai_service
 import json
 import logging
 import traceback
-from sqlalchemy.exc import IntegrityError # Spesifik DB hataları için
+from sqlalchemy.exc import IntegrityError
+from app.utils.auth import get_current_user
+from app.models import User
 
 # Logger nesnesi oluşturma
 logger = logging.getLogger(__name__)
@@ -19,9 +21,10 @@ router = APIRouter(prefix="/api", tags=["Tarif"])
 
 
 @router.post("/tarif/oner")
-async def tarif_oner(request: TarifOner):
+async def tarif_oner(request: TarifOner,current_user: User = Depends(get_current_user)):
     """Malzemelerden tarif öner"""
-    logger.info("Tarif önerme isteği alındı.")
+    logger.info(f"Kullanıcı {current_user.id} önerme isteği alındı.")
+
 
     if not ai_service.enabled:
         logger.warning("AI servisi aktif değil.")
@@ -56,10 +59,10 @@ async def tarif_oner(request: TarifOner):
 
 
 @router.post("/favoriler/ekle")
-async def tarif_favori_ekle(request: TarifFavori, db: Session = Depends(get_db)):
+async def tarif_favori_ekle(request: TarifFavori,current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Tarifi favorilere ekle"""
     tarif = request.tarif
-    user_id = 1 # Kimlik doğrulama sonrası güncellenecek
+    user_id = current_user.id
 
     logger.info(f"Kullanıcı ID {user_id} için favori tarif ekleniyor: {tarif.get('baslik')}")
 
@@ -99,9 +102,11 @@ async def tarif_favori_ekle(request: TarifFavori, db: Session = Depends(get_db))
 
 
 @router.get("/favoriler/liste")
-async def tarif_favoriler(db: Session = Depends(get_db)):
+async def tarif_favoriler(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Favori tarifleri listele"""
-    logger.info(f"Favori liste isteği.")
+    user_id = current_user.id
+
+    logger.info(f"Kullanıcı {user_id} Favori listeleme  isteği")
 
     try:
         # GEÇICI: user_id filtresi olmadan
@@ -137,15 +142,16 @@ async def tarif_favoriler(db: Session = Depends(get_db)):
 
 
 @router.get("/favoriler/{favori_id}")
-async def tarif_favori_detay(favori_id: int, db: Session = Depends(get_db)):
+async def tarif_favori_detay(favori_id: int ,current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Favori tarif detayını getir"""
-    logger.info(f"Favori detay isteği: ID {favori_id}")
+    user_id = current_user.id
+
+    logger.info(f"Kullanıcı {user_id} Favori detay isteği: ID {favori_id}")
 
     try:
         # GEÇICI: user_id filtresi olmadan
         favori = db.query(FavoriTarif).filter(
             FavoriTarif.id == favori_id
-            # KALDIRDIK: FavoriTarif.user_id == user_id
         ).first()
 
         if not favori:
@@ -182,9 +188,9 @@ async def tarif_favori_detay(favori_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/favoriler/{favori_id}")
-async def tarif_favori_sil(favori_id: int, db: Session = Depends(get_db)):
+async def tarif_favori_sil(favori_id: int ,current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Favori tarifi sil"""
-    user_id = 1 # Kimlik doğrulama sonrası güncellenecek
+    user_id = current_user.id
     logger.info(f"Kullanıcı {user_id} için Favori silme isteği: ID {favori_id}")
 
     favori = db.query(FavoriTarif).filter(

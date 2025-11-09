@@ -8,6 +8,8 @@ from app.models import AlisverisListesi, AlisverisUrunu, Malzeme, KullaniciMalze
 from app.schemas.alisveris import AlisverisOlustur, AlisverisUrunDurum
 import logging
 import traceback
+from app.utils.auth import get_current_user
+from app.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +18,9 @@ router = APIRouter(prefix="/api/alisveris", tags=["Alışveriş"])
 
 
 @router.post("/olustur")
-async def alisveris_olustur(request: AlisverisOlustur, db: Session = Depends(get_db)):
+async def alisveris_olustur(request: AlisverisOlustur, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Tarifteki malzemelerden alışveriş listesi oluştur"""
-    user_id = 1 # Kimlik doğrulama sonrası güncellenecek
+    user_id = current_user.id # Kimlik doğrulama sonrası güncellenecek
     logger.info(f"Kullanıcı {user_id} için alışveriş listesi oluşturuluyor.")
     logger.debug(f"Gelen malzemeler: {request.malzemeler}")
 
@@ -118,9 +120,11 @@ async def alisveris_olustur(request: AlisverisOlustur, db: Session = Depends(get
 
 
 @router.get("/listeler")
-async def alisveris_listeler(db: Session = Depends(get_db)):
+async def alisveris_listeler( current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
     """Kullanıcının tüm alışveriş listelerini getir"""
-    user_id = 1 # Kimlik doğrulama sonrası güncellenecek
+    user_id = current_user.id  # Kimlik doğrulama sonrası güncellenecek
+    logger.info(f"Kullanıcı {user_id} için alışveriş listesi oluşturuluyor.")
+
     listeler = db.query(AlisverisListesi).filter(
         AlisverisListesi.user_id == user_id
     ).order_by(AlisverisListesi.olusturma_tarihi.desc()).all()
@@ -164,11 +168,14 @@ async def alisveris_listeler(db: Session = Depends(get_db)):
 
 
 @router.get("/{liste_id}")
-async def alisveris_detay(liste_id: int, db: Session = Depends(get_db)):
+async def alisveris_detay(liste_id: int , current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Alışveriş listesi detayı"""
+    user_id = current_user.id # Kimlik doğrulama sonrası güncellenecek
+    logger.info(f"Kullanıcı {user_id} için alışveriş listesi detayı oluşturuluyor.")
+
     liste = db.query(AlisverisListesi).filter(
         AlisverisListesi.id == liste_id,
-        AlisverisListesi.user_id == 1
+        AlisverisListesi.user_id == user_id
     ).first()
 
     if not liste:
@@ -208,12 +215,16 @@ async def alisveris_urun_ekle(
     malzeme_adi: str = Body(...),
     miktar: float = Body(...),
     birim: str = Body(...),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Alışveriş listesine yeni ürün ekle"""
+    user_id = current_user.id # Kimlik doğrulama sonrası güncellenecek
+    logger.info(f"Kullanıcı {user_id} için alışveriş urun ekleniyor.")
+
     liste = db.query(AlisverisListesi).filter(
         AlisverisListesi.id == liste_id,
-        AlisverisListesi.user_id == 1
+        AlisverisListesi.user_id == user_id
     ).first()
 
     if not liste:
@@ -254,9 +265,13 @@ async def alisveris_urun_ekle(
 async def alisveris_urun_durum(
     urun_id: int,
     request: dict,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Alışveriş ürünü durumunu güncelle"""
+    user_id = current_user.id # Kimlik doğrulama sonrası güncellenecek
+    logger.info(f"Kullanıcı {user_id} için alışveriş durumu alınıyor")
+
     alinma_durumu = request.get("alinma_durumu")
 
     logger.info(f"Ürün durumu güncelleme isteği. Ürün ID: {urun_id}, Yeni durum: {alinma_durumu}")
@@ -283,8 +298,11 @@ async def alisveris_urun_durum(
 
 
 @router.delete("/urun/{urun_id}")
-async def alisveris_urun_sil(urun_id: int, db: Session = Depends(get_db)):
+async def alisveris_urun_sil(urun_id: int , current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Alışveriş listesinden ürün sil"""
+    user_id = current_user.id # Kimlik doğrulama sonrası güncellenecek
+    logger.info(f"Kullanıcı {user_id} için alışveriş urun silme.")
+
     urun = db.query(AlisverisUrunu).filter(AlisverisUrunu.id == urun_id).first()
 
     if not urun:
@@ -314,11 +332,14 @@ async def alisveris_urun_sil(urun_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{liste_id}/tamamla")
-async def alisveris_tamamla(liste_id: int, db: Session = Depends(get_db)):
+async def alisveris_tamamla(liste_id: int , current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Alışveriş listesini tamamla"""
+    user_id = current_user.id
+    logger.info(f"Kullanıcı {user_id} için alışveriş tamamlama.")
+
     liste = db.query(AlisverisListesi).filter(
         AlisverisListesi.id == liste_id,
-        AlisverisListesi.user_id == 1
+        AlisverisListesi.user_id == user_id
     ).first()
 
     if not liste:
@@ -334,11 +355,11 @@ async def alisveris_tamamla(liste_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{liste_id}")
-async def alisveris_sil(liste_id: int, db: Session = Depends(get_db)):
+async def alisveris_sil(liste_id: int , current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Alışveriş listesini sil"""
     liste = db.query(AlisverisListesi).filter(
         AlisverisListesi.id == liste_id,
-        AlisverisListesi.user_id == 1
+        AlisverisListesi.user_id == current_user.id
     ).first()
 
     if not liste:

@@ -11,7 +11,8 @@ import shutil
 from pathlib import Path
 import logging
 import traceback # Hata izini loglamak için eklendi
-from sqlalchemy.exc import IntegrityError # Spesifik DB hataları için
+from app.utils.auth import get_current_user
+from app.models import User
 
 # Logger nesnesi oluşturma
 logger = logging.getLogger(__name__)
@@ -23,9 +24,12 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 
 
 @router.post("/tani")
-async def malzeme_tani(file: UploadFile = File(...)):
+async def malzeme_tani(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
     """Fotoğraftan malzeme tanıma"""
-    logger.info(f"Malzeme tanıma isteği alındı. Dosya: {file.filename}")
+    logger.info(f"Kullanıcı {current_user.id} malzeme tanıma isteği yaptı")
 
     if not ai_service.enabled:
         logger.warning("AI servisi aktif değil. Malzeme tanıma yapılamadı.")
@@ -54,10 +58,10 @@ async def malzeme_tani(file: UploadFile = File(...)):
 
 
 @router.post("/ekle")
-async def malzeme_ekle(malzeme: MalzemeEkle, db: Session = Depends(get_db)):
+async def malzeme_ekle(malzeme: MalzemeEkle,
+    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Manuel malzeme ekleme - Varsa miktarı artır"""
-    user_id = 1 # Kimlik doğrulama sonrası değişecek
-    logger.info(f"Kullanıcı {user_id} için malzeme ekleme/güncelleme isteği: {malzeme.name}")
+    logger.info(f"Kullanıcı {current_user.id} için malzeme ekleme/güncelleme isteği: {malzeme.name}")
 
     try:
         db_malzeme = db.query(Malzeme).filter(Malzeme.name == malzeme.name.lower()).first()
@@ -69,7 +73,7 @@ async def malzeme_ekle(malzeme: MalzemeEkle, db: Session = Depends(get_db)):
             logger.info(f"Yeni genel malzeme eklendi: {db_malzeme.name}")
 
         kullanici_malzeme = db.query(KullaniciMalzeme).filter(
-            KullaniciMalzeme.user_id == user_id,
+            KullaniciMalzeme.user_id == current_user.id,
             KullaniciMalzeme.malzeme_id == db_malzeme.id
         ).first()
 
@@ -79,7 +83,7 @@ async def malzeme_ekle(malzeme: MalzemeEkle, db: Session = Depends(get_db)):
             logger.info(message)
         else:
             kullanici_malzeme = KullaniciMalzeme(
-                user_id=user_id,
+                user_id=current_user.id,
                 malzeme_id=db_malzeme.id,
                 miktar=malzeme.miktar,
                 birim=malzeme.birim
@@ -109,9 +113,9 @@ async def malzeme_ekle(malzeme: MalzemeEkle, db: Session = Depends(get_db)):
 
 
 @router.get("/liste")
-async def malzeme_liste(db: Session = Depends(get_db)):
+async def malzeme_liste(current_user: User = Depends(get_current_user),db: Session = Depends(get_db)):
     """Kullanıcının malzeme listesi"""
-    user_id = 1 # Kimlik doğrulama sonrası değişecek
+    user_id = current_user.id
     logger.info(f"Kullanıcı {user_id} için malzeme listesi isteği.")
 
     try:
@@ -143,10 +147,11 @@ async def malzeme_liste(db: Session = Depends(get_db)):
 async def malzeme_guncelle(
     malzeme_id: int,
     guncelleme: MalzemeGuncelle,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Malzeme miktarını güncelle"""
-    user_id = 1 # Kimlik doğrulama sonrası değişecek
+    user_id = current_user.id
     logger.info(f"Kullanıcı {user_id} için malzeme ID {malzeme_id} güncelleme isteği.")
 
     malzeme = db.query(KullaniciMalzeme).filter(
@@ -181,9 +186,9 @@ async def malzeme_guncelle(
 
 
 @router.delete("/{malzeme_id}")
-async def malzeme_sil(malzeme_id: int, db: Session = Depends(get_db)):
+async def malzeme_sil(malzeme_id: int,current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Malzeme sil"""
-    user_id = 1 # Kimlik doğrulama sonrası değişecek
+    user_id = current_user.id
     logger.info(f"Kullanıcı {user_id} için malzeme silme isteği: ID {malzeme_id}")
 
     malzeme = db.query(KullaniciMalzeme).filter(

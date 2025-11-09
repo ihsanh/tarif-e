@@ -1,5 +1,25 @@
 // Tarif-e JavaScript
 
+// SAYFA YÜKLENİRKEN HEMEN KONTROL ET
+(function() {
+    const token = localStorage.getItem('access_token');
+    const path = window.location.pathname;
+
+    console.log('🔍 İlk kontrol - Path:', path, 'Token:', token ? 'VAR' : 'YOK');
+
+    // Login sayfasında app.js çalışmasın
+    if (path.includes('login.html')) {
+        console.log('🔓 Login sayfası, app.js iptal edildi');
+        return;
+    }
+
+    // Token yoksa login'e git
+    if (!token) {
+        console.log('❌ Token yok, login\'e gidiyor...');
+        window.location.href = '/login.html';
+    }
+})();
+
 // API Base URL
 const API_BASE = window.location.origin;
 
@@ -7,53 +27,188 @@ const API_BASE = window.location.origin;
 let currentIngredients = [];
 let currentRecipe = null;
 
+// ============================================
+// AUTH & TOKEN MANAGEMENT
+// ============================================
+
+// Token helper
+function getToken() {
+    return localStorage.getItem('access_token');
+}
+
+// Fetch with authentication
+async function fetchWithAuth(url, options = {}) {
+    const token = getToken();
+
+    if (!token) {
+        console.error('❌ Token yok!');
+        window.location.href = '/login.html';
+        throw new Error('No token');
+    }
+
+    // Headers ekle
+    options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+
+    const response = await fetch(url, options);
+
+    // 401 Unauthorized - Token geçersiz veya süresi dolmuş
+    if (response.status === 401) {
+        console.error('❌ Token geçersiz, logout yapılıyor...');
+        handleLogout(false); // confirm olmadan direkt logout
+        throw new Error('Unauthorized');
+    }
+
+    return response;
+}
+
+// Logout fonksiyonu
+window.handleLogout = async function handleLogout(confirm = true) {
+    if (confirm) {
+        const confirmLogout = window.confirm('Çıkış yapmak istediğinize emin misiniz?');
+        if (!confirmLogout) return;
+    }
+
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.style.display = 'flex';
+
+    try {
+        // Backend'e logout isteği (opsiyonel)
+        const token = getToken();
+        if (token) {
+            await fetchWithAuth(`${API_BASE}/api/auth/logout`, {
+                method: 'POST'
+            }).catch(() => {}); // Hata olsa da devam et
+        }
+    } finally {
+        // Token'ları temizle
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+
+        console.log('👋 Logout başarılı');
+
+        // Login sayfasına yönlendir
+        window.location.href = '/login.html';
+    }
+}
+
+// Kullanıcı bilgisini göster
+function displayUserInfo() {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return;
+
+    try {
+        const user = JSON.parse(userStr);
+        console.log('👤 Giriş yapannnnnn:', user.username, '(' + user.email + ')');
+
+        // UI'da göster (element varsa)
+        const userDisplay = document.getElementById('user-display');
+        if (userDisplay) {
+            userDisplay.textContent = `Merhaba, ${user.username}!`;
+        }
+    } catch (e) {
+        console.error('User parse error:', e);
+    }
+}
+
+// ============================================
+// APP INITIALIZATION
+// ============================================
+
 // Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🍳 Tarif-e başlatılıyor...');
-    loadMyIngredients();
-    updatePhotoUIForDevice();
-    loadSettings();
-    
-    // Fotoğraf seçildiğinde
-    document.getElementById('photo-input').addEventListener('change', handlePhotoSelect);
+    const currentPath = window.location.pathname;
+
+    console.log('📍 Sayfaaaaaaa:', currentPath);
+
+    // Login sayfasındaysa app.js'i yükleme
+    if (currentPath.includes('login.html')) {
+        console.log('🔓 Login sayfası, app.js atlandı');
+        return;
+    }
+
+    // Token kontrolü - küçük gecikme ile
+    setTimeout(() => {
+        const token = getToken();
+
+        console.log('🔐 Token kontrolü:', token ? 'Var ✅' : 'Yok ❌');
+
+        if (!token) {
+            console.log('❌ Token yok, login\'e yönlendiriliyor...');
+            window.location.href = '/login.html';
+            return;
+        }
+
+        // Token OK, app başlat
+        console.log('✅ Auth OK, sayfa yükleniyor...');
+        console.log('🍳 Tarif-e başlatılıyor...!!!!!!!!!');
+
+        // Kullanıcı bilgisini göster
+        displayUserInfo();
+
+        // Diğer başlangıç işlemleri
+        loadMyIngredients();
+        updatePhotoUIForDevice();
+        loadSettings();
+
+        // Fotoğraf seçildiğinde
+        const photoInput = document.getElementById('photo-input');
+        if (photoInput) {
+            photoInput.addEventListener('change', handlePhotoSelect);
+        }
+    }, 100); // 100ms gecikme - localStorage'ın flush olmasını bekle
 });
 
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
 function showScreen(screenId) {
-    // Tüm ekranları gizle
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
     });
 
-    // Seçilen ekranı göster
     document.getElementById(screenId).classList.add('active');
 
-    // Malzemelerim ekranına geçildiğinde yeniden yükle
     if (screenId === 'my-ingredients-screen') {
         loadMyIngredients();
     }
 }
 
-// Loading göster/gizle
 function showLoading(show = true) {
-    document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+        loadingEl.style.display = show ? 'flex' : 'none';
+    }
 }
 
-// Fotoğraf seçildiğinde
+// ============================================
+// PHOTO HANDLING
+// ============================================
+
 async function handlePhotoSelect(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     // Önizleme göster
     const reader = new FileReader();
     reader.onload = (e) => {
         const preview = document.getElementById('photo-preview');
-        preview.innerHTML = `<img src="${e.target.result}" alt="Seçilen fotoğraf">`;
+        if (preview) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Seçilen fotoğraf">`;
+        }
     };
     reader.readAsDataURL(file);
-    
+
     // Butonu gizle ve önceki sonuçları temizle
-    document.getElementById('get-recipe-btn').style.display = 'none';
-    document.getElementById('detected-ingredients').innerHTML = '';
+    const getRecipeBtn = document.getElementById('get-recipe-btn');
+    if (getRecipeBtn) getRecipeBtn.style.display = 'none';
+
+    const detectedIngredients = document.getElementById('detected-ingredients');
+    if (detectedIngredients) detectedIngredients.innerHTML = '';
+
     currentIngredients = [];
 
     // AI ile malzeme tanıma
@@ -63,7 +218,7 @@ async function handlePhotoSelect(event) {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch(`${API_BASE}/api/malzeme/tani`, {
+        const response = await fetchWithAuth(`${API_BASE}/api/malzeme/tani`, {
             method: 'POST',
             body: formData
         });
@@ -73,50 +228,40 @@ async function handlePhotoSelect(event) {
         }
 
         const data = await response.json();
+        console.log('🔍 AI Yanıtı:', data);
 
-        console.log('🔍 API Yanıtı:', data);
-
-        // Malzemeleri filtrele - "yok", "bulunmamaktadır" gibi kelimeler içeren cümleleri temizle
+        // Malzemeleri filtrele
         let malzemeler = [];
         if (data.malzemeler && Array.isArray(data.malzemeler)) {
             malzemeler = data.malzemeler.filter(item => {
                 const lowerItem = item.toLowerCase();
-                // Negatif kelimeler içeriyorsa atla
                 const negativeKeywords = [
                     'yok', 'bulunmamaktadır', 'bulunmuyor', 'görünmüyor',
                     'tespit edilemedi', 'tanınamadı', 'herhangi bir', 'hiçbir',
                     'resimde', 'fotoğrafta'
                 ];
-
-                const isNegative = negativeKeywords.some(keyword => lowerItem.includes(keyword));
-                const isTooShort = item.length < 3;
-
-                return !isNegative && !isTooShort;
+                return !negativeKeywords.some(keyword => lowerItem.includes(keyword));
             });
         }
 
-        console.log('📦 Filtrelenmiş malzemeler:', malzemeler);
-        console.log('🔢 Malzeme sayısı:', malzemeler.length);
-
         if (malzemeler.length > 0) {
-            console.log('✅ Malzeme bulundu');
             currentIngredients = malzemeler;
             displayDetectedIngredients(malzemeler);
+            if (getRecipeBtn) getRecipeBtn.style.display = 'block';
         } else {
-            console.log('❌ Malzeme bulunamadı');
-            currentIngredients = [];
-            displayDetectedIngredients([]);
+            alert('❌ Fotoğrafta malzeme tespit edilemedi. Lütfen daha net bir fotoğraf çekin.');
         }
 
     } catch (error) {
         console.error('❌ Error:', error);
-        alert('Bir hata oluştu: ' + error.message);
-        currentIngredients = [];
-        displayDetectedIngredients([]);
+        if (error.message !== 'Unauthorized') {
+            alert('Malzeme tanıma sırasında hata oluştu: ' + error.message);
+        }
     } finally {
         showLoading(false);
     }
 }
+
 
 // Tanınan malzemeleri göster
 function displayDetectedIngredients(ingredients) {
@@ -168,7 +313,7 @@ function displayDetectedIngredients(ingredients) {
 function removeIngredient(index) {
     currentIngredients.splice(index, 1);
     displayDetectedIngredients(currentIngredients);
-    
+
     if (currentIngredients.length === 0) {
         document.getElementById('get-recipe-btn').style.display = 'none';
     }
@@ -179,19 +324,21 @@ async function addManualIngredient() {
     const name = document.getElementById('ingredient-name').value.trim();
     const amount = parseFloat(document.getElementById('ingredient-amount').value);
     const unit = document.getElementById('ingredient-unit').value;
-    
+
     if (!name) {
         alert('Lütfen malzeme adı girin');
         return;
     }
-    
+
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/malzeme/ekle`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/malzeme/ekle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+
             },
             body: JSON.stringify({ name, miktar: amount, birim: unit })
         });
@@ -221,7 +368,7 @@ async function addManualIngredient() {
 // Manuel malzeme listesini güncelle
 function updateManualIngredientsList() {
     const container = document.getElementById('manual-ingredients-list');
-    
+
     if (currentIngredients.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -231,9 +378,9 @@ function updateManualIngredientsList() {
         `;
         return;
     }
-    
+
     let html = '<h3>📋 Eklenen Malzemeler:</h3>';
-    
+
     currentIngredients.forEach((ingredient, index) => {
         html += `
             <div class="ingredient-item">
@@ -242,9 +389,9 @@ function updateManualIngredientsList() {
             </div>
         `;
     });
-    
+
     html += '<button class="btn btn-success" style="margin-top: 20px;" onclick="getTarifOnerisi()">🍽️ Tarif Öner</button>';
-    
+
     container.innerHTML = html;
 }
 
@@ -256,7 +403,12 @@ async function loadMyIngredients() {
     console.log('🔄 Malzemeler yükleniyor...');
 
     try {
-        const response = await fetch(`${API_BASE}/api/malzeme/liste`);
+
+        const response = await fetchWithAuth(`${API_BASE}/api/malzeme/liste`, {
+            headers: {
+
+            }
+        });
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -343,10 +495,12 @@ async function saveIngredientUpdate() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/malzeme/${currentEditingIngredient}`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/malzeme/${currentEditingIngredient}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+
             },
             body: JSON.stringify({
                 miktar: miktar,
@@ -391,7 +545,12 @@ async function getTarifOnerisi() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/malzeme/liste`);
+
+        const response = await fetchWithAuth(`${API_BASE}/api/malzeme/liste`, {
+            headers: {
+
+            }
+        });
         const data = await response.json();
 
         if (!data.malzemeler || data.malzemeler.length === 0) {
@@ -407,7 +566,8 @@ async function getTarifOnerisi() {
         console.log('🍽️ Tarif isteniyor, malzemeler:', malzemeIsimleri);
 
         // Tarif iste
-        const tarifResponse = await fetch(`${API_BASE}/api/tarif/oner`, {
+
+        const tarifResponse = await fetchWithAuth(`${API_BASE}/api/tarif/oner`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -453,7 +613,8 @@ async function getRecipeFromPhoto() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/oner`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/tarif/oner`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -559,10 +720,11 @@ async function createShoppingList() {
 
         console.log('📤 Gönderilen request:', requestBody);
 
-        const response = await fetch(`${API_BASE}/api/alisveris/olustur`, {
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/olustur`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+
             },
             body: JSON.stringify(requestBody)
         });
@@ -601,14 +763,15 @@ async function createShoppingList() {
 // Ayarları yükle
 async function loadSettings() {
     try {
-        const response = await fetch(`${API_BASE}/api/ayarlar`);
+
+        const response = await fetchWithAuth(`${API_BASE}/api/ayarlar`);
         const data = await response.json();
-        
+
         document.getElementById('ai-mode-select').value = data.ai_mode;
         document.getElementById('ai-quota').textContent = data.ai_quota;
-        
+
         updateAIStatusDisplay(data.ai_mode);
-        
+
     } catch (error) {
         console.error('Error loading settings:', error);
     }
@@ -617,11 +780,12 @@ async function loadSettings() {
 // AI modunu güncelle
 async function updateAIMode() {
     const mode = document.getElementById('ai-mode-select').value;
-    
+
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/ayarlar`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/ayarlar`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -649,14 +813,14 @@ async function updateAIMode() {
 // AI durum göstergesini güncelle
 function updateAIStatusDisplay(mode) {
     const statusElement = document.getElementById('ai-status');
-    
+
     const modeTexts = {
         'auto': '🤖 AI: Aktif',
         'manual': '✍️ AI: Manuel',
         'hybrid': '⚙️ AI: Hibrit',
         'off': '🚫 AI: Kapalı'
     };
-    
+
     statusElement.textContent = modeTexts[mode] || '🤖 AI: Aktif';
 }
 
@@ -674,8 +838,12 @@ async function deleteIngredient(ingredientId) {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/malzeme/${ingredientId}`, {
-            method: 'DELETE'
+
+        const response = await fetchWithAuth(`${API_BASE}/api/malzeme/${ingredientId}`, {
+            method: 'DELETE',
+            headers: {
+
+            }
         });
 
         const data = await response.json();
@@ -703,7 +871,12 @@ async function loadShoppingLists() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/alisveris/listeler`);
+
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/listeler`, {
+            headers: {
+
+            }
+        });
         const data = await response.json();
 
         const container = document.getElementById('shopping-lists-container');
@@ -781,7 +954,12 @@ async function loadShoppingDetail(listeId) {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/alisveris/${listeId}`);
+
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/${listeId}`, {
+            headers: {
+
+            }
+        });
         const data = await response.json();
 
         if (!data.success) {
@@ -915,7 +1093,8 @@ async function toggleShoppingItem(urunId, checked) {
     console.log(`   Yeni durum: ${checked}`);
 
     try {
-        const response = await fetch(`${API_BASE}/api/alisveris/urun/${urunId}/durum`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/urun/${urunId}/durum`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -948,7 +1127,12 @@ async function toggleShoppingItem(urunId, checked) {
 }
 
 async function updateShoppingListHeader(listeId) {
-    const response = await fetch(`${API_BASE}/api/alisveris/${listeId}`);
+
+    const response = await fetchWithAuth(`${API_BASE}/api/alisveris/${listeId}`, {
+        headers: {
+             // YENİ
+        }
+    });
     const data = await response.json();
 
     if (data.success) {
@@ -1004,8 +1188,12 @@ async function completeShoppingList() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/alisveris/${currentShoppingListId}/tamamla`, {
-            method: 'PUT'
+
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/${currentShoppingListId}/tamamla`, {
+            method: 'PUT',
+            headers: {
+
+            }
         });
 
         const data = await response.json();
@@ -1035,8 +1223,12 @@ async function deleteShoppingList() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/alisveris/${currentShoppingListId}`, {
-            method: 'DELETE'
+
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/${currentShoppingListId}`, {
+            method: 'DELETE',
+            headers: {
+
+            }
         });
 
         const data = await response.json();
@@ -1155,7 +1347,8 @@ async function addItemToShoppingList() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/alisveris/${currentShoppingListId}/urun`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/${currentShoppingListId}/urun`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1194,8 +1387,12 @@ async function deleteShoppingItem(urunId) {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/alisveris/urun/${urunId}`, {
-            method: 'DELETE'
+
+        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/urun/${urunId}`, {
+            method: 'DELETE',
+            headers: {
+
+            }
         });
 
         const data = await response.json();
@@ -1243,7 +1440,8 @@ async function getNewRecipe() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/oner`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/tarif/oner`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1282,7 +1480,8 @@ async function addRecipeToFavorites() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/favoriler/ekle`, {
+
+        const response = await fetchWithAuth(`${API_BASE}/api/favoriler/ekle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1317,7 +1516,12 @@ async function loadFavorites() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/favoriler/liste`);
+
+        const response = await fetchWithAuth(`${API_BASE}/api/favoriler/liste`, {
+            headers: {
+
+            }
+        });
         const data = await response.json();
 
         const container = document.getElementById('favorites-container');
@@ -1385,7 +1589,12 @@ async function loadFavoriteDetail(favoriId) {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/favoriler/${favoriId}`);
+
+        const response = await fetchWithAuth(`${API_BASE}/api/favoriler/${favoriId}`, {
+            headers: {
+
+            }
+        });
 
         // HTTP hata kontrolü
         if (!response.ok) {
@@ -1490,8 +1699,12 @@ async function deleteFavoriteRecipe() {
     showLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE}/api/tarif/favoriler/${currentFavoriteId}`, {
-            method: 'DELETE'
+
+        const response = await fetchWithAuth(`${API_BASE}/api/tarif/favoriler/${currentFavoriteId}`, {
+            method: 'DELETE',
+            headers: {
+
+            }
         });
 
         const data = await response.json();
@@ -1512,4 +1725,4 @@ async function deleteFavoriteRecipe() {
     }
 }
 
-console.log('✅ Tarif-e hazır!');
+console.log('✅ Tarif-e hazır! Kullanmaya başla');

@@ -19,10 +19,10 @@ class Settings(BaseSettings):
     PORT: int = 8000
     
     # Database
-    DATABASE_URL: str = "sqlite:///./tarif.db"
+    DATABASE_URL: str = "sqlite:///./data/tarif_e.db"
     
     # Security
-    SECRET_KEY: str = "development-secret-key-change-in-production"
+    SECRET_KEY: str = "qTuW8SYKzlZZRI_otbnrtf3MyUcfzebi35ZN-gTMFOw"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     

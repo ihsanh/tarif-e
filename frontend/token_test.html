@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Token Test</title>
+</head>
+<body>
+    <h1>🔐 Token Test</h1>
+    <div id="result"></div>
+    
+    <script>
+        const result = document.getElementById('result');
+        
+        // Token var mı kontrol et
+        const token = localStorage.getItem('access_token');
+        const user = localStorage.getItem('user');
+        
+        result.innerHTML = `
+            <h2>localStorage İçeriği:</h2>
+            <p><strong>Token:</strong> ${token ? '✅ Var (' + token.substring(0, 50) + '...)' : '❌ Yok'}</p>
+            <p><strong>User:</strong> ${user ? '✅ Var' : '❌ Yok'}</p>
+            <p><strong>User Data:</strong> ${user || 'N/A'}</p>
+            
+            <h2>Test Butonları:</h2>
+            <button onclick="localStorage.clear(); location.reload();">🗑️ Clear All</button>
+            <button onclick="location.href='/login.html'">🔓 Login'e Git</button>
+            <button onclick="location.href='/index.html'">🏠 Ana Sayfaya Git</button>
+            
+            <h2>Console Logları:</h2>
+            <pre id="logs"></pre>
+        `;
+        
+        // Console'u yakala
+        const logs = document.getElementById('logs');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logs.textContent += args.join(' ') + '\n';
+        };
+    </script>
+</body>
+</html>

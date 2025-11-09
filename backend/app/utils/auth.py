@@ -43,24 +43,27 @@ def get_password_hash(password: str) -> str:
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """JWT token oluştur"""
     to_encode = data.copy()
-
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+    # ❌ YANLIŞ - user_id integer olarak geliyor
+    # to_encode["sub"] = user_id
+
+    # ✅ DOĞRU - string'e çevir
+    if "sub" in to_encode and isinstance(to_encode["sub"], int):
+        to_encode["sub"] = str(to_encode["sub"])
+
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def decode_access_token(token: str) -> Optional[dict]:
-    """JWT token'ı decode et"""
+def decode_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(f"✅ Token decode edildi: {payload}")  # DEBUG
         return payload
-    except JWTError:
+    except Exception as e:
+        print(f"❌ Token decode hatası: {e}")  # DEBUG - NE HATASI VAR?
         return None
 
 
@@ -71,6 +74,8 @@ async def get_current_user(
     """Mevcut kullanıcıyı getir (token'dan)"""
     from app.models import User
 
+    print(f"🔑 Token alındı: {token[:20]}...")
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Kimlik doğrulama başarısız",
@@ -78,7 +83,9 @@ async def get_current_user(
     )
 
     payload = decode_access_token(token)
+    print(f"📦 Payload: {payload}")
     if payload is None:
+        print("❌ Payload None!")
         raise credentials_exception
 
     user_id: int = payload.get("sub")

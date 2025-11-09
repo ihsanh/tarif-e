@@ -11,7 +11,7 @@ def configure_logging():
     """
 
     # settings.LOG_LEVEL'i (örn. "DEBUG", "INFO") config.py dosyanızdan alın
-    log_level = settings.LOG_LEVEL.upper() if settings.DEBUG else "INFO"
+    log_level = settings.LOG_LEVEL.upper() if settings.DEBUG else "DEBUG"
 
     logging.basicConfig(
         level=log_level,

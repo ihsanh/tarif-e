@@ -5,8 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍳 Tarif-e - Akıllı Mutfak Asistanı</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script>
+        // Token yoksa login'e yönlendir
+        if (!localStorage.getItem('access_token')) {
+            window.location.href = '/login.html';
+        }
+    </script>
 </head>
 <body>
+<!-- User Info & Logout Bar -->
+<div id="user-info-bar" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+">
+    <!-- Logo -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 2em;">🍳</span>
+        <h2 style="color: white; margin: 0; font-size: 1.5em;">Tarif-e</h2>
+    </div>
+
+    <!-- User Info & Logout -->
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <!-- Kullanıcı Bilgisi -->
+        <div id="user-display" style="
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        "></div>
+
+        <!-- Logout Butonu -->
+        <button onclick="window.handleLogout()" style="
+            padding: 8px 20px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        "  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.3)'"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.2)'">
+            🚪 Çıkış
+        </button>
+    </div>
+</div>
+
+<!-- Main Content Spacer - User bar için boşluk bırakır -->
+<div style="height: 60px;"></div>
+
+    <!-- Main Content Spacer - User bar için boşluk bırakır -->
+    <div style="height: 60px;"></div>
     <div class="container">
         <!-- Header -->
         <header>
@@ -275,5 +337,26 @@
     </div>
 
     <script src="/static/js/app.js"></script>
+    <script>
+    function handleLogout() {
+        if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+    }
+    </script>
+<script>
+    const token = localStorage.getItem('access_token');
+console.log('Token uzunluğu:', token.length);
+console.log('Token başlangıcı:', token);
+
+// Manual test
+fetch('http://localhost:8000/api/malzeme/liste', {
+    headers: {
+        'Authorization': `Bearer ${token}`
+    }
+}).then(r => r.json()).then(d => console.log('Sonuç:', d));
+</script>
 </body>
 </html>
