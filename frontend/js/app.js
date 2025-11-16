@@ -1764,4 +1764,381 @@ async function deleteFavoriteRecipe() {
     }
 }
 
+// ============================================
+// PAYLAŞIM FONKSİYONLARI
+// ============================================
+
+// Paylaşım modalını aç
+function showShareModal(listeId) {
+    currentShoppingListId = listeId;
+    document.getElementById('share-email-input').value = '';
+    document.getElementById('share-role-select').value = 'view';
+    document.getElementById('share-modal').style.display = 'flex';
+    loadShareInfo(listeId);
+}
+
+// Paylaşım modalını kapat
+function closeShareModal() {
+    document.getElementById('share-modal').style.display = 'none';
+}
+
+// Liste paylaş
+async function shareList() {
+    const email = document.getElementById('share-email-input').value.trim();
+    const rol = document.getElementById('share-role-select').value;
+
+    if (!email) {
+        alert('Lütfen bir email adresi girin');
+        return;
+    }
+
+    if (!currentShoppingListId) {
+        alert('Liste seçilmedi');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/olustur`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                liste_id: currentShoppingListId,
+                paylasilan_email: email,
+                rol: rol
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showNotification('✅ Liste paylaşıldı!', 'success');
+            document.getElementById('share-email-input').value = '';
+            loadShareInfo(currentShoppingListId);
+        } else {
+            showNotification(data.detail || 'Paylaşım başarısız', 'error');
+        }
+    } catch (error) {
+        console.error('Paylaşım hatası:', error);
+        showNotification('Liste paylaşılamadı', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Paylaşım bilgilerini yükle
+async function loadShareInfo(listeId) {
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/liste/${listeId}/paylasimlar`);
+        const data = await response.json();
+
+        if (data.success && data.paylasimlar) {
+            displayShareInfo(data.paylasimlar);
+        }
+    } catch (error) {
+        console.error('Paylaşım bilgileri yüklenemedi:', error);
+    }
+}
+
+// Paylaşım bilgilerini göster
+function displayShareInfo(paylasimlar) {
+    const container = document.getElementById('share-info-container');
+
+    if (!container) return;
+
+    if (paylasimlar.length === 0) {
+        container.innerHTML = '<p style="color: #718096; font-size: 0.9em; margin-top: 10px;">Bu liste henüz kimseyle paylaşılmadı</p>';
+        return;
+    }
+
+    let html = '<div style="margin-top: 15px;"><h4 style="margin-bottom: 10px;">👥 Paylaşılan Kişiler:</h4>';
+
+    paylasimlar.forEach(p => {
+        const rolBadge = p.rol === 'view' ? '👁️ Görüntüleyebilir' :
+                        p.rol === 'edit' ? '✏️ Düzenleyebilir' :
+                        '👑 Sahip';
+        const statusBadge = p.kabul_edildi ? '✅ Kabul Edildi' : '⏳ Bekliyor';
+
+        html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #F7FAFC; border-radius: 8px; margin: 8px 0;">
+                <div>
+                    <div style="font-weight: 600;">${p.username}</div>
+                    <div style="font-size: 0.85em; color: #718096;">${p.email}</div>
+                    <div style="font-size: 0.85em; margin-top: 4px;">
+                        <span style="background: #E6FFFA; color: #234E52; padding: 2px 8px; border-radius: 4px; margin-right: 5px;">${rolBadge}</span>
+                        <span>${statusBadge}</span>
+                    </div>
+                </div>
+                <button class="btn" style="background: #FC8181; color: white; padding: 6px 12px; font-size: 0.85em;" onclick="cancelShare(${p.id})">
+                    🗑️ İptal
+                </button>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// Paylaşımı iptal et
+async function cancelShare(paylasimId) {
+    if (!confirm('Paylaşımı iptal etmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/paylasim/${paylasimId}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Paylaşım iptal edildi', 'success');
+            loadShareInfo(currentShoppingListId);
+        } else {
+            showNotification('Paylaşım iptal edilemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Davetleri yükle
+async function loadInvitations() {
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davetler`);
+        const data = await response.json();
+
+        const container = document.getElementById('invitations-container');
+
+        if (!data.davetler || data.davetler.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <p>Henüz davetiniz yok</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        data.davetler.forEach(davet => {
+            const rolBadge = davet.rol === 'view' ? '👁️ Görüntüleyebilir' :
+                            davet.rol === 'edit' ? '✏️ Düzenleyebilir' :
+                            '👑 Sahip';
+
+            const tarih = new Date(davet.paylasim_tarihi).toLocaleDateString('tr-TR');
+
+            html += `
+                <div style="background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 5px;">
+                                ${davet.liste_baslik}
+                            </div>
+                            <div style="color: #718096; font-size: 0.9em; margin-bottom: 8px;">
+                                👤 ${davet.paylasan_username} • 📅 ${tarih}
+                            </div>
+                            <div>
+                                <span style="background: #E6FFFA; color: #234E52; padding: 4px 10px; border-radius: 6px; font-size: 0.9em;">
+                                    ${rolBadge}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-success" onclick="acceptInvitation(${davet.id})" style="flex: 1;">
+                            ✅ Kabul Et
+                        </button>
+                        <button class="btn" style="background: #FC8181; color: white; flex: 1;" onclick="rejectInvitation(${davet.id})">
+                            ❌ Reddet
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Davetler yüklenemedi:', error);
+        showNotification('Davetler yüklenemedi', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Daveti kabul et
+async function acceptInvitation(davetId) {
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davet/${davetId}/kabul`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Davet kabul edildi!', 'success');
+            loadInvitations();
+        } else {
+            showNotification('Davet kabul edilemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Daveti reddet
+async function rejectInvitation(davetId) {
+    if (!confirm('Daveti reddetmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davet/${davetId}/reddet`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Davet reddedildi', 'success');
+            loadInvitations();
+        } else {
+            showNotification('Davet reddedilemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Paylaşılan listeleri yükle
+async function loadSharedLists() {
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/benimle-paylasilan`);
+        const data = await response.json();
+
+        const container = document.getElementById('shared-lists-container');
+
+        if (!data.listeler || data.listeler.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <p>Sizinle paylaşılan liste yok</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        data.listeler.forEach(liste => {
+            const progress = liste.toplam_urun > 0
+                ? (liste.tamamlanan_urun / liste.toplam_urun * 100).toFixed(0)
+                : 0;
+
+            const statusClass = liste.tamamlandi ? 'completed' : '';
+            const statusBadge = liste.tamamlandi
+                ? '<span class="shopping-list-status status-completed">✅ Tamamlandı</span>'
+                : '<span class="shopping-list-status status-active">📝 Aktif</span>';
+
+            const tarih = new Date(liste.olusturma_tarihi).toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const rolBadge = liste.rol === 'view' ? '👁️' : liste.rol === 'edit' ? '✏️' : '👑';
+
+            html += `
+                <div class="shopping-list-card ${statusClass}" onclick="loadShoppingDetail(${liste.id})">
+                    <div class="shopping-list-header">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 600; font-size: 1.1em;">
+                                    ${liste.baslik || 'Alışveriş Listesi'}
+                                </span>
+                                <span style="font-size: 1.2em;" title="${liste.rol === 'view' ? 'Görüntüleyebilir' : liste.rol === 'edit' ? 'Düzenleyebilir' : 'Sahip'}">${rolBadge}</span>
+                            </div>
+                            <div class="shopping-list-date">
+                                👤 ${liste.paylasan_username} • 📅 ${tarih}
+                            </div>
+                        </div>
+                        ${statusBadge}
+                    </div>
+
+                    <div class="shopping-list-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="shopping-list-summary">
+                        📦 ${liste.tamamlanan_urun} / ${liste.toplam_urun} ürün alındı
+                        ${progress > 0 ? `(${progress}%)` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Paylaşılan listeler yüklenemedi:', error);
+        showNotification('Listeler yüklenemedi', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Listeden ayrıl
+async function leaveSharedList(listeId) {
+    if (!confirm('Bu listeden ayrılmak istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/ayril/${listeId}`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Listeden ayrıldınız', 'success');
+            showScreen('shared-lists-screen');
+            loadSharedLists();
+        } else {
+            showNotification('İşlem başarısız', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+console.log('✅ Paylaşım özellikleri yüklendi');
+
 console.log('✅ Tarif-e hazır! Kullanmaya başla');

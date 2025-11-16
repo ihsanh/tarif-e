@@ -35,24 +35,7 @@ class AlisverisListesi(Base):
     # İlişkiler
     owner = relationship("User", back_populates="alisveris_listeleri")
     urunler = relationship("AlisverisUrunu", back_populates="liste", cascade="all, delete-orphan")
-    paylasilmalar = relationship("ListePaylasim", back_populates="liste", cascade="all, delete-orphan")  # ✅ YENİ
-
-
-class AlisverisUrunu(Base):
-    """Alışveriş listesindeki ürünler"""
-    __tablename__ = "alisveris_urunu"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    liste_id = Column(Integer, ForeignKey("alisveris_listesi.id"), nullable=False)
-    malzeme_adi = Column(String(100), nullable=False)
-    miktar = Column(Float, default=1)
-    birim = Column(String(20), default="adet")
-    kategori = Column(Enum(MalzemeKategorisi), default=MalzemeKategorisi.DIGER)  # ✅ YENİ
-    alinan = Column(Boolean, default=False)
-    
-    # İlişkiler
-    liste = relationship("AlisverisListesi", back_populates="urunler")
-
+    paylasilmalar = relationship("ListePaylasim", back_populates="liste", cascade="all, delete-orphan")
 
 class ListePaylasim(Base):
     """Alışveriş listesi paylaşımları"""
@@ -70,3 +53,25 @@ class ListePaylasim(Base):
     liste = relationship("AlisverisListesi", back_populates="paylasilmalar")
     paylasan = relationship("User", foreign_keys=[paylasan_user_id])
     paylasilan = relationship("User", foreign_keys=[paylasilan_user_id])
+
+
+class PaylaşımRolü(str, enum.Enum):
+    """Paylaşım yetkileri"""
+    GORUNTULEYEBILIR = "view"  # Sadece görüntüle
+    DUZENLEYEBILIR = "edit"  # Düzenleyebilir
+    SAHIP = "owner"  # Liste sahibi
+
+class AlisverisUrunu(Base):
+    """Alışveriş listesindeki ürünler"""
+    __tablename__ = "alisveris_urunu"
+
+    id = Column(Integer, primary_key=True, index=True)
+    liste_id = Column(Integer, ForeignKey("alisveris_listesi.id"), nullable=False)
+    malzeme_adi = Column(String(100), nullable=False)
+    miktar = Column(Float, default=1)
+    birim = Column(String(20), default="adet")
+    kategori = Column(Enum(MalzemeKategorisi), default=MalzemeKategorisi.DIGER)  # ✅ YENİ
+    alinan = Column(Boolean, default=False)
+
+    # İlişkiler
+    liste = relationship("AlisverisListesi", back_populates="urunler")

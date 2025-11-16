@@ -95,6 +95,12 @@
                 <button class="btn" style="background: #F59E0B; color: white;" onclick="loadFavorites(); showScreen('favorites-screen');">
                     ⭐ Favori Tariflerim
                 </button>
+                <button class="btn" style="background: #9F7AEA; color: white;" onclick="loadInvitations(); showScreen('invitations-screen');">
+                    🔔 Davetlerim
+                </button>
+                <button class="btn" style="background: #4299E1; color: white;" onclick="loadSharedLists(); showScreen('shared-lists-screen');">
+                    👥 Paylaşılan Listeler
+                </button>
             </div>
 
             <div class="status-bar">
@@ -126,6 +132,9 @@
         </button>
         <button class="btn" style="background: #FC8181; color: white;" onclick="deleteShoppingList()">
             🗑️ Listeyi Sil
+        </button>
+        <button class="btn" style="background: #9F7AEA; color: white;" onclick="showShareModal(currentShoppingListId)">
+            👥 Paylaş
         </button>
     </div>
 </div>
@@ -335,7 +344,58 @@
             <p>Yükleniyor...</p>
         </div>
     </div>
+    <!-- Davetler Ekranı -->
+    <div id="invitations-screen" class="screen">
+        <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+        <h2>🔔 Davetlerim</h2>
+        <p style="color: #718096; margin-bottom: 20px;">
+            Sizinle paylaşılan alışveriş listesi davetleri
+        </p>
+        <div id="invitations-container"></div>
+    </div>
 
+    <!-- Paylaşılan Listeler Ekranı -->
+    <div id="shared-lists-screen" class="screen">
+        <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+        <h2>👥 Benimle Paylaşılan Listeler</h2>
+        <p style="color: #718096; margin-bottom: 20px;">
+            Diğer kullanıcıların sizinle paylaştığı listeler
+        </p>
+        <div id="shared-lists-container"></div>
+    </div>
+
+    <!-- Paylaşım Modalı -->
+    <div id="share-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3>👥 Liste Paylaş</h3>
+
+            <div class="form-group">
+                <label>Kullanıcı Email:</label>
+                <input type="email" id="share-email-input" class="input" placeholder="ornek@email.com">
+
+                <label style="margin-top: 15px;">Yetki Seviyesi:</label>
+                <select id="share-role-select" class="input">
+                    <option value="view">👁️ Sadece Görüntüleyebilir</option>
+                    <option value="edit">✏️ Düzenleyebilir</option>
+                </select>
+
+                <div style="background: #EDF2F7; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.9em;">
+                    <strong>ℹ️ Bilgi:</strong>
+                    <ul style="margin: 8px 0 0 20px; color: #4A5568;">
+                        <li><strong>Görüntüleyebilir:</strong> Sadece listeyi görebilir</li>
+                        <li><strong>Düzenleyebilir:</strong> Ürün ekleyebilir/çıkarabilir</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-success" onclick="shareList()">✅ Paylaş</button>
+                    <button class="btn btn-secondary" onclick="closeShareModal()">❌ İptal</button>
+                </div>
+            </div>
+
+            <div id="share-info-container" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E2E8F0;"></div>
+        </div>
+    </div>
     <script src="/static/js/app.js"></script>
     <script>
     function handleLogout() {
@@ -358,5 +418,6 @@ fetch('http://localhost:8000/api/malzeme/liste', {
     }
 }).then(r => r.json()).then(d => console.log('Sonuç:', d));
 </script>
+
 </body>
 </html>

@@ -22,7 +22,8 @@ from app.routes import (
     malzeme_router,
     tarif_router,
     alisveris_router,
-    auth_router
+    auth_router,
+    paslasim_router
 )
 from app.routes.alisveris_extended import router as alisveris_extended_router
 
@@ -50,11 +51,12 @@ frontend_path = BACKEND_DIR.parent / "frontend"
 
 # API Routes (önce bunlar)
 app.include_router(health_router)
-app.include_router(auth_router)  # YENİ - Authentication
+app.include_router(auth_router)
 app.include_router(malzeme_router)
 app.include_router(tarif_router)
 app.include_router(alisveris_router)
 app.include_router(alisveris_extended_router)
+app.include_router(paslasim_router)
 
 # HTML Pages (API route'larından sonra)
 @app.get("/login.html")

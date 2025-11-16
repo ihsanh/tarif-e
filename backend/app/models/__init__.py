@@ -14,7 +14,7 @@ __all__ = [
     "User",
     "Malzeme",
     "MalzemeKategorisi",
-    "KullaniciMalzeme",  # ✅ Eklendi
+    "KullaniciMalzeme",
     "AlisverisListesi",
     "AlisverisUrunu",
     "ListePaylasim",
