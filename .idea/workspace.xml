@@ -4,31 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v11 - authorization altyapısı eklendi,ve hatalar giderildi.">
-      <change afterPath="$PROJECT_DIR$/backend/app/routes/alisveris_extended.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/check_db_path.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/check_tables.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/create_tables.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/migrations/add_sharing_and_category.py" afterDir="false" />
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v12 - kategori özelliği eklendi">
+      <change afterPath="$PROJECT_DIR$/backend/app.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/alisveris.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/alisveris.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app/schemas/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/alisveris.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/schemas/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/conftest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_auth.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/tests/test_malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_malzeme.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/tests/test_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_regression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_tarif.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -232,7 +215,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762695095192</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="v12 - kategori özelliği eklendi">
+      <option name="closed" value="true" />
+      <created>1763318793118</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1763318793118</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -249,7 +240,8 @@
     <MESSAGE value="test düzeltmelrei ve favori detay gözlem düzeltmesi" />
     <MESSAGE value="authorization altyapısı eklendi," />
     <MESSAGE value="v11 - authorization altyapısı eklendi,ve hatalar giderildi." />
-    <option name="LAST_COMMIT_MESSAGE" value="v11 - authorization altyapısı eklendi,ve hatalar giderildi." />
+    <MESSAGE value="v12 - kategori özelliği eklendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v12 - kategori özelliği eklendi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

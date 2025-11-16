@@ -78,8 +78,9 @@ async def alisveris_olustur(request: AlisverisListesiCreate, current_user: User 
 
         alisveris_listesi = AlisverisListesi(
             user_id=user_id,
-            durum="aktif",
-            notlar=f"{len(eksik_malzemeler)} eksik malzeme"
+            baslik=request.baslik or "Alışveriş Listesi",
+            aciklama=f"{len(eksik_malzemeler)} eksik malzeme",
+            tamamlandi=False
         )
         db.add(alisveris_listesi)
         db.flush() # ID almak için commit öncesi flush
@@ -87,19 +88,12 @@ async def alisveris_olustur(request: AlisverisListesiCreate, current_user: User 
         logger.info(f"Yeni alışveriş listesi oluşturuldu, ID: {alisveris_listesi.id}")
 
         for item in eksik_malzemeler:
-            malzeme = db.query(Malzeme).filter(Malzeme.name == item["name"]).first()
-
-            if not malzeme:
-                malzeme = Malzeme(name=item["name"], category="genel")
-                db.add(malzeme)
-                db.flush() # ID almak için commit öncesi flush
-
             alisveris_urunu = AlisverisUrunu(
                 liste_id=alisveris_listesi.id,
-                malzeme_id=malzeme.id,
+                malzeme_adi=item["name"],
                 miktar=item["miktar"],
                 birim=item["birim"],
-                alinma_durumu=False
+                alinan=False
             )
             db.add(alisveris_urunu)
 
@@ -139,23 +133,22 @@ async def alisveris_listeler( current_user: User = Depends(get_current_user),db:
         tamamlanan_sayisi = 0
 
         for urun in urunler:
-            malzeme = db.query(Malzeme).filter(Malzeme.id == urun.malzeme_id).first()
-            if malzeme:
-                urun_listesi.append({
-                    "id": urun.id,
-                    "name": malzeme.name,
-                    "miktar": urun.miktar,
-                    "birim": urun.birim,
-                    "alinma_durumu": urun.alinma_durumu
-                })
-                if urun.alinma_durumu:
-                    tamamlanan_sayisi += 1
+            urun_listesi.append({
+                "id": urun.id,
+                "name": urun.malzeme_adi,
+                "miktar": urun.miktar,
+                "birim": urun.birim,
+                "alinma_durumu": urun.alinan
+            })
+            if urun.alinan:
+                tamamlanan_sayisi += 1
 
         result.append({
             "id": liste.id,
+            "baslik": liste.baslik,
+            "aciklama": liste.aciklama,
             "olusturma_tarihi": liste.olusturma_tarihi.isoformat(),
-            "durum": liste.durum,
-            "notlar": liste.notlar,
+            "tamamlandi": liste.tamamlandi,
             "toplam_urun": len(urun_listesi),
             "tamamlanan_urun": tamamlanan_sayisi,
             "urunler": urun_listesi
@@ -187,23 +180,22 @@ async def alisveris_detay(liste_id: int , current_user: User = Depends(get_curre
 
     urun_listesi = []
     for urun in urunler:
-        malzeme = db.query(Malzeme).filter(Malzeme.id == urun.malzeme_id).first()
-        if malzeme:
-            urun_listesi.append({
-                "id": urun.id,
-                "name": malzeme.name,
-                "miktar": urun.miktar,
-                "birim": urun.birim,
-                "alinma_durumu": urun.alinma_durumu
-            })
+        urun_listesi.append({
+            "id": urun.id,
+            "name": urun.malzeme_adi,
+            "miktar": urun.miktar,
+            "birim": urun.birim,
+            "alinma_durumu": urun.alinan
+        })
 
     return {
         "success": True,
         "liste": {
             "id": liste.id,
+            "baslik": liste.baslik,
+            "aciklama": liste.aciklama,
             "olusturma_tarihi": liste.olusturma_tarihi.isoformat(),
-            "durum": liste.durum,
-            "notlar": liste.notlar,
+            "tamamlandi": liste.tamamlandi,
             "urunler": urun_listesi
         }
     }
@@ -230,20 +222,12 @@ async def alisveris_urun_ekle(
     if not liste:
         raise HTTPException(status_code=404, detail="Liste bulunamadı")
 
-    malzeme = db.query(Malzeme).filter(Malzeme.name == malzeme_adi.lower()).first()
-
-    if not malzeme:
-        malzeme = Malzeme(name=malzeme_adi.lower(), category="genel")
-        db.add(malzeme)
-        db.commit()
-        db.refresh(malzeme)
-
     urun = AlisverisUrunu(
         liste_id=liste_id,
-        malzeme_id=malzeme.id,
+        malzeme_adi=malzeme_adi.lower(),
         miktar=miktar,
         birim=birim,
-        alinma_durumu=False
+        alinan=False
     )
     db.add(urun)
     db.commit()
@@ -252,7 +236,7 @@ async def alisveris_urun_ekle(
         AlisverisUrunu.liste_id == liste_id
     ).count()
 
-    liste.notlar = f"{toplam_urun} ürün"
+    liste.aciklama = f"{toplam_urun} ürün"
     db.commit()
 
     return {
@@ -283,7 +267,7 @@ async def alisveris_urun_durum(
         raise HTTPException(status_code=404, detail="Ürün bulunamadı")
 
     try:
-        urun.alinma_durumu = alinma_durumu
+        urun.alinan = alinma_durumu
         db.commit()
         logger.info(f"Ürün ID {urun_id} durumu başarıyla kaydedildi: {alinma_durumu}")
     except Exception as e:
@@ -322,7 +306,7 @@ async def alisveris_urun_sil(urun_id: int , current_user: User = Depends(get_cur
     ).first()
 
     if liste:
-        liste.notlar = f"{toplam_urun} ürün" if toplam_urun > 0 else "Liste boş"
+        liste.aciklama = f"{toplam_urun} ürün" if toplam_urun > 0 else "Liste boş"
         db.commit()
 
     return {
@@ -345,7 +329,9 @@ async def alisveris_tamamla(liste_id: int , current_user: User = Depends(get_cur
     if not liste:
         raise HTTPException(status_code=404, detail="Liste bulunamadı")
 
-    liste.durum = "tamamlandi"
+    liste.tamamlandi = True
+    from datetime import datetime
+    liste.tamamlanma_tarihi = datetime.utcnow()
     db.commit()
 
     return {

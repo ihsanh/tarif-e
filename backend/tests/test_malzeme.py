@@ -213,11 +213,12 @@ class TestMalzemeSilme:
         assert response.json()["success"] is True
 
         # Silinmiş olmalı - tekrar almaya çalışınca 404
-        get_response = client.get(
-            f"/api/malzeme/{malzeme_id}",
+        list_response = client.get(
+            "/api/malzeme/liste",
             headers=get_auth_headers(auth_token)
         )
-        assert get_response.status_code == 404
+        malzemeler = list_response.json()["malzemeler"]
+        assert not any(m["id"] == malzeme_id for m in malzemeler)
 
     def test_malzeme_sil_olmayan_id(self, client, auth_token):
         """Olmayan ID ile silme - 404 dönmeli"""

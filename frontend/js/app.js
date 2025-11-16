@@ -702,62 +702,101 @@ function displayRecipe(recipe) {
 
 // Alışveriş listesi oluştur
 async function createShoppingList() {
-    if (!currentRecipe) {
-        console.error('❌ currentRecipe yok!');
-        return;
-    }
-
     console.log('🛒 Alışveriş listesi oluşturuluyor...');
-    console.log('📋 Current recipe:', currentRecipe);
-    console.log('📦 Malzemeler:', currentRecipe.malzemeler);
-
-    showLoading(true);
 
     try {
-        const requestBody = {
-            malzemeler: currentRecipe.malzemeler
-        };
+        const currentRecipe = getCurrentRecipe();
 
-        console.log('📤 Gönderilen request:', requestBody);
+        if (!currentRecipe?.malzemeler?.length) {
+            showNotification('Tarif bilgisi bulunamadı', 'error');
+            return;
+        }
 
-        const response = await fetchWithAuth(`${API_BASE}/api/alisveris/olustur`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-
-            },
-            body: JSON.stringify(requestBody)
+        // Malzemeleri formatla: "Patates: 2 adet" → "patates - 2 adet"
+        const malzemeler = currentRecipe.malzemeler.map(m => {
+            const parts = m.split(':');
+            if (parts.length >= 2) {
+                const adi = parts[0].trim().toLowerCase();
+                const miktar = parts[1].replace(/\(.*?\)/g, '').trim();
+                return `${adi} - ${miktar}`;
+            }
+            return m.toLowerCase();
         });
 
-        console.log('📥 Response status:', response.status);
+        // Backend'e gönder
+        const response = await fetchWithAuth('/api/alisveris/olustur', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                baslik: currentRecipe.baslik,
+                malzemeler: malzemeler
+            })
+        });
 
         const data = await response.json();
-        console.log('📥 Response data:', data);
 
-    if (data.success) {
-        if (data.eksik_malzemeler.length === 0) {
-            alert('🎉 Harika! Tüm malzemeler evinizde var!');
-        } else {
-            let message = '✅ Alışveriş listesi oluşturuldu!\n\n';
-            message += `📋 ${data.eksik_malzemeler.length} eksik malzeme bulundu.\n\n`;
-            message += 'Alışveriş listelerime gitmek ister misiniz?';
-
-            if (confirm(message)) {
-                loadShoppingLists();
-                showScreen('shopping-lists-screen');
+        if (response.ok && data.success) {
+            // Başarılı
+            if (data.eksik_malzemeler?.length > 0) {
+                const eksikler = data.eksik_malzemeler
+                    .map(m => `${m.malzeme}: ${m.gereken} (${m.mevcut} mevcut)`)
+                    .join('\n');
+                showNotification(`✅ Liste oluşturuldu!\n\n⚠️ Eksik:\n${eksikler}`, 'warning', 5000);
+            } else {
+                showNotification('✅ Liste oluşturuldu! Tüm malzemeler mevcut!', 'success');
             }
-        }
-    } else {
-            console.error('❌ Backend success:false döndü');
-            alert('❌ Alışveriş listesi oluşturulamadı: ' + (data.message || 'Bilinmeyen hata'));
+            // Liste oluşturuldu, alışveriş ekranına git
+            loadShoppingLists();
+            showScreen('shopping-lists-screen');
+        } else {
+            showNotification(data.message || 'Hata oluştu', 'error');
         }
 
     } catch (error) {
-        console.error('❌ Catch bloğunda hata:', error);
-        alert('❌ Hata: ' + error.message);
-    } finally {
-        showLoading(false);
+        console.error('Hata:', error);
+        showNotification('Liste oluşturulamadı', 'error');
     }
+}
+
+/**
+ * Şu anda görüntülenen tarifin bilgilerini al
+ */
+function getCurrentRecipe() {
+    // currentRecipe global değişkenini kullan
+    if (!currentRecipe) {
+        console.error('❌ currentRecipe bulunamadı');
+        return null;
+    }
+
+    return currentRecipe;
+}
+
+// Modal kapatma fonksiyonu artık gerekli değil - ekran sistemi kullanıyoruz
+
+function showNotification(message, type = 'info', duration = 3000) {
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px;
+        padding: 15px 20px;
+        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : type === 'warning' ? '#ff9800' : '#2196F3'};
+        color: white; border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        z-index: 10000; max-width: 400px;
+        white-space: pre-line;
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.3s';
+        setTimeout(() => notification.remove(), 300);
+    }, duration);
 }
 
 // Ayarları yükle
@@ -898,8 +937,8 @@ async function loadShoppingLists() {
                 ? (liste.tamamlanan_urun / liste.toplam_urun * 100).toFixed(0)
                 : 0;
 
-            const statusClass = liste.durum === 'tamamlandi' ? 'completed' : '';
-            const statusBadge = liste.durum === 'tamamlandi'
+            const statusClass = liste.tamamlandi ? 'completed' : '';
+            const statusBadge = liste.tamamlandi
                 ? '<span class="shopping-list-status status-completed">✅ Tamamlandı</span>'
                 : '<span class="shopping-list-status status-active">📝 Aktif</span>';
 
@@ -916,7 +955,7 @@ async function loadShoppingLists() {
                     <div class="shopping-list-header">
                         <div>
                             <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 5px;">
-                                ${liste.notlar || 'Alışveriş Listesi'}
+                                ${liste.baslik || 'Alışveriş Listesi'}
                             </div>
                             <div class="shopping-list-date">📅 ${tarih}</div>
                         </div>
@@ -968,9 +1007,9 @@ async function loadShoppingDetail(listeId) {
         }
 
         const liste = data.liste;
-        const isTamamlandi = liste.durum === 'tamamlandi';
+        const isTamamlandi = liste.tamamlandi;
 
-        console.log(`Liste durumu: ${liste.durum}, Tamamlandı mı: ${isTamamlandi}`);
+        console.log(`Liste durumu: ${liste.tamamlandi ? 'Tamamlandı' : 'Aktif'}, Tamamlandı mı: ${isTamamlandi}`);
 
         // Header
         const tarih = new Date(liste.olusturma_tarihi).toLocaleDateString('tr-TR', {
@@ -1156,7 +1195,7 @@ async function updateShoppingListHeader(listeId) {
                 <h3>🛒 Alışveriş Listesi</h3>
                 <p style="color: #718096; margin: 8px 0;">📅 ${tarih}</p>
                 <p style="color: #718096; margin: 8px 0;">
-                    Durum: ${liste.durum === 'tamamlandi' ? '✅ Tamamlandı' : '📝 Aktif'}
+                    Durum: ${liste.tamamlandi ? '✅ Tamamlandı' : '📝 Aktif'}
                 </p>
                 <div style="margin-top: 15px; padding: 12px; background: #EDF2F7; border-radius: 8px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">

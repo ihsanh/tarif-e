@@ -5,6 +5,9 @@ backend/app/schemas/alisveris.py
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
+
+from pydantic.v1 import validator
+
 from app.models.malzeme import MalzemeKategorisi
 from app.models.alisveris import PaylaşımRolü
 
@@ -100,6 +103,11 @@ class AlisverisListesiCreate(BaseModel):
     aciklama: Optional[str] = None
     malzemeler: List[str] = Field(..., min_items=1)  # ["domates - 2 kg", ...]
 
+    @validator('malzemeler')
+    def malzemeler_bos_olamaz(cls, v):
+        if not v or len(v) == 0:
+            raise ValueError('En az 1 malzeme eklemelisiniz')
+        return v
 
 class AlisverisListesiResponse(BaseModel):
     """Liste response"""
