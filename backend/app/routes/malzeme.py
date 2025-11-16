@@ -4,15 +4,16 @@ Malzeme Routes - Güncellenmiş Versiyon
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import Malzeme, KullaniciMalzeme
 from app.schemas.malzeme import MalzemeEkle, MalzemeGuncelle
 from app.services.ai_service import ai_service
 import shutil
 from pathlib import Path
 import logging
-import traceback # Hata izini loglamak için eklendi
+import traceback
 from app.utils.auth import get_current_user
 from app.models import User
+from app.models import Malzeme, MalzemeKategorisi
+
 
 # Logger nesnesi oluşturma
 logger = logging.getLogger(__name__)
@@ -58,35 +59,47 @@ async def malzeme_tani(
 
 
 @router.post("/ekle")
-async def malzeme_ekle(malzeme: MalzemeEkle,
-    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Manuel malzeme ekleme - Varsa miktarı artır"""
-    logger.info(f"Kullanıcı {current_user.id} için malzeme ekleme/güncelleme isteği: {malzeme.name}")
+async def malzeme_ekle(
+        malzeme: MalzemeEkle,
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    """
+    Manuel malzeme ekleme - Varsa miktarı artır
+
+    BASİT MANTIK:
+    1. Kullanıcının bu malzemesi var mı kontrol et
+    2. Varsa → Miktarı artır
+    3. Yoksa → Yeni ekle
+    """
+    logger.info(f"Kullanıcı {current_user.id} için malzeme ekleme: {malzeme.name}")
 
     try:
-        db_malzeme = db.query(Malzeme).filter(Malzeme.name == malzeme.name.lower()).first()
-
-        if not db_malzeme:
-            db_malzeme = Malzeme(name=malzeme.name.lower(), category="genel")
-            db.add(db_malzeme)
-            db.flush() # ID almak için commit öncesi flush
-            logger.info(f"Yeni genel malzeme eklendi: {db_malzeme.name}")
-
-        kullanici_malzeme = db.query(KullaniciMalzeme).filter(
-            KullaniciMalzeme.user_id == current_user.id,
-            KullaniciMalzeme.malzeme_id == db_malzeme.id
+        # Kullanıcının bu malzemesi var mı?
+        kullanici_malzeme = db.query(Malzeme).filter(
+            Malzeme.name == malzeme.name.lower(),
+            Malzeme.user_id == current_user.id
         ).first()
 
         if kullanici_malzeme:
+            # ✅ VAR - Miktarı artır
+            eski_miktar = kullanici_malzeme.miktar
             kullanici_malzeme.miktar += malzeme.miktar
-            message = f"{malzeme.name} miktarı güncellendi ({kullanici_malzeme.miktar} {kullanici_malzeme.birim})"
+
+            # Kategori güncelle (varsa)
+            if hasattr(malzeme, 'kategori') and malzeme.kategori:
+                kullanici_malzeme.kategori = malzeme.kategori
+
+            message = f"{malzeme.name} miktarı güncellendi ({eski_miktar} → {kullanici_malzeme.miktar} {kullanici_malzeme.birim})"
             logger.info(message)
         else:
-            kullanici_malzeme = KullaniciMalzeme(
-                user_id=current_user.id,
-                malzeme_id=db_malzeme.id,
+            # ❌ YOK - Yeni ekle
+            kullanici_malzeme = Malzeme(
+                name=malzeme.name.lower(),
                 miktar=malzeme.miktar,
-                birim=malzeme.birim
+                birim=malzeme.birim,
+                kategori=malzeme.kategori if hasattr(malzeme, 'kategori') else MalzemeKategorisi.DIGER,
+                user_id=current_user.id
             )
             db.add(kullanici_malzeme)
             message = f"{malzeme.name} eklendi"
@@ -95,21 +108,25 @@ async def malzeme_ekle(malzeme: MalzemeEkle,
         db.commit()
         db.refresh(kullanici_malzeme)
 
+        return {
+            "success": True,
+            "message": message,
+            "malzeme": {
+                "id": kullanici_malzeme.id,
+                "name": kullanici_malzeme.name,
+                "miktar": kullanici_malzeme.miktar,
+                "birim": kullanici_malzeme.birim,
+                "kategori": kullanici_malzeme.kategori.value if kullanici_malzeme.kategori else "diğer"
+            }
+        }
+
     except Exception as e:
         db.rollback()
         logger.error(f"Malzeme eklenirken/güncellenirken hata: {e}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail="Malzeme işlemi sırasında bir sunucu hatası oluştu.")
-
-    return {
-        "success": True,
-        "message": message,
-        "malzeme": {
-            "id": kullanici_malzeme.id,
-            "name": db_malzeme.name,
-            "miktar": kullanici_malzeme.miktar,
-            "birim": kullanici_malzeme.birim
-        }
-    }
+        raise HTTPException(
+            status_code=500,
+            detail=f"Malzeme işlemi sırasında hata: {str(e)}"
+        )
 
 
 @router.get("/liste")
@@ -119,21 +136,23 @@ async def malzeme_liste(current_user: User = Depends(get_current_user),db: Sessi
     logger.info(f"Kullanıcı {user_id} için malzeme listesi isteği.")
 
     try:
-        user_malzemeler = db.query(KullaniciMalzeme).filter(
-            KullaniciMalzeme.user_id == user_id
-        ).all()
+        malzemeler = db.query(Malzeme).filter(
+            Malzeme.user_id == user_id
+        ).order_by(Malzeme.name).all()
 
-        malzemeler = []
-        for um in user_malzemeler:
-            malzeme = db.query(Malzeme).filter(Malzeme.id == um.malzeme_id).first()
-            if malzeme:
-                malzemeler.append({
-                    "id": um.id,
-                    "name": malzeme.name,
-                    "miktar": um.miktar,
-                    "birim": um.birim,
-                    "eklenme_tarihi": um.eklenme_tarihi.isoformat() if um.eklenme_tarihi else None
-                })
+        return {
+            "success": True,
+            "malzemeler": [
+                {
+                    "id": m.id,
+                    "name": m.name,
+                    "miktar": m.miktar,
+                    "birim": m.birim,
+                    "kategori": m.kategori.value if m.kategori else "diğer"
+                }
+                for m in malzemeler
+            ]
+        }
 
         logger.info(f"Kullanıcıya {len(malzemeler)} adet malzeme döndürüldü.")
         return {"malzemeler": malzemeler}
@@ -154,9 +173,9 @@ async def malzeme_guncelle(
     user_id = current_user.id
     logger.info(f"Kullanıcı {user_id} için malzeme ID {malzeme_id} güncelleme isteği.")
 
-    malzeme = db.query(KullaniciMalzeme).filter(
-        KullaniciMalzeme.id == malzeme_id,
-        KullaniciMalzeme.user_id == user_id
+    malzeme = db.query(Malzeme).filter(
+        Malzeme.id == malzeme_id,
+        Malzeme.user_id == user_id
     ).first()
 
     if not malzeme:
@@ -191,9 +210,9 @@ async def malzeme_sil(malzeme_id: int,current_user: User = Depends(get_current_u
     user_id = current_user.id
     logger.info(f"Kullanıcı {user_id} için malzeme silme isteği: ID {malzeme_id}")
 
-    malzeme = db.query(KullaniciMalzeme).filter(
-        KullaniciMalzeme.id == malzeme_id,
-        KullaniciMalzeme.user_id == user_id
+    malzeme = db.query(Malzeme).filter(
+        Malzeme.id == malzeme_id,
+        Malzeme.user_id == user_id
     ).first()
 
     if not malzeme:

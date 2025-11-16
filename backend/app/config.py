@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     PORT: int = 8000
     
     # Database
-    DATABASE_URL: str = "sqlite:///./data/tarif_e.db"
+    DATABASE_URL: str = "sqlite:///./data/tarif_e2.db"
+    DATABASE_URL_TEST: str = "sqlite:///./data/test_tarif_e.db"
     
     # Security
     SECRET_KEY: str = "qTuW8SYKzlZZRI_otbnrtf3MyUcfzebi35ZN-gTMFOw"

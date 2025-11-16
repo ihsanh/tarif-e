@@ -1,18 +1,23 @@
 """
-Veritabanı Modelleri
+Models Package - Tüm modelleri export et
+backend/app/models/__init__.py
 """
 from .base import Base
-from .malzeme import Malzeme, KullaniciMalzeme
+from .user import User
+from .malzeme import Malzeme, MalzemeKategorisi, KullaniciMalzeme
+from .alisveris import AlisverisListesi, AlisverisUrunu, ListePaylasim, PaylaşımRolü
 from .tarif import FavoriTarif
-from .alisveris import AlisverisListesi, AlisverisUrunu
-from app.models.user import User
+
 
 __all__ = [
     "Base",
+    "User",
     "Malzeme",
-    "KullaniciMalzeme",
-    "FavoriTarif",
+    "MalzemeKategorisi",
+    "KullaniciMalzeme",  # ✅ Eklendi
     "AlisverisListesi",
     "AlisverisUrunu",
-    "User",
+    "ListePaylasim",
+    "PaylaşımRolü",
+    "FavoriTarif"
 ]

@@ -4,6 +4,7 @@ User Model - Authentication
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql import func
 from app.models.base import Base
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -19,6 +20,12 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
+    # ✅ Malzeme relationship (Eksikse ekleyin)
+    malzemeler = relationship("Malzeme", back_populates="owner", cascade="all, delete-orphan")
+
+    # ✅ Alışveriş Listeleri relationship (Eksikse ekleyin)
+    alisveris_listeleri = relationship("AlisverisListesi", back_populates="owner", cascade="all, delete-orphan")
+
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, username={self.username})>"

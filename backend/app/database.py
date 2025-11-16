@@ -1,30 +1,39 @@
 """
-Veritabanı Konfigürasyonu
+Database Configuration - Absolute Path ile
+backend/app/database.py
 """
+import os
+from pathlib import Path
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from app.config import settings
-from app.models import Base
-import logging
+from sqlalchemy.orm import sessionmaker
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+# Backend dizinini bul (app/ klasörünün parent'ı)
+BASE_DIR = Path(__file__).resolve().parent.parent  # backend/
+DATA_DIR = BASE_DIR / "data"
 
-# Database engine
+# data/ klasörü yoksa oluştur
+DATA_DIR.mkdir(exist_ok=True)
+
+# Test modunda mı kontrol et
+TESTING = os.getenv("TESTING", "false").lower() == "true"
+
+if TESTING:
+    # Test için ayrı database - ABSOLUTE PATH
+    DB_PATH = DATA_DIR / "test_tarif_e.db"
+    SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+    print(f"⚠️  TEST DATABASE kullanılıyor: {DB_PATH}")
+else:
+    # Production database - ABSOLUTE PATH
+    DB_PATH = DATA_DIR / "tarif_e.db"
+    SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+    print(f"✅ PRODUCTION DATABASE kullanılıyor: {DB_PATH}")
+
 engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False}  # SQLite için gerekli
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False}
 )
 
-# Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def init_db():
-    """Veritabanı tablolarını oluştur"""
-    Base.metadata.create_all(bind=engine)
-    # print yerine logger.info
-    logger.info("Veritabanı tabloları oluşturuldu")
 
 
 def get_db():

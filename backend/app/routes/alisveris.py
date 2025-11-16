@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import AlisverisListesi, AlisverisUrunu, Malzeme, KullaniciMalzeme
-from app.schemas.alisveris import AlisverisOlustur, AlisverisUrunDurum
+from app.schemas.alisveris import AlisverisListesiCreate
 import logging
 import traceback
 from app.utils.auth import get_current_user
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/alisveris", tags=["Alışveriş"])
 
 
 @router.post("/olustur")
-async def alisveris_olustur(request: AlisverisOlustur, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def alisveris_olustur(request: AlisverisListesiCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Tarifteki malzemelerden alışveriş listesi oluştur"""
     user_id = current_user.id # Kimlik doğrulama sonrası güncellenecek
     logger.info(f"Kullanıcı {user_id} için alışveriş listesi oluşturuluyor.")

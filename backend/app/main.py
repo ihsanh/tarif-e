@@ -4,7 +4,6 @@ Tarif-e FastAPI Ana Uygulama
 import sys
 from pathlib import Path
 
-# Backend klasörünü Python path'ine ekle
 BACKEND_DIR = Path(__file__).parent.parent.resolve()
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
@@ -23,8 +22,9 @@ from app.routes import (
     malzeme_router,
     tarif_router,
     alisveris_router,
-    auth_router  # YENİ
+    auth_router
 )
+from app.routes.alisveris_extended import router as alisveris_extended_router
 
 # Veritabanını başlat
 Base.metadata.create_all(bind=engine)
@@ -54,7 +54,7 @@ app.include_router(auth_router)  # YENİ - Authentication
 app.include_router(malzeme_router)
 app.include_router(tarif_router)
 app.include_router(alisveris_router)
-
+app.include_router(alisveris_extended_router)
 
 # HTML Pages (API route'larından sonra)
 @app.get("/login.html")
