@@ -99,7 +99,7 @@ async def liste_paylas(
     }
 
 
-@router.get("/benimle-paylasilan", response_model=List[PaylasilanListeResponse])
+@router.get("/benimle-paylasilanlar", response_model=List[PaylasilanListeResponse])
 async def benimle_paylasilan_listeler(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)

@@ -132,13 +132,20 @@ header h1 {
 }
 
 .btn-back {
-    background: transparent;
+    padding: 10px 20px;
+    background: #E2E8F0;
+    color: #2D3748;
     border: none;
-    font-size: 1.1em;
-    padding: 10px;
+    border-radius: 8px;
     cursor: pointer;
-    color: var(--primary-color);
+    font-weight: 600;
     margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: #CBD5E0;
+    transform: translateX(-2px);
 }
 
 .btn-settings {

@@ -110,7 +110,7 @@
         </div>
         <!-- Alışveriş Listelerim Ekranı -->
         <div id="shopping-lists-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            <button class="btn-back" onclick="goBack()">← Geri</button>
 
             <h2>🛒 Alışveriş Listelerim</h2>
             <div id="shopping-lists-container"></div>
@@ -173,7 +173,7 @@
         <!-- Kamera Ekranı -->
         <!-- Fotoğraf Çek/Yükle Ekranı -->
         <div id="camera-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            <button class="btn-back" onclick="goBack()">← Geri</button>
 
             <h2 id="camera-screen-title">📷 Fotoğraf Çek</h2>
 
@@ -202,7 +202,7 @@
 
         <!-- Manuel Ekleme Ekranı -->
         <div id="manual-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            <button class="btn-back" onclick="goBack()">← Geri</button>
             
             <h2>Malzeme Ekle</h2>
             
@@ -224,7 +224,7 @@
 
         <!-- Malzemelerim Ekranı -->
         <div id="my-ingredients-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            <button class="btn-back" onclick="goBack()">← Geri</button>
 
             <h2>Malzemelerim</h2>
             <div id="my-ingredients-list" class="ingredients-list"></div>
@@ -265,7 +265,7 @@
 
         <!-- Tarif Ekranı -->
         <div id="recipe-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            <button class="btn-back" onclick="goBack()">← Geri</button>
 
             <div id="recipe-details"></div>
 
@@ -284,7 +284,7 @@
 
         <!-- Favori Tarifler Ekranı -->
         <div id="favorites-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            <button class="btn-back" onclick="goBack()">← Geri</button>
 
             <h2>⭐ Favori Tariflerim</h2>
             <div id="favorites-container"></div>
@@ -308,7 +308,7 @@
 
         <!-- Ayarlar Ekranı -->
         <div id="settings-screen" class="screen">
-            <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
+            <button class="btn-back" onclick="goBack()">← Geri</button>
             
             <h2>⚙️ Ayarlar</h2>
             
@@ -343,25 +343,26 @@
             <div class="spinner"></div>
             <p>Yükleniyor...</p>
         </div>
-    </div>
-    <!-- Davetler Ekranı -->
-    <div id="invitations-screen" class="screen">
-        <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
-        <h2>🔔 Davetlerim</h2>
-        <p style="color: #718096; margin-bottom: 20px;">
-            Sizinle paylaşılan alışveriş listesi davetleri
-        </p>
-        <div id="invitations-container"></div>
-    </div>
 
-    <!-- Paylaşılan Listeler Ekranı -->
-    <div id="shared-lists-screen" class="screen">
-        <button class="btn-back" onclick="showScreen('main-menu')">← Geri</button>
-        <h2>👥 Benimle Paylaşılan Listeler</h2>
-        <p style="color: #718096; margin-bottom: 20px;">
-            Diğer kullanıcıların sizinle paylaştığı listeler
-        </p>
-        <div id="shared-lists-container"></div>
+        <!-- Davetler Ekranı -->
+        <div id="invitations-screen" class="screen">
+            <button class="btn-back" onclick="goBack()">← Geri</button>
+            <h2>🔔 Davetlerim</h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                Sizinle paylaşılan alışveriş listesi davetleri
+            </p>
+            <div id="invitations-container"></div>
+        </div>
+
+        <!-- Paylaşılan Listeler Ekranı -->
+        <div id="shared-lists-screen" class="screen">
+            <button class="btn-back" onclick="goBack()">← Geri</button>
+            <h2>👥 Benimle Paylaşılan Listeler</h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                Diğer kullanıcıların sizinle paylaştığı listeler
+            </p>
+            <div id="shared-lists-container"></div>
+        </div>
     </div>
 
     <!-- Paylaşım Modalı -->
@@ -408,8 +409,6 @@
     </script>
 <script>
     const token = localStorage.getItem('access_token');
-console.log('Token uzunluğu:', token.length);
-console.log('Token başlangıcı:', token);
 
 // Manual test
 fetch('http://localhost:8000/api/malzeme/liste', {

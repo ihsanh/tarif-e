@@ -1,5 +1,52 @@
 // Tarif-e JavaScript
 
+// ============================================
+// AKıLLI NAVİGASYON SİSTEMİ
+// ============================================
+
+let screenHistory = ['main-menu'];
+
+// Orijinal showScreen'i kaydet
+const originalShowScreen = showScreen;
+
+// showScreen'i override et
+function showScreen(screenId) {
+    const currentScreen = document.querySelector('.screen.active')?.id;
+
+    // Geçmişe ekle
+    if (currentScreen && currentScreen !== screenId && screenId !== 'main-menu') {
+        if (screenHistory[screenHistory.length - 1] !== currentScreen) {
+            screenHistory.push(currentScreen);
+        }
+    }
+
+    // Ana menüye gidince geçmişi temizle
+    if (screenId === 'main-menu') {
+        screenHistory = ['main-menu'];
+    }
+
+    // Orijinal fonksiyonu çağır
+    originalShowScreen(screenId);
+}
+
+// Geri dönüş fonksiyonu
+function goBack() {
+    if (screenHistory.length > 1) {
+        screenHistory.pop(); // Mevcut ekranı çıkar
+        const previousScreen = screenHistory[screenHistory.length - 1];
+
+        // Direkt geçiş yap (geçmişe tekrar eklenmemesi için)
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        document.getElementById(previousScreen)?.classList.add('active');
+    } else {
+        showScreen('main-menu');
+    }
+}
+
+console.log('✅ Akıllı navigasyon sistemi yüklendi');
+
 // SAYFA YÜKLENİRKEN HEMEN KONTROL ET
 (function() {
     const token = localStorage.getItem('access_token');
@@ -121,7 +168,7 @@ function displayUserInfo() {
 document.addEventListener('DOMContentLoaded', () => {
     const currentPath = window.location.pathname;
 
-    console.log('📍 Sayfaaaaaaa:', currentPath);
+    console.log('📍 Sayfa:', currentPath);
 
     // Login sayfasındaysa app.js'i yükleme
     if (currentPath.includes('login.html')) {
@@ -1800,7 +1847,7 @@ async function shareList() {
     showLoading(true);
 
     try {
-        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/olustur`, {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davet-gonder`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1830,7 +1877,7 @@ async function shareList() {
 // Paylaşım bilgilerini yükle
 async function loadShareInfo(listeId) {
     try {
-        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/liste/${listeId}/paylasimlar`);
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/liste/${listeId}/paylasilanlar`);
         const data = await response.json();
 
         if (data.success && data.paylasimlar) {
@@ -2035,7 +2082,7 @@ async function loadSharedLists() {
     showLoading(true);
 
     try {
-        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/benimle-paylasilan`);
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/benimle-paylasilanlar`);
         const data = await response.json();
 
         const container = document.getElementById('shared-lists-container');
