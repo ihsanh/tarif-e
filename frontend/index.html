@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍳 Tarif-e - Akıllı Mutfak Asistanı</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/favicon-512.png">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tarif-e">
+
     <link rel="stylesheet" href="/static/css/style.css">
     <script>
         // Token yoksa login'e yönlendir
@@ -203,9 +217,9 @@
         <!-- Manuel Ekleme Ekranı -->
         <div id="manual-screen" class="screen">
             <button class="btn-back" onclick="goBack()">← Geri</button>
-            
+
             <h2>Malzeme Ekle</h2>
-            
+
             <div class="form-group">
                 <input type="text" id="ingredient-name" placeholder="Malzeme adı (örn: domates)" class="input">
                 <input type="number" id="ingredient-amount" placeholder="Miktar" class="input" value="1">
@@ -309,9 +323,9 @@
         <!-- Ayarlar Ekranı -->
         <div id="settings-screen" class="screen">
             <button class="btn-back" onclick="goBack()">← Geri</button>
-            
+
             <h2>⚙️ Ayarlar</h2>
-            
+
             <div class="settings-group">
                 <h3>🤖 AI Kullanım Modu</h3>
                 <select id="ai-mode-select" class="input" onchange="updateAIMode()">

@@ -22,10 +22,10 @@ from app.routes import (
     malzeme_router,
     tarif_router,
     alisveris_router,
-    auth_router,
-    paslasim_router
+    auth_router
 )
 from app.routes.alisveris_extended import router as alisveris_extended_router
+from app.routes.paylasim import router as paylasim_router
 
 # Veritabanını başlat
 Base.metadata.create_all(bind=engine)
@@ -56,7 +56,7 @@ app.include_router(malzeme_router)
 app.include_router(tarif_router)
 app.include_router(alisveris_router)
 app.include_router(alisveris_extended_router)
-app.include_router(paslasim_router)
+app.include_router(paylasim_router)
 
 # HTML Pages (API route'larından sonra)
 @app.get("/login.html")
@@ -99,9 +99,20 @@ async def root():
     }
 
 
-# Static files (CSS, JS, images) - en sonda
+# Static files - CSS, JS, images
+# Frontend CSS/JS için
 if frontend_path.exists():
-    app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
+    app.mount("/static/css", StaticFiles(directory=str(frontend_path / "css")), name="css")
+    app.mount("/static/js", StaticFiles(directory=str(frontend_path / "js")), name="js")
+
+# Backend static dosyaları (favicon, manifest, vb.)
+backend_static_path = BACKEND_DIR / "static"
+if not backend_static_path.exists():
+    backend_static_path.mkdir(exist_ok=True)
+    print(f"📁 Static klasörü oluşturuldu: {backend_static_path}")
+
+# Favicon ve diğer root static dosyalar için
+app.mount("/static", StaticFiles(directory=str(backend_static_path)), name="static")
 
 
 @app.get("/api/ayarlar")
