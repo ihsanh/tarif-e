@@ -8,6 +8,7 @@ from .health import router as health_router
 from .auth import router as auth_router
 from .alisveris_extended import router as alısveris_extended_router
 from .paylasim import router as paslasim_router
+from .profile import router as profile_router
 
 __all__ = [
     "malzeme_router",

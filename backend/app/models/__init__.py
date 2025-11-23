@@ -7,6 +7,7 @@ from .user import User
 from .malzeme import Malzeme, MalzemeKategorisi, KullaniciMalzeme
 from .alisveris import AlisverisListesi, AlisverisUrunu, ListePaylasim, PaylaşımRolü
 from .tarif import FavoriTarif
+from .user_profile import UserProfile
 
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "AlisverisUrunu",
     "ListePaylasim",
     "PaylaşımRolü",
-    "FavoriTarif"
+    "FavoriTarif",
+    "UserProfile"
 ]
