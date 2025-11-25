@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v17- Favori Tarif Yazdırma Eklendi">
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v18- test senaryoları düzenlendi">
+      <change afterPath="$PROJECT_DIR$/frontend/css/themes.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/js/theme.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_profile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/profile.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,17 +57,21 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/tests",
+    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/frontend/js",
     "settings.editor.selected.configurable": "File.Encoding"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\js" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\css" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\static" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\routes" />
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\models" />
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\css" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\static" />
     </key>
   </component>
   <component name="RunManager">
@@ -268,7 +273,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764090736100</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="v18- test senaryoları düzenlendi">
+      <option name="closed" value="true" />
+      <created>1764091409610</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1764091409610</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -303,7 +316,8 @@
     <MESSAGE value="v15 - FAVICon eklendi" />
     <MESSAGE value="v1 - Profil Ayarları eklendi" />
     <MESSAGE value="v17- Favori Tarif Yazdırma Eklendi" />
-    <option name="LAST_COMMIT_MESSAGE" value="v17- Favori Tarif Yazdırma Eklendi" />
+    <MESSAGE value="v18- test senaryoları düzenlendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v18- test senaryoları düzenlendi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -312,11 +326,6 @@
           <url>file://$PROJECT_DIR$/backend/app/utils/__init__.py</url>
           <line>3</line>
           <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/tests/test_profile.py</url>
-          <line>4</line>
-          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

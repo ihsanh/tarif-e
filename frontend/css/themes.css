@@ -1,0 +1,371 @@
+/* ============================================
+   TARIF-E TEMA SİSTEMİ
+   3 Tema: Light, Material Design, Dark
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES - Light Theme (Default)
+   ============================================ */
+:root {
+    /* Colors */
+    --primary-color: #667eea;
+    --primary-dark: #5568d3;
+    --secondary-color: #764ba2;
+    --accent-color: #f093fb;
+    
+    /* Background */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    
+    /* Text */
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    
+    /* Borders */
+    --border-color: #e2e8f0;
+    --border-dark: #cbd5e0;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+    
+    /* Status Colors */
+    --success-color: #48bb78;
+    --warning-color: #f6ad55;
+    --error-color: #f56565;
+    --info-color: #4299e1;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* ============================================
+   MATERIAL DESIGN THEME
+   ============================================ */
+[data-theme="material"] {
+    /* Material Design Colors */
+    --primary-color: #2196F3;
+    --primary-dark: #1976D2;
+    --secondary-color: #FF5722;
+    --accent-color: #00BCD4;
+    
+    /* Background - Material Paper */
+    --bg-primary: #FAFAFA;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #F5F5F5;
+    
+    /* Text - Material Typography */
+    --text-primary: rgba(0, 0, 0, 0.87);
+    --text-secondary: rgba(0, 0, 0, 0.60);
+    --text-muted: rgba(0, 0, 0, 0.38);
+    
+    /* Borders */
+    --border-color: rgba(0, 0, 0, 0.12);
+    --border-dark: rgba(0, 0, 0, 0.24);
+    
+    /* Material Shadows (Elevation) */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    --shadow-xl: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    
+    /* Status Colors - Material */
+    --success-color: #4CAF50;
+    --warning-color: #FF9800;
+    --error-color: #F44336;
+    --info-color: #2196F3;
+    
+    /* Gradients - Material */
+    --gradient-primary: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+    --gradient-secondary: linear-gradient(135deg, #FF5722 0%, #FFC107 100%);
+}
+
+/* ============================================
+   DARK MODE THEME
+   ============================================ */
+[data-theme="dark"] {
+    /* Dark Mode Colors */
+    --primary-color: #7c3aed;
+    --primary-dark: #6d28d9;
+    --secondary-color: #ec4899;
+    --accent-color: #8b5cf6;
+    
+    /* Background - Dark Surfaces */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    
+    /* Text - Dark Mode */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    
+    /* Borders */
+    --border-color: #334155;
+    --border-dark: #475569;
+    
+    /* Dark Shadows (Glow effect) */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+    
+    /* Status Colors - Dark Mode */
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --info-color: #3b82f6;
+    
+    /* Gradients - Dark */
+    --gradient-primary: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+    --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+}
+
+/* ============================================
+   GLOBAL STYLES - THEME AWARE
+   ============================================ */
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color var(--transition-normal), 
+                color var(--transition-normal);
+}
+
+/* Container */
+.container {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+}
+
+/* Cards */
+.card,
+.profile-card,
+.recipe-card,
+.favorite-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+}
+
+.card:hover,
+.favorite-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* Buttons */
+.btn {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+}
+
+.btn:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    background: var(--gradient-secondary);
+}
+
+.btn-danger {
+    background: var(--error-color);
+}
+
+/* Inputs */
+input,
+textarea,
+select {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+/* Dark mode input focus */
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+/* Tabs */
+.tabs {
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab {
+    color: var(--text-secondary);
+    border-bottom: 3px solid transparent;
+    transition: all var(--transition-fast);
+}
+
+.tab:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+}
+
+.tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* User Info Bar */
+#user-info-bar {
+    background: var(--gradient-primary);
+}
+
+/* Loading */
+.loading {
+    border-color: var(--border-color);
+    border-top-color: var(--primary-color);
+}
+
+/* Status Tags */
+.badge {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.badge-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.badge-warning {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.badge-error {
+    background-color: var(--error-color);
+    color: white;
+}
+
+/* ============================================
+   MATERIAL DESIGN SPECIFIC STYLES
+   ============================================ */
+
+[data-theme="material"] .btn {
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+[data-theme="material"] .card,
+[data-theme="material"] .container {
+    border-radius: 4px;
+}
+
+[data-theme="material"] input,
+[data-theme="material"] textarea,
+[data-theme="material"] select {
+    border-radius: 4px;
+}
+
+/* Material Ripple Effect */
+[data-theme="material"] .btn:active {
+    transform: scale(0.98);
+}
+
+/* ============================================
+   DARK MODE SPECIFIC STYLES
+   ============================================ */
+
+/* Darker scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 12px;
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background-color: var(--bg-tertiary);
+    border-radius: 6px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-dark);
+}
+
+/* Dark mode card hover */
+[data-theme="dark"] .card:hover,
+[data-theme="dark"] .favorite-card:hover {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+}
+
+/* Dark mode button glow */
+[data-theme="dark"] .btn:hover {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+}
+
+/* ============================================
+   THEME TRANSITION ANIMATION
+   ============================================ */
+
+* {
+    transition: background-color var(--transition-normal),
+                color var(--transition-normal),
+                border-color var(--transition-normal),
+                box-shadow var(--transition-normal);
+}
+
+/* ============================================
+   RESPONSIVE - THEME AWARE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    [data-theme="material"] .btn {
+        font-size: 14px;
+    }
+}
+
+/* ============================================
+   PRINT STYLES - FORCE LIGHT
+   ============================================ */
+
+@media print {
+    * {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+    }
+}

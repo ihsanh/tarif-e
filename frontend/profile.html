@@ -11,7 +11,8 @@
     
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/profile.css">
-    
+    <link rel="stylesheet" href="/static/css/themes.css">
+
     <script>
         // Token kontrolü
         if (!localStorage.getItem('access_token')) {
@@ -21,6 +22,7 @@
         // API Base
         const API_BASE = 'http://localhost:8000';
     </script>
+    <script src="/static/js/theme.js" defer></script>
 </head>
 <body>
 
@@ -107,7 +109,7 @@
 
         <div class="profile-info">
             <h3 id="profile-username">Username</h3>
-            <p id="profile-email">email@example.com</p>
+            <p id="profile-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="67020a060e0b27021f060a170b024904080a">[email&#160;protected]</a></p>
             <p id="profile-joined" style="font-size: 0.85em; color: #A0AEC0; margin-top: 5px;">
                 Üyelik: -
             </p>
@@ -238,10 +240,10 @@
 
         <div class="preference-section">
             <h4>🎨 Tema Seçimi</h4>
-            <p class="info-text">Yakında aktif olacak</p>
+            <p class="info-text">Uygulamanın görünümünü değiştir</p>
 
             <div class="theme-options">
-                <div class="theme-option" data-theme="light">
+                <div class="theme-option" data-theme="light" onclick="changeTheme('light')">
                     <div class="theme-preview light-theme">
                         <div class="preview-header"></div>
                         <div class="preview-body">
@@ -255,7 +257,21 @@
                     </div>
                 </div>
 
-                <div class="theme-option" data-theme="dark">
+                <div class="theme-option" data-theme="material" onclick="changeTheme('material')">
+                    <div class="theme-preview material-theme">
+                        <div class="preview-header" style="background: #2196F3;"></div>
+                        <div class="preview-body" style="background: #FAFAFA;">
+                            <div class="preview-line" style="background: rgba(0,0,0,0.6);"></div>
+                            <div class="preview-line short" style="background: rgba(0,0,0,0.4);"></div>
+                        </div>
+                    </div>
+                    <div class="theme-info">
+                        <input type="radio" name="theme" value="material" id="theme-material">
+                        <label for="theme-material">🎨 Material Design</label>
+                    </div>
+                </div>
+
+                <div class="theme-option" data-theme="dark" onclick="changeTheme('dark')">
                     <div class="theme-preview dark-theme">
                         <div class="preview-header"></div>
                         <div class="preview-body">
@@ -264,30 +280,12 @@
                         </div>
                     </div>
                     <div class="theme-info">
-                        <input type="radio" name="theme" value="dark" id="theme-dark" disabled>
-                        <label for="theme-dark">🌙 Koyu Tema (Yakında)</label>
-                    </div>
-                </div>
-
-                <div class="theme-option" data-theme="auto">
-                    <div class="theme-preview auto-theme">
-                        <div class="preview-header"></div>
-                        <div class="preview-body">
-                            <div class="preview-line"></div>
-                            <div class="preview-line short"></div>
-                        </div>
-                    </div>
-                    <div class="theme-info">
-                        <input type="radio" name="theme" value="auto" id="theme-auto" disabled>
-                        <label for="theme-auto">🔄 Otomatik (Yakında)</label>
+                        <input type="radio" name="theme" value="dark" id="theme-dark">
+                        <label for="theme-dark">🌙 Koyu Tema</label>
                     </div>
                 </div>
             </div>
         </div>
-
-        <button class="btn btn-primary" onclick="saveAppearance()" disabled>
-            💾 Kaydet (Yakında Aktif)
-        </button>
     </div>
 
 </div>
@@ -302,7 +300,7 @@
 <div id="notification" class="notification"></div>
 
 <!-- Scripts -->
-<script src="/static/js/profile.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="/static/js/profile.js"></script>
 
 <script>
     // Yardımcı fonksiyonlar
@@ -336,7 +334,7 @@
         window.location.href = '/login.html';
     }
 
-    // Sayfa yüklendiğinde
+   // Sayfa yüklendiğinde
     document.addEventListener('DOMContentLoaded', async function() {
         try {
             const response = await fetchWithAuth(`${API_BASE}/api/auth/me`);
