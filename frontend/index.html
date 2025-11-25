@@ -20,6 +20,7 @@
 
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/themes.css">
+    <link rel="stylesheet" href="/static/css/share.css">
 
     <style>
         /* Modern Yumuşak Arka Plan */
@@ -370,6 +371,11 @@
                 <button class="btn" style="background: #FC8181; color: white;" onclick="deleteFavoriteRecipe()">
                     🗑️ Favorilerden Çıkar
                 </button>
+                <button class="btn btn-share"
+                        onclick="openShareModal(currentRecipe)"
+                        style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                    📤 Paylaş
+                </button>
             </div>
         </div>
 
@@ -466,6 +472,7 @@
     </div>
     <script src="/static/js/theme.js"></script>
     <script src="/static/js/app.js"></script>
+    <script src="/static/js/share.js"></script>
     <script>
     function handleLogout() {
         if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {

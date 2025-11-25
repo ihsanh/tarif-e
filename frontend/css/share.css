@@ -1,0 +1,336 @@
+/* ============================================
+   TARİF PAYLAŞMA MODAL STİLLERİ
+   ============================================ */
+
+/* Modal Overlay */
+.share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.share-modal.show {
+    opacity: 1;
+}
+
+.share-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+/* Modal Content */
+.share-modal-content {
+    position: relative;
+    background: var(--bg-secondary, white);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.share-modal.show .share-modal-content {
+    transform: scale(1);
+}
+
+/* Modal Header */
+.share-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.share-modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary, #2d3748);
+}
+
+.share-modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-muted, #718096);
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.share-modal-close:hover {
+    background: var(--bg-tertiary, #e9ecef);
+    color: var(--text-primary, #2d3748);
+}
+
+/* Modal Body */
+.share-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(80vh - 80px);
+}
+
+/* Tarif Önizleme */
+.share-recipe-preview {
+    background: var(--bg-tertiary, #f8f9fa);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.share-recipe-preview h4 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary, #2d3748);
+}
+
+.share-recipe-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #4a5568);
+    margin: 0 0 8px 0;
+}
+
+.share-recipe-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary, #4a5568);
+    margin: 8px 0 0 0;
+    line-height: 1.5;
+}
+
+/* Paylaşım Butonları */
+.share-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border: 2px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    background: var(--bg-primary, white);
+    color: var(--text-primary, #2d3748);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.share-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* WhatsApp */
+.share-btn.whatsapp {
+    background: #25D366;
+    color: white;
+    border-color: #25D366;
+}
+
+.share-btn.whatsapp:hover {
+    background: #20BA5A;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+/* Twitter/X */
+.share-btn.twitter {
+    background: #1DA1F2;
+    color: white;
+    border-color: #1DA1F2;
+}
+
+.share-btn.twitter:hover {
+    background: #1A91DA;
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.3);
+}
+
+/* Dark theme için Twitter */
+[data-theme="dark"] .share-btn.twitter {
+    background: #000000;
+    border-color: #000000;
+}
+
+[data-theme="dark"] .share-btn.twitter:hover {
+    background: #1a1a1a;
+}
+
+/* Facebook */
+.share-btn.facebook {
+    background: #1877F2;
+    color: white;
+    border-color: #1877F2;
+}
+
+.share-btn.facebook:hover {
+    background: #166FE5;
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+}
+
+/* Telegram */
+.share-btn.telegram {
+    background: #0088CC;
+    color: white;
+    border-color: #0088CC;
+}
+
+.share-btn.telegram:hover {
+    background: #007AB8;
+    box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+}
+
+/* Email */
+.share-btn.email {
+    background: #EA4335;
+    color: white;
+    border-color: #EA4335;
+}
+
+.share-btn.email:hover {
+    background: #D93025;
+    box-shadow: 0 4px 12px rgba(234, 67, 53, 0.3);
+}
+
+/* Link Kopyala */
+.share-btn.copy {
+    background: var(--primary-color, #667eea);
+    color: white;
+    border-color: var(--primary-color, #667eea);
+}
+
+.share-btn.copy:hover {
+    background: var(--primary-dark, #5568d3);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Link Önizleme */
+.share-link-preview {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: var(--bg-tertiary, #f8f9fa);
+    border-radius: 8px;
+}
+
+.share-link-preview input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: var(--bg-primary, white);
+    color: var(--text-primary, #2d3748);
+}
+
+.share-link-preview button {
+    padding: 8px 16px;
+    background: var(--primary-color, #667eea);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.share-link-preview button:hover {
+    background: var(--primary-dark, #5568d3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .share-modal-content {
+        width: 95%;
+        max-width: none;
+    }
+
+    .share-options {
+        grid-template-columns: 1fr;
+    }
+
+    .share-btn {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+
+    .share-modal-body {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .share-modal-header {
+        padding: 16px 20px;
+    }
+
+    .share-modal-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .share-recipe-preview {
+        padding: 12px;
+    }
+}
+
+/* Dark Theme Uyumu */
+[data-theme="dark"] .share-modal-overlay {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .share-modal-content {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* Print için gizle */
+@media print {
+    .share-modal {
+        display: none !important;
+    }
+}
+
+/* Animasyonlar */
+@keyframes shareButtonPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.share-btn:active {
+    animation: shareButtonPulse 0.3s ease;
+}
