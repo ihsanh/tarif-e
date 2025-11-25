@@ -4,13 +4,6 @@ Düzeltilmiş: conftest.py kullanır
 """
 import pytest
 
-# ❌ BUNLARI KALDIR - conftest.py halledecek
-# from fastapi.testclient import TestClient
-# from app.main import app
-# from app.database import Base, engine
-# client = TestClient(app)
-
-
 class TestRegister:
     """Kullanıcı kayıt testleri"""
 

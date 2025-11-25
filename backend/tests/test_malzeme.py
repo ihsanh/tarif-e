@@ -2,21 +2,6 @@
 Malzeme API Testleri - Düzeltilmiş (conftest.py kullanır)
 """
 import pytest
-from fastapi.testclient import TestClient
-
-# ❌ BUNLARI KALDIR - conftest.py halledecek
-# from app.main import app
-# from app.database import get_db, Base, engine
-# client = TestClient(app)
-
-
-# ❌ BU FİXTURE'U KALDIR - conftest.py'de var
-# @pytest.fixture(autouse=True)
-# def setup_database():
-#     Base.metadata.create_all(bind=engine)
-#     yield
-#     Base.metadata.drop_all(bind=engine)  # ❌ Production DB'yi siliyordu!
-
 
 # Test kullanıcısı oluştur ve token al
 @pytest.fixture

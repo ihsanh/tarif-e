@@ -4,20 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v1 - Profil Ayarları eklendi">
-      <change afterPath="$PROJECT_DIR$/backend/tests/test_profile.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/css/profile.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/profile.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/profile.html" afterDir="false" />
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v17- Favori Tarif Yazdırma Eklendi">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/services/ai_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/ai_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/utils/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/utils/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/test_requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/test_requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/conftest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_malzeme.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_profile.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -269,7 +260,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763925404854</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="v17- Favori Tarif Yazdırma Eklendi">
+      <option name="closed" value="true" />
+      <created>1764090736100</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1764090736100</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -303,7 +302,8 @@
     <MESSAGE value="v15 - Alışevriş listele paylaşımı" />
     <MESSAGE value="v15 - FAVICon eklendi" />
     <MESSAGE value="v1 - Profil Ayarları eklendi" />
-    <option name="LAST_COMMIT_MESSAGE" value="v1 - Profil Ayarları eklendi" />
+    <MESSAGE value="v17- Favori Tarif Yazdırma Eklendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v17- Favori Tarif Yazdırma Eklendi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
