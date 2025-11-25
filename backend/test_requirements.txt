@@ -4,3 +4,15 @@ pytest-asyncio==0.21.1
 pytest-cov==4.1.0
 httpx==0.25.2
 faker==20.1.0
+
+fastapi[all]==0.104.1
+
+# Test utilities
+Faker==20.1.0  # Generate fake data
+factory-boy==3.3.0  # Test factories
+
+# Image processing (for photo upload tests)
+Pillow==10.1.0
+
+# Database
+sqlalchemy==2.0.23

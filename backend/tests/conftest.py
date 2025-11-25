@@ -77,6 +77,12 @@ def db_session():
 
 
 @pytest.fixture(scope="function")
+def db(db_session):
+    """Alias for test_profile.py compatibility"""
+    return db_session
+
+
+@pytest.fixture(scope="function")
 def client(db_session):
     """Test client with test database"""
     def override_get_db():

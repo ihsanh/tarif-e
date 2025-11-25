@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Ayarları - Tarif-e</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
+    
+    <script>
+        // Token kontrolü
+        if (!localStorage.getItem('access_token')) {
+            window.location.href = '/login.html';
+        }
+
+        // API Base
+        const API_BASE = 'http://localhost:8000';
+    </script>
+</head>
+<body>
+
+<!-- User Info Bar -->
+<div id="user-info-bar" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+">
+    <div>
+        <span id="user-display-name" style="font-weight: 600; font-size: 1.1em;">Kullanıcı</span>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <button onclick="window.location.href='/'"
+                style="
+                    padding: 8px 16px;
+                    background: rgba(255,255,255,0.2);
+                    color: white;
+                    border: 1px solid rgba(255,255,255,0.3);
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: all 0.2s;
+                "
+                onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            🏠 Ana Sayfa
+        </button>
+        <button onclick="logout()"
+                style="
+                    padding: 8px 16px;
+                    background: rgba(255,255,255,0.2);
+                    color: white;
+                    border: 1px solid rgba(255,255,255,0.3);
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: all 0.2s;
+                "
+                onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            🚪 Çıkış
+        </button>
+    </div>
+</div>
+
+<!-- Main Content Spacer -->
+<div style="height: 70px;"></div>
+
+<!-- Container -->
+<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+    <!-- Profil Kartı -->
+    <div class="profile-card">
+        <div class="profile-photo-section">
+            <div class="profile-photo-container">
+                <img id="profile-photo-display"
+                     src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23E2E8F0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='40' fill='%234A5568'%3E👤%3C/text%3E%3C/svg%3E"
+                     alt="Profil Fotoğrafı">
+                <div class="photo-overlay">
+                    <label for="profile-photo-input" class="photo-upload-btn">
+                        📷 Değiştir
+                    </label>
+                    <input type="file"
+                           id="profile-photo-input"
+                           accept="image/*"
+                           style="display: none;"
+                           onchange="uploadProfilePhoto()">
+                </div>
+            </div>
+            <button class="btn btn-secondary" onclick="deleteProfilePhoto()" style="margin-top: 10px;">
+                🗑️ Fotoğrafı Sil
+            </button>
+        </div>
+
+        <div class="profile-info">
+            <h3 id="profile-username">Username</h3>
+            <p id="profile-email">email@example.com</p>
+            <p id="profile-joined" style="font-size: 0.85em; color: #A0AEC0; margin-top: 5px;">
+                Üyelik: -
+            </p>
+        </div>
+    </div>
+
+    <!-- Tab Navigasyon -->
+    <div class="settings-tabs">
+        <button class="tab-btn active" onclick="showSettingsTab('personal')">
+            👤 Kişisel Bilgiler
+        </button>
+        <button class="tab-btn" onclick="showSettingsTab('preferences')">
+            🍽️ Tercihler
+        </button>
+        <button class="tab-btn" onclick="showSettingsTab('security')">
+            🔒 Güvenlik
+        </button>
+        <button class="tab-btn" onclick="showSettingsTab('appearance')">
+            🎨 Görünüm
+        </button>
+    </div>
+
+    <!-- Kişisel Bilgiler Tab -->
+    <div id="settings-tab-personal" class="settings-tab-content active">
+        <h3>Kişisel Bilgiler</h3>
+
+        <div class="form-group">
+            <label>Ad Soyad:</label>
+            <input type="text" id="full-name-input" class="input" placeholder="Ad Soyad">
+        </div>
+
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="email-input" class="input" placeholder="email@example.com">
+        </div>
+
+        <div class="form-group">
+            <label>Hakkımda:</label>
+            <textarea id="bio-input" class="input" rows="4" placeholder="Kendiniz hakkında birkaç kelime..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" onclick="updateUserInfo()">
+            💾 Bilgileri Kaydet
+        </button>
+    </div>
+
+    <!-- Tercihler Tab -->
+    <div id="settings-tab-preferences" class="settings-tab-content">
+        <h3>Beslenme Tercihleri</h3>
+        <p class="info-text">Bu tercihler tarif önerilerinde kullanılacaktır</p>
+
+        <!-- Diyet Tercihleri -->
+        <div class="preference-section">
+            <h4>🥗 Diyet Tercihleri</h4>
+            <div id="dietary-preferences-container" class="preference-grid">
+                <!-- JavaScript ile doldurulacak -->
+            </div>
+        </div>
+
+        <!-- Alerjiler -->
+        <div class="preference-section">
+            <h4>⚠️ Alerjilerim</h4>
+            <div id="allergies-container" class="preference-grid">
+                <!-- JavaScript ile doldurulacak -->
+            </div>
+        </div>
+
+        <!-- Sevmediğim Yiyecekler -->
+        <div class="preference-section">
+            <h4>❌ Sevmediğim Yiyecekler</h4>
+            <div class="form-group">
+                <input type="text"
+                       id="dislike-input"
+                       class="input"
+                       placeholder="Örn: patlıcan, kereviz"
+                       onkeypress="if(event.key === 'Enter') addDislike()">
+                <button class="btn btn-secondary" onclick="addDislike()">
+                    ➕ Ekle
+                </button>
+            </div>
+            <div id="dislikes-list" class="tags-list">
+                <!-- JavaScript ile doldurulacak -->
+            </div>
+        </div>
+
+        <button class="btn btn-success" onclick="savePreferences()">
+            💾 Tercihleri Kaydet
+        </button>
+    </div>
+
+    <!-- Güvenlik Tab -->
+    <div id="settings-tab-security" class="settings-tab-content">
+        <h3>Şifre Değiştir</h3>
+
+        <div class="form-group">
+            <label>Mevcut Şifre:</label>
+            <input type="password" id="current-password" class="input" placeholder="Mevcut şifreniz">
+        </div>
+
+        <div class="form-group">
+            <label>Yeni Şifre:</label>
+            <input type="password" id="new-password" class="input" placeholder="Yeni şifre (en az 6 karakter)">
+        </div>
+
+        <div class="form-group">
+            <label>Yeni Şifre (Tekrar):</label>
+            <input type="password" id="confirm-password" class="input" placeholder="Yeni şifrenizi tekrar girin">
+        </div>
+
+        <button class="btn btn-primary" onclick="changePassword()">
+            🔒 Şifreyi Değiştir
+        </button>
+
+        <div class="security-tips" style="margin-top: 30px; padding: 15px; background: #FFF8E1; border-radius: 8px;">
+            <h4>🛡️ Güvenlik İpuçları:</h4>
+            <ul style="margin: 10px 0 0 20px; color: #666;">
+                <li>Şifreniz en az 6 karakter olmalı</li>
+                <li>Büyük/küçük harf, rakam ve özel karakter kullanın</li>
+                <li>Aynı şifreyi farklı sitelerde kullanmayın</li>
+                <li>Şifrenizi kimseyle paylaşmayın</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Görünüm Tab -->
+    <div id="settings-tab-appearance" class="settings-tab-content">
+        <h3>Görünüm Ayarları</h3>
+
+        <div class="preference-section">
+            <h4>🎨 Tema Seçimi</h4>
+            <p class="info-text">Yakında aktif olacak</p>
+
+            <div class="theme-options">
+                <div class="theme-option" data-theme="light">
+                    <div class="theme-preview light-theme">
+                        <div class="preview-header"></div>
+                        <div class="preview-body">
+                            <div class="preview-line"></div>
+                            <div class="preview-line short"></div>
+                        </div>
+                    </div>
+                    <div class="theme-info">
+                        <input type="radio" name="theme" value="light" id="theme-light" checked>
+                        <label for="theme-light">☀️ Açık Tema</label>
+                    </div>
+                </div>
+
+                <div class="theme-option" data-theme="dark">
+                    <div class="theme-preview dark-theme">
+                        <div class="preview-header"></div>
+                        <div class="preview-body">
+                            <div class="preview-line"></div>
+                            <div class="preview-line short"></div>
+                        </div>
+                    </div>
+                    <div class="theme-info">
+                        <input type="radio" name="theme" value="dark" id="theme-dark" disabled>
+                        <label for="theme-dark">🌙 Koyu Tema (Yakında)</label>
+                    </div>
+                </div>
+
+                <div class="theme-option" data-theme="auto">
+                    <div class="theme-preview auto-theme">
+                        <div class="preview-header"></div>
+                        <div class="preview-body">
+                            <div class="preview-line"></div>
+                            <div class="preview-line short"></div>
+                        </div>
+                    </div>
+                    <div class="theme-info">
+                        <input type="radio" name="theme" value="auto" id="theme-auto" disabled>
+                        <label for="theme-auto">🔄 Otomatik (Yakında)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveAppearance()" disabled>
+            💾 Kaydet (Yakında Aktif)
+        </button>
+    </div>
+
+</div>
+
+<!-- Loading -->
+<div id="loading" class="loading" style="display: none;">
+    <div class="spinner"></div>
+    <p>Yükleniyor...</p>
+</div>
+
+<!-- Notification -->
+<div id="notification" class="notification"></div>
+
+<!-- Scripts -->
+<script src="/static/js/profile.js"></script>
+
+<script>
+    // Yardımcı fonksiyonlar
+    async function fetchWithAuth(url, options = {}) {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            window.location.href = '/login.html';
+            throw new Error('Token yok');
+        }
+        const headers = { 'Authorization': `Bearer ${token}`, ...options.headers };
+        return fetch(url, { ...options, headers });
+    }
+
+    function showLoading(show) {
+        const loading = document.getElementById('loading');
+        if (loading) loading.style.display = show ? 'flex' : 'none';
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        notification.textContent = message;
+        notification.style.display = 'block';
+        notification.style.background = type === 'error' ? '#FED7D7' : type === 'success' ? '#C6F6D5' : '#EDF2F7';
+        notification.style.color = type === 'error' ? '#742A2A' : type === 'success' ? '#22543D' : '#2D3748';
+        setTimeout(() => { notification.style.display = 'none'; }, 3000);
+    }
+
+    function logout() {
+        localStorage.removeItem('access_token');
+        window.location.href = '/login.html';
+    }
+
+    // Sayfa yüklendiğinde
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const response = await fetchWithAuth(`${API_BASE}/api/auth/me`);
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('user-display-name').textContent = data.username;
+            }
+        } catch (error) {
+            console.error('Kullanıcı bilgisi alınamadı:', error);
+        }
+
+        loadProfileSettings();
+    });
+</script>
+
+</body>
+</html>

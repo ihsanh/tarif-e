@@ -1763,6 +1763,186 @@ async function loadFavoriteDetail(favoriId) {
     }
 }
 
+// ============================================
+// TARİF YAZDIRMA
+// ============================================
+
+// Favori tarifi yazdır
+function printFavoriteRecipe() {
+    if (!currentRecipe) {
+        alert('Tarif bilgisi bulunamadı');
+        return;
+    }
+
+    console.log('🖨️ Tarif yazdırılıyor:', currentRecipe.baslik);
+
+    // Yazdırılabilir HTML oluştur
+    const printContent = `
+        <!DOCTYPE html>
+        <html lang="tr">
+        <head>
+            <meta charset="UTF-8">
+            <title>${currentRecipe.baslik || 'Tarif'} - Tarif-e</title>
+            <style>
+                @media print {
+                    @page {
+                        margin: 2cm;
+                    }
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }
+                }
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    color: #333;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 3px solid #667eea;
+                }
+                .header h1 {
+                    color: #667eea;
+                    margin: 10px 0;
+                    font-size: 2em;
+                }
+                .header .logo {
+                    font-size: 3em;
+                    margin-bottom: 10px;
+                }
+                .meta-info {
+                    display: flex;
+                    justify-content: center;
+                    gap: 30px;
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                }
+                .meta-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 600;
+                }
+                .description {
+                    font-style: italic;
+                    text-align: center;
+                    color: #666;
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: #f0f4ff;
+                    border-radius: 8px;
+                }
+                .section {
+                    margin: 30px 0;
+                    page-break-inside: avoid;
+                }
+                .section h2 {
+                    color: #667eea;
+                    border-bottom: 2px solid #667eea;
+                    padding-bottom: 10px;
+                    margin-bottom: 15px;
+                }
+                ul, ol {
+                    padding-left: 30px;
+                }
+                li {
+                    margin: 10px 0;
+                    line-height: 1.8;
+                }
+                .footer {
+                    margin-top: 50px;
+                    padding-top: 20px;
+                    border-top: 2px solid #e0e0e0;
+                    text-align: center;
+                    color: #999;
+                    font-size: 0.9em;
+                }
+                .print-date {
+                    color: #666;
+                    font-size: 0.85em;
+                    margin-top: 10px;
+                }
+                @media print {
+                    .no-print {
+                        display: none;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="logo">🍳</div>
+                <h1>${currentRecipe.baslik || 'Tarif'}</h1>
+                ${currentRecipe.aciklama ? `<div class="description">${currentRecipe.aciklama}</div>` : ''}
+                <div class="meta-info">
+                    ${currentRecipe.sure ? `<div class="meta-item">⏱️ ${currentRecipe.sure} dakika</div>` : ''}
+                    ${currentRecipe.zorluk ? `<div class="meta-item">📊 ${currentRecipe.zorluk}</div>` : ''}
+                    ${currentRecipe.kategori ? `<div class="meta-item">🍽️ ${currentRecipe.kategori}</div>` : ''}
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📋 Malzemeler</h2>
+                <ul>
+                    ${currentRecipe.malzemeler && currentRecipe.malzemeler.length > 0
+                        ? currentRecipe.malzemeler.map(m => `<li>${m}</li>`).join('')
+                        : '<li>Malzeme bilgisi yok</li>'}
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>👨‍🍳 Hazırlanışı</h2>
+                <ol>
+                    ${currentRecipe.adimlar && currentRecipe.adimlar.length > 0
+                        ? currentRecipe.adimlar.map(a => `<li>${a}</li>`).join('')
+                        : '<li>Hazırlanış bilgisi yok</li>'}
+                </ol>
+            </div>
+
+            <div class="footer">
+                <p>🍳 Tarif-e - Akıllı Mutfak Asistanı</p>
+                <p class="print-date">Yazdırma Tarihi: ${new Date().toLocaleDateString('tr-TR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}</p>
+            </div>
+        </body>
+        </html>
+    `;
+
+    // Yeni pencere aç ve yazdır
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+
+    if (!printWindow) {
+        alert('Pop-up engellendi! Lütfen tarayıcınızda pop-up\'lara izin verin.');
+        return;
+    }
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Sayfa yüklendikten sonra yazdır
+    printWindow.onload = function() {
+        printWindow.focus();
+        printWindow.print();
+        // Yazdırma işlemi tamamlandıktan sonra pencereyi kapat
+        printWindow.onafterprint = function() {
+            printWindow.close();
+        };
+    };
+}
+
 // Favoriden alışveriş listesi oluştur
 async function createShoppingListFromFavorite() {
     if (!currentRecipe) {
@@ -1937,7 +2117,7 @@ async function cancelShare(paylasimId) {
     showLoading(true);
 
     try {
-        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/paylasim/${paylasimId}`, {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/paylasilandan-cikar/${paylasimId}`, {
             method: 'DELETE'
         });
 
@@ -2028,7 +2208,7 @@ async function acceptInvitation(davetId) {
     showLoading(true);
 
     try {
-        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davet/${davetId}/kabul`, {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davet-kabul/${davetId}`, {
             method: 'POST'
         });
 
@@ -2057,7 +2237,7 @@ async function rejectInvitation(davetId) {
     showLoading(true);
 
     try {
-        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davet/${davetId}/reddet`, {
+        const response = await fetchWithAuth(`${API_BASE}/api/paylasim/davet-reddet/${davetId}`, {
             method: 'DELETE'
         });
 
@@ -2185,6 +2365,502 @@ async function leaveSharedList(listeId) {
         showLoading(false);
     }
 }
+
+// ============================================
+// PROFIL AYARLARI JAVASCRIPT
+// app.js dosyasına eklenecek
+// ============================================
+
+// Global değişkenler
+let currentProfile = null;
+let dietaryOptions = null;
+let selectedDislikes = [];
+
+// ============================================
+// PROFIL YÜKLEME
+// ============================================
+
+async function loadProfileSettings() {
+    showLoading(true);
+
+    try {
+        // Profil bilgilerini getir
+        const profileResponse = await fetchWithAuth(`${API_BASE}/api/profile/me`);
+        const profileData = await profileResponse.json();
+
+        if (profileData.success) {
+            currentProfile = profileData;
+            displayProfile(profileData);
+        }
+
+        // Diyet seçeneklerini getir
+        const optionsResponse = await fetchWithAuth(`${API_BASE}/api/profile/dietary-options`);
+        const optionsData = await optionsResponse.json();
+
+        if (optionsData.success) {
+            dietaryOptions = optionsData.options;
+            displayDietaryOptions();
+        }
+
+    } catch (error) {
+        console.error('Profil yükleme hatası:', error);
+        showNotification('Profil yüklenemedi', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+function displayProfile(data) {
+    const { user, profile } = data;
+
+    // Kullanıcı bilgileri
+    document.getElementById('profile-username').textContent = user.username;
+    document.getElementById('profile-email').textContent = user.email;
+    document.getElementById('full-name-input').value = user.full_name || '';
+    document.getElementById('email-input').value = user.email;
+    document.getElementById('bio-input').value = profile.bio || '';
+
+    // Profil fotoğrafı
+    if (profile.profile_photo_url) {
+        document.getElementById('profile-photo-display').src = profile.profile_photo_url;
+    }
+
+    // Sevmediği yiyecekler
+    selectedDislikes = profile.dislikes || [];
+    displayDislikes();
+
+    // Tema
+    if (profile.theme) {
+        document.querySelector(`input[name="theme"][value="${profile.theme}"]`).checked = true;
+    }
+}
+
+// ============================================
+// TAB YÖNETİMİ
+// ============================================
+
+function showSettingsTab(tabName) {
+    // Tüm tab butonlarını pasifleştir
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Tüm tab içeriklerini gizle
+    document.querySelectorAll('.settings-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Seçili tab'ı aktifleştir
+    event.target.classList.add('active');
+    document.getElementById(`settings-tab-${tabName}`).classList.add('active');
+}
+
+// ============================================
+// DİYET TERCİHLERİ
+// ============================================
+
+function displayDietaryOptions() {
+    if (!dietaryOptions) return;
+
+    // Diyet tercihleri
+    const dietaryContainer = document.getElementById('dietary-preferences-container');
+    dietaryContainer.innerHTML = '';
+
+    dietaryOptions.dietary_preferences.forEach(option => {
+        const isSelected = currentProfile.profile.dietary_preferences.includes(option.value);
+        const item = createPreferenceItem(option, isSelected, 'dietary');
+        dietaryContainer.appendChild(item);
+    });
+
+    // Alerjiler
+    const allergiesContainer = document.getElementById('allergies-container');
+    allergiesContainer.innerHTML = '';
+
+    dietaryOptions.common_allergies.forEach(option => {
+        const isSelected = currentProfile.profile.allergies.includes(option.value);
+        const item = createPreferenceItem(option, isSelected, 'allergy');
+        allergiesContainer.appendChild(item);
+    });
+}
+
+function createPreferenceItem(option, isSelected, type) {
+    const div = document.createElement('div');
+    div.className = `preference-item ${isSelected ? 'selected' : ''}`;
+    div.onclick = () => togglePreference(div, option.value, type);
+
+    div.innerHTML = `
+        <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation()">
+        <span class="icon">${option.icon}</span>
+        <span class="label">${option.label}</span>
+    `;
+
+    return div;
+}
+
+function togglePreference(element, value, type) {
+    const checkbox = element.querySelector('input[type="checkbox"]');
+    checkbox.checked = !checkbox.checked;
+    element.classList.toggle('selected');
+}
+
+function getSelectedPreferences(type) {
+    const containerId = type === 'dietary' ? 'dietary-preferences-container' : 'allergies-container';
+    const container = document.getElementById(containerId);
+    const selected = [];
+
+    container.querySelectorAll('.preference-item.selected').forEach(item => {
+        const label = item.querySelector('.label').textContent;
+        const option = dietaryOptions[type === 'dietary' ? 'dietary_preferences' : 'common_allergies']
+            .find(opt => opt.label === label);
+        if (option) {
+            selected.push(option.value);
+        }
+    });
+
+    return selected;
+}
+
+async function savePreferences() {
+    showLoading(true);
+
+    const dietary_preferences = getSelectedPreferences('dietary');
+    const allergies = getSelectedPreferences('allergy');
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/profile/update`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dietary_preferences,
+                allergies,
+                dislikes: selectedDislikes
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Tercihler kaydedildi!', 'success');
+            currentProfile.profile.dietary_preferences = dietary_preferences;
+            currentProfile.profile.allergies = allergies;
+            currentProfile.profile.dislikes = selectedDislikes;
+        } else {
+            showNotification('Tercihler kaydedilemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ============================================
+// SEVMEDİĞİM YİYECEKLER
+// ============================================
+
+function addDislike() {
+    const input = document.getElementById('dislike-input');
+    const value = input.value.trim();
+
+    if (!value) return;
+
+    if (selectedDislikes.includes(value)) {
+        showNotification('Bu zaten listede var', 'error');
+        return;
+    }
+
+    selectedDislikes.push(value);
+    displayDislikes();
+    input.value = '';
+}
+
+function removeDislike(value) {
+    selectedDislikes = selectedDislikes.filter(item => item !== value);
+    displayDislikes();
+}
+
+function displayDislikes() {
+    const container = document.getElementById('dislikes-list');
+    container.innerHTML = '';
+
+    selectedDislikes.forEach(item => {
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.innerHTML = `
+            ${item}
+            <span class="tag-remove" onclick="removeDislike('${item}')">×</span>
+        `;
+        container.appendChild(tag);
+    });
+}
+
+// ============================================
+// KULLANICI BİLGİLERİ GÜNCELLEME
+// ============================================
+
+async function updateUserInfo() {
+    const full_name = document.getElementById('full-name-input').value.trim();
+    const email = document.getElementById('email-input').value.trim();
+    const bio = document.getElementById('bio-input').value.trim();
+
+    if (!email) {
+        showNotification('Email boş olamaz', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        // Kullanıcı bilgilerini güncelle
+        const userResponse = await fetchWithAuth(`${API_BASE}/api/profile/user-info`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ full_name, email })
+        });
+
+        const userData = await userResponse.json();
+
+        // Profil bilgilerini güncelle
+        const profileResponse = await fetchWithAuth(`${API_BASE}/api/profile/update`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bio })
+        });
+
+        const profileData = await profileResponse.json();
+
+        if (userData.success && profileData.success) {
+            showNotification('✅ Bilgiler güncellendi!', 'success');
+            currentProfile.user.full_name = full_name;
+            currentProfile.user.email = email;
+            currentProfile.profile.bio = bio;
+            document.getElementById('profile-email').textContent = email;
+        } else {
+            showNotification('Bilgiler güncellenemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ============================================
+// ŞİFRE DEĞİŞTİRME
+// ============================================
+
+async function changePassword() {
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    // Validasyon
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showNotification('Tüm alanları doldurun', 'error');
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        showNotification('Yeni şifre en az 6 karakter olmalı', 'error');
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        showNotification('Yeni şifreler eşleşmiyor', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/profile/change-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Şifre değiştirildi!', 'success');
+            // Alanları temizle
+            document.getElementById('current-password').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+        } else {
+            showNotification(data.detail || 'Şifre değiştirilemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ============================================
+// PROFİL FOTOĞRAFI
+// ============================================
+
+async function uploadProfilePhoto() {
+    const input = document.getElementById('profile-photo-input');
+    const file = input.files[0];
+
+    if (!file) return;
+
+    // Dosya tipi kontrolü
+    if (!file.type.startsWith('image/')) {
+        showNotification('Sadece resim dosyaları yüklenebilir', 'error');
+        return;
+    }
+
+    // Dosya boyutu kontrolü (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        showNotification('Dosya boyutu 5MB\'dan küçük olmalı', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/profile/upload-photo`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Fotoğraf yüklendi!', 'success');
+            document.getElementById('profile-photo-display').src = data.photo_url;
+            currentProfile.profile.profile_photo_url = data.photo_url;
+        } else {
+            showNotification('Fotoğraf yüklenemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function deleteProfilePhoto() {
+    if (!confirm('Profil fotoğrafını silmek istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/profile/delete-photo`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Fotoğraf silindi', 'success');
+            document.getElementById('profile-photo-display').src = '/static/default-avatar.png';
+            currentProfile.profile.profile_photo_url = null;
+        } else {
+            showNotification(data.detail || 'Fotoğraf silinemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ============================================
+// GÖRÜNÜM AYARLARI
+// ============================================
+
+async function saveAppearance() {
+    const theme = document.querySelector('input[name="theme"]:checked')?.value;
+
+    if (!theme) {
+        showNotification('Bir tema seçin', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/profile/update`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ theme })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('✅ Tema kaydedildi!', 'success');
+            currentProfile.profile.theme = theme;
+            // Tema uygulaması (gelecekte)
+            // applyTheme(theme);
+        } else {
+            showNotification('Tema kaydedilemedi', 'error');
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        showNotification('İşlem başarısız', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ============================================
+// YARDIMCI FONKSİYONLAR
+// ============================================
+
+// Profil tercihlerini tarif önerisi için al
+function getUserPreferences() {
+    if (!currentProfile) return null;
+
+    return {
+        dietary_preferences: currentProfile.profile.dietary_preferences || [],
+        allergies: currentProfile.profile.allergies || [],
+        dislikes: currentProfile.profile.dislikes || []
+    };
+}
+
+// Tarif önerisi için prompt oluştur
+function buildRecipePromptWithPreferences(malzemeler) {
+    const preferences = getUserPreferences();
+    if (!preferences) return buildRecipePrompt(malzemeler);
+
+    let prompt = `Bu malzemelerle tarif öner: ${malzemeler.join(', ')}\n\n`;
+
+    if (preferences.dietary_preferences.length > 0) {
+        prompt += `Diyet tercihleri: ${preferences.dietary_preferences.join(', ')}\n`;
+    }
+
+    if (preferences.allergies.length > 0) {
+        prompt += `Alerjiler (kullanma): ${preferences.allergies.join(', ')}\n`;
+    }
+
+    if (preferences.dislikes.length > 0) {
+        prompt += `Sevmediği yiyecekler (mümkünse kullanma): ${preferences.dislikes.join(', ')}\n`;
+    }
+
+    prompt += '\nBu tercihlere uygun, detaylı bir tarif hazırla.';
+
+    return prompt;
+}
+
+console.log('✅ Profil ayarları modülü yüklendi');
 
 console.log('✅ Paylaşım özellikleri yüklendi');
 

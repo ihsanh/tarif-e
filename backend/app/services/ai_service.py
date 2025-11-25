@@ -142,7 +142,7 @@ class AIService:
 
         Args:
             malzemeler: Mevcut malzeme listesi
-            preferences: Kullanıcı tercihleri (süre, zorluk, vb.)
+            preferences: Kullanıcı tercihleri (süre, zorluk, dietary_preferences, allergies, dislikes)
 
         Returns:
             Tarif bilgileri (başlık, malzemeler, adımlar)
@@ -161,12 +161,32 @@ class AIService:
                 if preferences.get('kategori'):
                     pref_text += f"\n- Kategori: {preferences['kategori']}"
 
+                # Diyet tercihleri
+                if preferences.get('dietary_preferences'):
+                    diets = ', '.join(preferences['dietary_preferences'])
+                    pref_text += f"\n- Diyet tercihleri: {diets}"
+
+                # Alerjiler - ÇOK ÖNEMLİ
+                if preferences.get('allergies'):
+                    allergies = ', '.join(preferences['allergies'])
+                    pref_text += f"\n- ⚠️ ALERJİLER (KESİNLİKLE KULLANMA): {allergies}"
+
+                # Sevmediği yiyecekler
+                if preferences.get('dislikes'):
+                    dislikes = ', '.join(preferences['dislikes'])
+                    pref_text += f"\n- Sevmediği yiyecekler (mümkünse kullanma): {dislikes}"
+
             # Prompt
             malzeme_listesi = ", ".join(malzemeler)
             prompt = f"""
             Elimde bu malzemeler var: {malzeme_listesi}
             
             Bana bir Türk mutfağı tarifi öner.{pref_text}
+            
+            ÖNEMLİ KURALLAR:
+            1. Eğer alerji listesi varsa, o malzemeleri KESİNLİKLE kullanma
+            2. Sevmediği yiyecekleri mümkün olduğunca kullanma
+            3. Diyet tercihlerine uygun tarif hazırla
             
             Lütfen şu formatta yanıt ver:
             
@@ -198,7 +218,7 @@ class AIService:
             return tarif
 
         except Exception as e:
-            logger.error(f"Error in tarif_oner: {e}\n{traceback.format_exc()}") # print yerine logger.error ve traceback eklendi
+            logger.error(f"Error in tarif_oner: {e}\n{traceback.format_exc()}")
             return self._get_fallback_recipe(malzemeler)
 
     def _parse_tarif_response(self, response_text: str) -> dict:

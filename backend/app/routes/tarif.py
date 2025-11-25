@@ -1,10 +1,11 @@
 """
-Tarif Routes - Güncellenmiş Versiyon
+Tarif Routes - Profil Tercihleri ile Güncellenmiş
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import FavoriTarif
+from app.models.user_profile import UserProfile
 from app.schemas.tarif import TarifOner, TarifFavori
 from app.services.ai_service import ai_service
 import json
@@ -14,17 +15,15 @@ from sqlalchemy.exc import IntegrityError
 from app.utils.auth import get_current_user
 from app.models import User
 
-# Logger nesnesi oluşturma
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["Tarif"])
 
 
 @router.post("/tarif/oner")
-async def tarif_oner(request: TarifOner,current_user: User = Depends(get_current_user)):
-    """Malzemelerden tarif öner"""
+async def tarif_oner(request: TarifOner, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Malzemelerden tarif öner - Kullanıcı tercihleri dahil"""
     logger.info(f"Kullanıcı {current_user.id} önerme isteği alındı.")
-
 
     if not ai_service.enabled:
         logger.warning("AI servisi aktif değil.")
@@ -34,7 +33,11 @@ async def tarif_oner(request: TarifOner,current_user: User = Depends(get_current
         )
 
     try:
+        # Kullanıcı profil tercihlerini getir
+        profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+
         preferences = {}
+
         # İstek body'sindeki tercihler alınır
         if request.sure:
             preferences['sure'] = request.sure
@@ -43,7 +46,21 @@ async def tarif_oner(request: TarifOner,current_user: User = Depends(get_current
         if request.kategori:
             preferences['kategori'] = request.kategori
 
-        # Eğer ai_service.tarif_oner asenkron ise await kullanın
+        # Profil tercihlerini ekle
+        if profile:
+            if profile.dietary_preferences:
+                preferences['dietary_preferences'] = profile.dietary_preferences
+                logger.info(f"Diyet tercihleri: {profile.dietary_preferences}")
+
+            if profile.allergies:
+                preferences['allergies'] = profile.allergies
+                logger.info(f"Alerjiler: {profile.allergies}")
+
+            if profile.dislikes:
+                preferences['dislikes'] = profile.dislikes
+                logger.info(f"Sevmediği yiyecekler: {profile.dislikes}")
+
+        # AI'dan tarif iste
         tarif = ai_service.tarif_oner(request.malzemeler, preferences)
 
         logger.info(f"AI tarafından başarıyla tarif önerildi.")
@@ -53,7 +70,6 @@ async def tarif_oner(request: TarifOner,current_user: User = Depends(get_current
             "tarif": tarif
         }
     except Exception as e:
-        # Hata izini loglama
         logger.error(f"Tarif önerme sırasında beklenmedik hata: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Tarif önerilirken bir sunucu hatası oluştu.")
 
@@ -71,7 +87,6 @@ async def tarif_favori_ekle(request: TarifFavori,current_user: User = Depends(ge
             user_id=user_id,
             baslik=tarif.get('baslik', 'İsimsiz Tarif'),
             aciklama=tarif.get('aciklama'),
-            # JSON olarak saklama işlemi
             malzemeler=json.dumps(tarif.get('malzemeler', []), ensure_ascii=False),
             adimlar=json.dumps(tarif.get('adimlar', []), ensure_ascii=False),
             sure=tarif.get('sure'),
@@ -91,7 +106,6 @@ async def tarif_favori_ekle(request: TarifFavori,current_user: User = Depends(ge
             "favori_id": favori.id
         }
     except IntegrityError:
-        # Tekrarlanan giriş gibi veritabanı kısıtlaması hatası
         logger.warning(f"Kullanıcı {user_id} için veritabanı bütünlüğü hatası (IntegrityError).")
         db.rollback()
         raise HTTPException(status_code=400, detail="Bu tarif zaten favorilerinizde olabilir.")
@@ -109,7 +123,6 @@ async def tarif_favoriler(current_user: User = Depends(get_current_user), db: Se
     logger.info(f"Kullanıcı {user_id} Favori listeleme  isteği")
 
     try:
-        # GEÇICI: user_id filtresi olmadan
         favoriler = db.query(FavoriTarif).order_by(
             FavoriTarif.eklenme_tarihi.desc()
         ).all()
@@ -149,7 +162,6 @@ async def tarif_favori_detay(favori_id: int ,current_user: User = Depends(get_cu
     logger.info(f"Kullanıcı {user_id} Favori detay isteği: ID {favori_id}")
 
     try:
-        # GEÇICI: user_id filtresi olmadan
         favori = db.query(FavoriTarif).filter(
             FavoriTarif.id == favori_id
         ).first()
@@ -158,7 +170,6 @@ async def tarif_favori_detay(favori_id: int ,current_user: User = Depends(get_cu
             logger.warning(f"Favori ID {favori_id} veritabanında bulunamadı.")
             raise HTTPException(status_code=404, detail="Favori bulunamadı")
 
-        # DEBUG: User ID'yi logla
         logger.info(f"Favori bulundu! ID: {favori.id}, User ID: {favori.user_id}")
 
         result = {
@@ -210,4 +221,3 @@ async def tarif_favori_sil(favori_id: int ,current_user: User = Depends(get_curr
         "success": True,
         "message": "Favori silindi"
     }
-

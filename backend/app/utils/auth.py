@@ -1,6 +1,7 @@
 """
 Authentication Utilities
 """
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -22,6 +23,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 SECRET_KEY = settings.SECRET_KEY if hasattr(settings, 'SECRET_KEY') else "your-secret-key-change-this-in-production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 gün
+
+# Logger nesnesi oluşturma
+logger = logging.getLogger(__name__)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -46,10 +50,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
 
-    # ❌ YANLIŞ - user_id integer olarak geliyor
-    # to_encode["sub"] = user_id
-
-    # ✅ DOĞRU - string'e çevir
     if "sub" in to_encode and isinstance(to_encode["sub"], int):
         to_encode["sub"] = str(to_encode["sub"])
 
@@ -60,10 +60,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 def decode_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        print(f"✅ Token decode edildi: {payload}")  # DEBUG
+        logger.info(f"✅ Token decode edildi: {payload}" ) # DEBUG
         return payload
     except Exception as e:
-        print(f"❌ Token decode hatası: {e}")  # DEBUG - NE HATASI VAR?
+        logger.error(f"❌ Token decode hatası: {e}" )
         return None
 
 
@@ -74,7 +74,7 @@ async def get_current_user(
     """Mevcut kullanıcıyı getir (token'dan)"""
     from app.models import User
 
-    print(f"🔑 Token alındı: {token[:20]}...")
+    logger.info(f"🔑 Token alındı: {token[:20]}...")
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -83,9 +83,9 @@ async def get_current_user(
     )
 
     payload = decode_access_token(token)
-    print(f"📦 Payload: {payload}")
+    logger.info(f"📦 Payload: {payload}")
     if payload is None:
-        print("❌ Payload None!")
+        logger.info("❌ Payload None!")
         raise credentials_exception
 
     user_id: int = payload.get("sub")
