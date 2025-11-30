@@ -1,7 +1,10 @@
 """
 Tarif Routes - Profil Tercihleri ile Güncellenmiş
 """
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import FavoriTarif
@@ -220,4 +223,80 @@ async def tarif_favori_sil(favori_id: int ,current_user: User = Depends(get_curr
     return {
         "success": True,
         "message": "Favori silindi"
+    }
+
+class NutritionRequest(BaseModel):
+    """Besin değerleri hesaplama request"""
+    baslik: str
+    malzemeler: List[str]
+    porsiyon: int = 4
+
+
+class NutritionResponse(BaseModel):
+    """Besin değerleri response"""
+    success: bool
+    message: str
+    nutrition: dict
+
+@router.post("/tarif/nutrition", response_model=NutritionResponse)
+async def calculate_nutrition(
+        request: NutritionRequest,
+        current_user: User = Depends(get_current_user)
+):
+    """Tarif için besin değerlerini hesapla"""
+    try:
+        logger.info(f"Besin değerleri: {request.baslik}")
+
+        # AI ile hesapla
+        nutrition_data = await ai_service.calculate_nutrition(
+            recipe_title=request.baslik,
+            ingredients=request.malzemeler,
+            portions=request.porsiyon
+        )
+
+        return NutritionResponse(
+            success=True,
+            message="Besin değerleri hesaplandı",
+            nutrition=nutrition_data
+        )
+
+    except Exception as e:
+        logger.error(f"Nutrition error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Besin değerleri hesaplanamadı: {str(e)}"
+        )
+
+# ============================================
+# OPSIYONEL: Test endpoint'i
+# ============================================
+
+@router.get("/tarif/nutrition/test")
+async def test_nutrition(current_user: User = Depends(get_current_user)):
+    """
+    Besin değerleri hesaplama test endpoint
+    Geliştirme sırasında kullanılır
+    """
+    test_recipe = {
+        "baslik": "Test Menemen",
+        "malzemeler": [
+            "3 adet yumurta",
+            "2 adet domates",
+            "1 adet biber",
+            "1 adet soğan",
+            "2 yemek kaşığı tereyağı"
+        ],
+        "porsiyon": 2
+    }
+
+    nutrition = await ai_service.calculate_nutrition(
+        recipe_title=test_recipe["baslik"],
+        ingredients=test_recipe["malzemeler"],
+        portions=test_recipe["porsiyon"]
+    )
+
+    return {
+        "success": True,
+        "test_recipe": test_recipe,
+        "nutrition": nutrition
     }

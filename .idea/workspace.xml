@@ -4,10 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v18- tema düzeltmeleri">
-      <change afterPath="$PROJECT_DIR$/frontend/css/share.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/share.js" afterDir="false" />
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v19- tarif paylaşımı">
+      <change afterPath="$PROJECT_DIR$/backend/app/models/nutrition.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/css/nutrition.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/js/nutrition.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TODO.TXT" beforeDir="false" afterPath="$PROJECT_DIR$/TODO.TXT" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas/tarif.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/services/ai_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/ai_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_tarif.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,17 +62,17 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/frontend/js",
+    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/app/models",
     "settings.editor.selected.configurable": "File.Encoding"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\models" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\js" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\css" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\static" />
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\routes" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend" />
@@ -288,7 +294,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764097941447</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="v19- tarif paylaşımı">
+      <option name="closed" value="true" />
+      <created>1764098759637</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1764098759637</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -325,7 +339,8 @@
     <MESSAGE value="v17- Favori Tarif Yazdırma Eklendi" />
     <MESSAGE value="v18- test senaryoları düzenlendi" />
     <MESSAGE value="v18- tema düzeltmeleri" />
-    <option name="LAST_COMMIT_MESSAGE" value="v18- tema düzeltmeleri" />
+    <MESSAGE value="v19- tarif paylaşımı" />
+    <option name="LAST_COMMIT_MESSAGE" value="v19- tarif paylaşımı" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

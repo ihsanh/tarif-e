@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/themes.css">
     <link rel="stylesheet" href="/static/css/share.css">
+    <link rel="stylesheet" href="/static/css/nutrition.css">
 
     <style>
         /* Modern Yumuşak Arka Plan */
@@ -376,6 +377,11 @@
                         style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
                     📤 Paylaş
                 </button>
+                <button class="btn btn-nutrition"
+                        onclick="openNutritionModal(currentRecipe)"
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    📊 Besin Değerleri
+                </button>
             </div>
         </div>
 
@@ -473,6 +479,7 @@
     <script src="/static/js/theme.js"></script>
     <script src="/static/js/app.js"></script>
     <script src="/static/js/share.js"></script>
+    <script src="/static/js/nutrition.js"></script>
     <script>
     function handleLogout() {
         if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {

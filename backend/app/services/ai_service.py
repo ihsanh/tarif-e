@@ -281,6 +281,78 @@ class AIService:
             'kategori': 'ana yemek'
         }
 
+    # ============================================
+    # BESİN DEĞERLERİ HESAPLAMA
+    # ============================================
+
+    async def calculate_nutrition(
+            self,
+            recipe_title: str,
+            ingredients: List[str],
+            portions: int = 4
+    ) -> dict:
+        """Besin değerlerini hesapla"""
+        if not self.enabled:
+            return self._get_fallback_nutrition(ingredients, portions)
+
+        try:
+            malzeme_listesi = '\n'.join(f"- {ing}" for ing in ingredients)
+
+            prompt = f"""
+Tarif: {recipe_title}
+Porsiyon: {portions}
+Malzemeler:
+{malzeme_listesi}
+
+SADECE JSON ver:
+{{
+    "per_serving": {{"calories": <float>, "protein": <float>, "carbs": <float>, "fat": <float>, "fiber": <float>, "sugar": <float>, "sodium": <float>, "cholesterol": <float>, "saturated_fat": <float>, "trans_fat": <float>}},
+    "total": {{"calories": <float>, "protein": <float>, "carbs": <float>, "fat": <float>, "fiber": <float>, "sugar": <float>, "sodium": <float>, "cholesterol": <float>, "saturated_fat": <float>, "trans_fat": <float>}}
+}}
+"""
+
+            response = self.model.generate_content(prompt)
+            if not response:
+                return self._get_fallback_nutrition(ingredients, portions)
+
+            response_text = response.text.strip()
+            if response_text.startswith("```json"):
+                response_text = response_text[7:]
+            if response_text.startswith("```"):
+                response_text = response_text[3:]
+            if response_text.endswith("```"):
+                response_text = response_text[:-3]
+            response_text = response_text.strip()
+
+            import json
+            nutrition_data = json.loads(response_text)
+
+            def clean(data):
+                return {k: round(float(v or 0), 1) for k, v in data.items()}
+
+            nutrition_data["per_serving"] = clean(nutrition_data["per_serving"])
+            nutrition_data["total"] = clean(nutrition_data["total"])
+
+            return nutrition_data
+
+        except Exception as e:
+            logger.error(f"Nutrition error: {e}")
+            return self._get_fallback_nutrition(ingredients, portions)
+
+    def _get_fallback_nutrition(self, ingredients: List[str], portions: int) -> dict:
+        """Fallback besin değerleri"""
+        avg = {
+            "calories": 450.0, "protein": 25.0, "carbs": 45.0, "fat": 18.0,
+            "fiber": 5.0, "sugar": 8.0, "sodium": 800.0, "cholesterol": 50.0,
+            "saturated_fat": 5.0, "trans_fat": 0.0
+        }
+
+        multiplier = 1 + (len(ingredients) - 5) * 0.1
+        per_serving = {k: round(v * multiplier, 1) for k, v in avg.items()}
+        total = {k: round(v * portions, 1) for k, v in per_serving.items()}
+
+        return {"per_serving": per_serving, "total": total}
+
 
 # Global AI service instance
 ai_service = AIService()
