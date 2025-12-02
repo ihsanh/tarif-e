@@ -249,11 +249,7 @@ class AIService:
             elif line.startswith('ADIMLAR:'):
                 current_section = 'adimlar'
             elif line.startswith('SÜRE:'):
-                try:
-                    sure_text = line.replace('SÜRE:', '').strip()
-                    tarif['sure'] = int(''.join(filter(str.isdigit, sure_text)))
-                except:
-                    pass
+                tarif['sure'] = self._parse_sure(line.replace('SÜRE:', '').strip())
             elif line.startswith('ZORLUK:'):
                 tarif['zorluk'] = line.replace('ZORLUK:', '').strip().lower()
             elif line.startswith('KATEGORİ:'):
@@ -264,6 +260,46 @@ class AIService:
                 tarif['adimlar'].append(line.split('.', 1)[1].strip())
 
         return tarif
+
+    def _parse_sure(self, sure_text: str) -> str:
+        """Süre metnini akıllıca parse et"""
+        import re
+
+        sure_text = sure_text.lower().strip()
+
+        if not sure_text or len(sure_text) > 100:
+            return "30 dakika"
+
+        total_minutes = 0
+
+        # Saat varsa (1 saat, 1.5 saat, vb.)
+        saat_match = re.search(r'(\d+(?:[.,]\d+)?)\s*(?:saat|sa)', sure_text)
+        if saat_match:
+            saat = float(saat_match.group(1).replace(',', '.'))
+            total_minutes += int(saat * 60)
+
+        # Dakika varsa
+        dakika_match = re.search(r'(\d+)\s*(?:dakika|dk)', sure_text)
+        if dakika_match:
+            total_minutes += int(dakika_match.group(1))
+
+        # Hiçbir şey bulunamadıysa makul rakam ara
+        if total_minutes == 0:
+            numbers = re.findall(r'\d+', sure_text)
+            if numbers:
+                for num in numbers:
+                    num_int = int(num)
+                    if 5 <= num_int <= 300:  # Makul süre
+                        total_minutes = num_int
+                        break
+
+        # Default ve sınırlama
+        if total_minutes == 0:
+            total_minutes = 30
+
+        total_minutes = max(5, min(300, total_minutes))
+
+        return f"{total_minutes} dakika"
 
     def _get_fallback_recipe(self, malzemeler: List[str]) -> dict:
         """AI çalışmazsa basit tarif döndür"""

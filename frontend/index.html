@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="/static/css/share.css">
     <link rel="stylesheet" href="/static/css/nutrition.css">
     <link rel="stylesheet" href="/static/css/mobile.css">
+    <link rel="stylesheet" href="/static/css/filters.css">
 
     <style>
         /* Modern Yumuşak Arka Plan */
@@ -52,6 +53,29 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
         }
+
+        .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
 
     </style>
 
@@ -354,7 +378,10 @@
             <button class="btn-back" onclick="goBack()">← Geri</button>
 
             <h2>⭐ Favori Tariflerim</h2>
-            <div id="favorites-container"></div>
+            <button onclick="openFilterModal()" class="filter-btn">
+                🔍 Gelişmiş Filtre
+            </button>
+            <div id="favoriler-container"></div>
         </div>
 
         <!-- Favori Tarif Detay Ekranı -->
@@ -482,6 +509,7 @@
     <script src="/static/js/app.js"></script>
     <script src="/static/js/share.js"></script>
     <script src="/static/js/nutrition.js"></script>
+    <script src="/static/js/filters.js"></script>
     <script>
     function handleLogout() {
         if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {

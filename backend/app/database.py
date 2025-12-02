@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
 
 # Backend dizinini bul (app/ klasörünün parent'ı)
 BASE_DIR = Path(__file__).resolve().parent.parent  # backend/
@@ -35,6 +37,7 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+Base = declarative_base()
 
 def get_db():
     """Database session dependency"""

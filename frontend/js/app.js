@@ -1610,7 +1610,7 @@ async function loadFavorites() {
         });
         const data = await response.json();
 
-        const container = document.getElementById('favorites-container');
+        const container = document.getElementById('favoriler-container');
 
         if (!data.favoriler || data.favoriler.length === 0) {
             container.innerHTML = `
@@ -1966,7 +1966,7 @@ async function deleteFavoriteRecipe() {
 
     try {
 
-        const response = await fetchWithAuth(`${API_BASE}/api/tarif/favoriler/${currentFavoriteId}`, {
+        const response = await fetchWithAuth(`${API_BASE}/api/favoriler/${currentFavoriteId}`, {
             method: 'DELETE',
             headers: {
 

@@ -1,16 +1,17 @@
 """
 User Model - Authentication
+backend/app/models/user.py
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql import func
-from app.models.base import Base
 from sqlalchemy.orm import relationship
+from app.models.base import Base
 
 
 class User(Base):
     """Kullanıcı modeli"""
     __tablename__ = "users"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
     username = Column(String(100), unique=True, index=True, nullable=False)
@@ -21,11 +22,39 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # ✅ Malzeme relationship (Eksikse ekleyin)
-    malzemeler = relationship("Malzeme", back_populates="owner", cascade="all, delete-orphan")
+    # ============================================
+    # RELATIONSHIPS
+    # ============================================
 
-    # ✅ Alışveriş Listeleri relationship (Eksikse ekleyin)
-    alisveris_listeleri = relationship("AlisverisListesi", back_populates="owner", cascade="all, delete-orphan")
+    # Malzeme relationship
+    malzemeler = relationship(
+        "Malzeme",
+        back_populates="owner",
+        cascade="all, delete-orphan"
+    )
+
+    # Alışveriş Listeleri relationship
+    alisveris_listeleri = relationship(
+        "AlisverisListesi",
+        back_populates="owner",
+        cascade="all, delete-orphan"
+    )
+
+    # ✅ User Profile relationship
+    # SADECE BİR TANE OLMALI - DUPLICATE KALDIRILDI
+    profile = relationship(
+        "UserProfile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    # ✅ Favori Tarifler relationship
+    favoriler = relationship(
+        "FavoriTarif",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, username={self.username})>"
