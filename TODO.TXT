@@ -71,7 +71,7 @@
 
 	6. Tarif Detaylandırma 🔴
 
-         Besin değerleri (kalori, protein, vb.)
+     Besin değerleri (kalori, protein, vb.)
 	 Pişirme videoları (YouTube embed)
 	 Tarif yorumları/değerlendirme
 	 Tarif paylaşma (sosyal medya)
