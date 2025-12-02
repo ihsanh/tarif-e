@@ -4,19 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v21 - başlık düzeltme">
-      <change afterPath="$PROJECT_DIR$/frontend/css/filters.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/filters.js" afterDir="false" />
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v22 - gelişmiş tarif filtresi eklendi">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/nutrition.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/nutrition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/tarif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/user_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user_profile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/services/ai_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/services/ai_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PROJE_OZETI.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROJE_OZETI.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PROJE_YAPISI.txt" beforeDir="false" afterPath="$PROJECT_DIR$/PROJE_YAPISI.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend.zip" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -320,7 +313,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764703035389</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="v22 - gelişmiş tarif filtresi eklendi">
+      <option name="closed" value="true" />
+      <created>1764712743612</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1764712743612</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -360,7 +361,8 @@
     <MESSAGE value="v19- tarif paylaşımı" />
     <MESSAGE value="v20 - tarif besin değer hesaplaması" />
     <MESSAGE value="v21 - başlık düzeltme" />
-    <option name="LAST_COMMIT_MESSAGE" value="v21 - başlık düzeltme" />
+    <MESSAGE value="v22 - gelişmiş tarif filtresi eklendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v22 - gelişmiş tarif filtresi eklendi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
