@@ -4,12 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v22 - gelişmiş tarif filtresi eklendi">
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v23 - dokumantasyon düzenlendi">
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/services/email_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/utils/token_generator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/migrations/add_reset_token.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/migrations/add_reset_token_columns.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROJE_OZETI.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROJE_OZETI.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROJE_YAPISI.txt" beforeDir="false" afterPath="$PROJECT_DIR$/PROJE_YAPISI.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/login.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,17 +65,17 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/app/models",
+    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/migrations",
     "settings.editor.selected.configurable": "File.Encoding"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\migrations" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\models" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\js" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\css" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests" />
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\static" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend" />
@@ -321,7 +329,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764712743612</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="v23 - dokumantasyon düzenlendi">
+      <option name="closed" value="true" />
+      <created>1764713313853</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1764713313853</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -337,7 +353,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="v1- firstcommit" />
     <MESSAGE value="v2" />
     <MESSAGE value="v3 - Alışveriş listesi oluşturma" />
     <MESSAGE value="v4 - Alışveriş listesi oluşturma düzeltme" />
@@ -362,7 +377,8 @@
     <MESSAGE value="v20 - tarif besin değer hesaplaması" />
     <MESSAGE value="v21 - başlık düzeltme" />
     <MESSAGE value="v22 - gelişmiş tarif filtresi eklendi" />
-    <option name="LAST_COMMIT_MESSAGE" value="v22 - gelişmiş tarif filtresi eklendi" />
+    <MESSAGE value="v23 - dokumantasyon düzenlendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v23 - dokumantasyon düzenlendi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

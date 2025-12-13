@@ -102,6 +102,13 @@
             border-color: #667eea;
         }
 
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 0.85em;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 15px;
@@ -122,6 +129,7 @@
         .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .error-message {
@@ -136,6 +144,15 @@
         .success-message {
             background: #e8f5e9;
             color: #2e7d32;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .info-message {
+            background: #e3f2fd;
+            color: #1565c0;
             padding: 12px;
             border-radius: 10px;
             margin-bottom: 20px;
@@ -162,6 +179,57 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .footer-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            background: #e0e0e0;
+            transform: translateX(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+
+            .logo h1 {
+                font-size: 2em;
+            }
+
+            .tab {
+                font-size: 0.9em;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -178,6 +246,7 @@
 
         <div id="error-message" class="error-message"></div>
         <div id="success-message" class="success-message"></div>
+        <div id="info-message" class="info-message"></div>
         <div id="loading" class="loading">
             <div class="loading-spinner"></div>
             <p>İşlem yapılıyor...</p>
@@ -195,6 +264,10 @@
                     <input type="password" id="login-password" required minlength="6">
                 </div>
                 <button type="submit" class="submit-btn">Giriş Yap</button>
+
+                <div class="footer-links">
+                    <a href="#" onclick="switchTab('forgot'); return false;">Şifremi Unuttum</a>
+                </div>
             </form>
         </div>
 
@@ -220,23 +293,81 @@
                 <button type="submit" class="submit-btn">Kayıt Ol</button>
             </form>
         </div>
+
+        <!-- Forgot Password Form -->
+        <div id="forgot-form" class="form-container">
+            <a href="#" class="back-button" onclick="switchTab('login'); return false;">
+                ← Geri
+            </a>
+
+            <h3 style="margin-bottom: 10px; color: #333;">🔑 Şifremi Unuttum</h3>
+            <p style="color: #666; margin-bottom: 20px; font-size: 0.95em;">
+                Email adresinizi girin, size şifre sıfırlama linki gönderelim.
+            </p>
+
+            <form id="forgot-password-form" onsubmit="handleForgotPassword(event)">
+                <div class="form-group">
+                    <label for="forgot-email">📧 Email</label>
+                    <input type="email" id="forgot-email" required placeholder="ornek@email.com">
+                </div>
+                <button type="submit" class="submit-btn">Sıfırlama Linki Gönder</button>
+            </form>
+        </div>
+
+        <!-- Reset Password Form -->
+        <div id="reset-form" class="form-container">
+            <a href="#" class="back-button" onclick="switchTab('login'); return false;">
+                ← Giriş Ekranı
+            </a>
+
+            <h3 style="margin-bottom: 10px; color: #333;">🔑 Yeni Şifre Belirle</h3>
+            <p id="reset-email-display" style="color: #666; margin-bottom: 20px; font-size: 0.95em;">
+                <!-- Email buraya yazılacak -->
+            </p>
+
+            <form id="reset-password-form" onsubmit="handleResetPassword(event)">
+                <input type="hidden" id="reset-token">
+
+                <div class="form-group">
+                    <label for="new-password">🔒 Yeni Şifre</label>
+                    <input type="password" id="new-password" required minlength="6" placeholder="En az 6 karakter">
+                    <small>En az 6 karakter, bir harf ve bir rakam içermeli</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">🔒 Şifre Tekrar</label>
+                    <input type="password" id="confirm-password" required minlength="6" placeholder="Şifrenizi tekrar girin">
+                </div>
+
+                <button type="submit" class="submit-btn">Şifremi Güncelle</button>
+            </form>
+        </div>
     </div>
 
     <script>
         const API_BASE = 'http://localhost:8000';
 
         function switchTab(tab) {
+            // Tab butonlarını güncelle
             document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if (tab === 'login' || tab === 'register') {
+                event.target.classList.add('active');
+            }
 
+            // Formları gizle
             document.getElementById('login-form').classList.remove('active');
             document.getElementById('register-form').classList.remove('active');
+            document.getElementById('forgot-form').classList.remove('active');
+            document.getElementById('reset-form').classList.remove('active');
+
+            // Seçilen formu göster
             document.getElementById(`${tab}-form`).classList.add('active');
 
             hideMessages();
         }
 
         function showError(message) {
+            hideMessages();
             const errorEl = document.getElementById('error-message');
             errorEl.textContent = message;
             errorEl.style.display = 'block';
@@ -244,15 +375,23 @@
         }
 
         function showSuccess(message) {
+            hideMessages();
             const successEl = document.getElementById('success-message');
             successEl.textContent = message;
             successEl.style.display = 'block';
-            setTimeout(() => successEl.style.display = 'none', 3000);
+        }
+
+        function showInfo(message) {
+            hideMessages();
+            const infoEl = document.getElementById('info-message');
+            infoEl.textContent = message;
+            infoEl.style.display = 'block';
         }
 
         function hideMessages() {
             document.getElementById('error-message').style.display = 'none';
             document.getElementById('success-message').style.display = 'none';
+            document.getElementById('info-message').style.display = 'none';
         }
 
         function showLoading(show) {
@@ -345,12 +484,155 @@
             }
         }
 
-        // Sayfa yüklendiğinde token kontrolü
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            hideMessages();
+            showLoading(true);
+
+            const email = document.getElementById('forgot-email').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('✅ Email gönderildi! Lütfen email kutunuzu kontrol edin.');
+                    document.getElementById('forgot-password-form').reset();
+
+                    // 3 saniye sonra login ekranına dön
+                    setTimeout(() => {
+                        switchTab('login');
+                    }, 3000);
+                } else {
+                    showError(data.detail || 'Email gönderilemedi. Lütfen tekrar deneyin.');
+                }
+            } catch (error) {
+                console.error('Forgot password error:', error);
+                showError('Bir hata oluştu. Lütfen tekrar deneyin.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function handleResetPassword(event) {
+            event.preventDefault();
+            hideMessages();
+
+            const token = document.getElementById('reset-token').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Şifre eşleşme kontrolü
+            if (newPassword !== confirmPassword) {
+                showError('Şifreler eşleşmiyor!');
+                return;
+            }
+
+            // Şifre gücü kontrolü
+            if (newPassword.length < 6) {
+                showError('Şifre en az 6 karakter olmalı!');
+                return;
+            }
+
+            if (!/[A-Za-z]/.test(newPassword)) {
+                showError('Şifre en az bir harf içermeli!');
+                return;
+            }
+
+            if (!/\d/.test(newPassword)) {
+                showError('Şifre en az bir rakam içermeli!');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        token: token,
+                        new_password: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('✅ Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
+                    document.getElementById('reset-password-form').reset();
+
+                    // 2 saniye sonra login ekranına dön
+                    setTimeout(() => {
+                        switchTab('login');
+                    }, 2000);
+                } else {
+                    showError(data.detail || 'Şifre güncellenemedi. Lütfen tekrar deneyin.');
+                }
+            } catch (error) {
+                console.error('Reset password error:', error);
+                showError('Bir hata oluştu. Lütfen tekrar deneyin.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function handleResetPasswordFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            if (token) {
+                console.log('🔑 Reset token found in URL');
+                showLoading(true);
+
+                try {
+                    const response = await fetch(`${API_BASE}/api/auth/verify-reset-token/${token}`);
+                    const data = await response.json();
+
+                    if (data.valid) {
+                        // Token geçerli - reset ekranını göster
+                        document.getElementById('reset-token').value = token;
+                        document.getElementById('reset-email-display').textContent =
+                            `${data.email} için yeni şifre belirleyin:`;
+                        switchTab('reset');
+                        showInfo('Lütfen yeni şifrenizi belirleyin.');
+                        console.log('✅ Token valid');
+                    } else {
+                        // Token geçersiz
+                        switchTab('forgot');
+                        showError('❌ Bu link geçersiz veya süresi dolmuş. Lütfen yeni bir talep oluşturun.');
+                        console.log('❌ Token invalid');
+                    }
+                } catch (error) {
+                    console.error('Token verification error:', error);
+                    switchTab('login');
+                    showError('Token doğrulanamadı. Lütfen tekrar deneyin.');
+                }
+
+                showLoading(false);
+            }
+        }
+
+        // Sayfa yüklendiğinde
         window.addEventListener('DOMContentLoaded', () => {
+            // Token kontrolü - zaten giriş yapmışsa index'e yönlendir
             const token = localStorage.getItem('access_token');
             if (token) {
                 window.location.href = '/index.html';
+                return;
             }
+
+            // URL'de reset token var mı kontrol et
+            handleResetPasswordFromURL();
         });
     </script>
 </body>

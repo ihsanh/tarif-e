@@ -17,6 +17,13 @@ from app.utils.auth import (
     get_current_user,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
+from app.schemas.auth import (
+    PasswordResetRequest,
+    PasswordResetConfirm,
+    PasswordResetResponse
+)
+from app.utils.token_generator import generate_reset_token
+from app.services.email_service import email_service
 
 logger = logging.getLogger(__name__)
 
@@ -152,4 +159,139 @@ async def logout(current_user: User = Depends(get_current_user)):
     return {
         "success": True,
         "message": "Başarıyla çıkış yapıldı"
+    }
+
+@router.post("/forgot-password", response_model=PasswordResetResponse)
+async def forgot_password(
+        request: PasswordResetRequest,
+        db: Session = Depends(get_db)
+):
+    """
+    Şifre sıfırlama talebi
+
+    - Email'e sıfırlama linki gönderir
+    - Güvenlik için her zaman başarılı döner (email bilgisi sızdırmamak için)
+    """
+    try:
+        # Kullanıcıyı bul
+        user = db.query(User).filter(User.email == request.email).first()
+
+        if user:
+            # Reset token üret
+            reset_token = generate_reset_token()
+
+            # Token'ı veritabanına kaydet (30 dakika geçerli)
+            user.set_reset_token(reset_token, expires_minutes=30)
+            db.commit()
+
+            # Reset linki oluştur
+            # Production'da: https://tarif-e.com/reset-password?token=...
+            # Development'ta: http://localhost:8000/reset-password?token=...
+            reset_link = f"http://localhost:8000/login.html?token={reset_token}"
+
+            # ✅ BU 3 SATIRI EKLE (email servisi yerine)
+            print("\n" + "=" * 60)
+            print(f"🔗 RESET LİNK: {reset_link}")
+            print("=" * 60 + "\n")
+
+            # Email gönder
+            await email_service.send_reset_email(
+                to_email=user.email,
+                reset_link=reset_link,
+                username=user.username
+            )
+
+            logger.info(f"✅ Password reset requested for: {user.email}")
+        else:
+            # Güvenlik: Email bulunamadı bile bilgisini verme
+            logger.warning(f"⚠️ Password reset requested for non-existent email: {request.email}")
+
+        # Her zaman başarılı döner (email enumeration önleme)
+        return PasswordResetResponse(
+            success=True,
+            message="Eğer bu email kayıtlıysa, şifre sıfırlama linki gönderildi."
+        )
+
+    except Exception as e:
+        logger.error(f"❌ Forgot password error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Şifre sıfırlama işlemi sırasında hata oluştu"
+        )
+
+
+@router.post("/reset-password", response_model=PasswordResetResponse)
+async def reset_password(
+        request: PasswordResetConfirm,
+        db: Session = Depends(get_db)
+):
+    """
+    Şifre sıfırlama onayı
+
+    - Token ile yeni şifreyi ayarlar
+    """
+    try:
+        # Token ile kullanıcıyı bul
+        user = db.query(User).filter(User.reset_token == request.token).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=400,
+                detail="Geçersiz veya süresi dolmuş token"
+            )
+
+        # Token geçerliliğini kontrol et
+        if not user.is_reset_token_valid(request.token):
+            raise HTTPException(
+                status_code=400,
+                detail="Token süresi dolmuş. Lütfen yeni bir şifre sıfırlama talebi oluşturun."
+            )
+
+        # Yeni şifreyi hashle ve kaydet
+        user.hashed_password = get_password_hash(request.new_password)
+
+        # Token'ı temizle
+        user.clear_reset_token()
+
+        db.commit()
+
+        logger.info(f"✅ Password reset successful for: {user.email}")
+
+        return PasswordResetResponse(
+            success=True,
+            message="Şifreniz başarıyla güncellendi. Giriş yapabilirsiniz."
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Reset password error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Şifre güncelleme sırasında hata oluştu"
+        )
+
+
+@router.get("/verify-reset-token/{token}")
+async def verify_reset_token(
+        token: str,
+        db: Session = Depends(get_db)
+):
+    """
+    Reset token'ın geçerliliğini kontrol et
+
+    Frontend bu endpoint'i kullanarak token'ın geçerli olup olmadığını öğrenebilir
+    """
+    user = db.query(User).filter(User.reset_token == token).first()
+
+    if not user or not user.is_reset_token_valid(token):
+        return {
+            "valid": False,
+            "message": "Token geçersiz veya süresi dolmuş"
+        }
+
+    return {
+        "valid": True,
+        "message": "Token geçerli",
+        "email": user.email  # Email'i göster (doğrulama için)
     }

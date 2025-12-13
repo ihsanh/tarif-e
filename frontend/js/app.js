@@ -2860,8 +2860,197 @@ function buildRecipePromptWithPreferences(malzemeler) {
     return prompt;
 }
 
-console.log('✅ Profil ayarları modülü yüklendi');
+// ============================================
+// ŞİFRE SIFIRLAMA FONKSİYONLARI
+// ============================================
 
-console.log('✅ Paylaşım özellikleri yüklendi');
+/**
+ * Şifremi unuttum formu submit
+ */
+document.getElementById('forgot-password-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('forgot-submit-btn');
+    const form = e.target;
+    const email = document.getElementById('forgot-email').value;
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Gönderiliyor...';
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Formu gizle, başarı mesajını göster
+            form.style.display = 'none';
+            document.getElementById('forgot-success-message').style.display = 'block';
+
+            console.log('✅ Password reset email sent');
+        } else {
+            alert('Hata: ' + (data.detail || 'Bir hata oluştu'));
+        }
+
+    } catch (error) {
+        console.error('❌ Forgot password error:', error);
+        alert('Bağlantı hatası. Lütfen tekrar deneyin.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sıfırlama Linki Gönder';
+    }
+});
+
+
+/**
+ * Yeni şifre belirleme formu submit
+ */
+document.getElementById('reset-password-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('reset-submit-btn');
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const token = document.getElementById('reset-token').value;
+
+    // Şifre eşleşme kontrolü
+    if (newPassword !== confirmPassword) {
+        alert('Şifreler eşleşmiyor!');
+        return;
+    }
+
+    // Şifre gücü kontrolü
+    if (newPassword.length < 6) {
+        alert('Şifre en az 6 karakter olmalı!');
+        return;
+    }
+
+    if (!/[A-Za-z]/.test(newPassword)) {
+        alert('Şifre en az bir harf içermeli!');
+        return;
+    }
+
+    if (!/\d/.test(newPassword)) {
+        alert('Şifre en az bir rakam içermeli!');
+        return;
+    }
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Güncelleniyor...';
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: token,
+                new_password: newPassword
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('✅ Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.');
+            showScreen('login-screen');
+        } else {
+            alert('Hata: ' + (data.detail || 'Şifre güncellenemedi'));
+        }
+
+    } catch (error) {
+        console.error('❌ Reset password error:', error);
+        alert('Bağlantı hatası. Lütfen tekrar deneyin.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Şifremi Güncelle';
+    }
+});
+
+
+/**
+ * URL'den token parametresini al ve doğrula
+ */
+async function handleResetPasswordFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (token) {
+        console.log('🔑 Reset token found in URL');
+
+        // Token doğrulama
+        try {
+            const response = await fetch(`${API_BASE}/auth/verify-reset-token/${token}`);
+            const data = await response.json();
+
+            if (data.valid) {
+                // Token geçerli - reset ekranını göster
+                document.getElementById('reset-token').value = token;
+                document.getElementById('reset-email-display').textContent =
+                    `${data.email} için yeni şifre belirleyin:`;
+                showScreen('reset-password-screen');
+
+                console.log('✅ Token valid, showing reset screen');
+            } else {
+                // Token geçersiz - hata mesajını göster
+                showScreen('reset-password-screen');
+                document.getElementById('reset-password-form').style.display = 'none';
+                document.getElementById('token-invalid-message').style.display = 'block';
+
+                console.log('❌ Token invalid or expired');
+            }
+        } catch (error) {
+            console.error('❌ Token verification error:', error);
+            alert('Token doğrulama hatası. Lütfen tekrar deneyin.');
+        }
+    }
+}
+
+
+/**
+ * Sayfa yüklendiğinde reset token kontrolü
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    handleResetPasswordFromURL();
+});
+
+
+/**
+ * Login ekranına "Şifremi Unuttum" linki ekle
+ */
+function addForgotPasswordLink() {
+    const loginForm = document.getElementById('login-form');
+
+    if (loginForm) {
+        // Eğer link zaten eklenmemişse
+        if (!document.getElementById('forgot-password-link')) {
+            const forgotLink = document.createElement('div');
+            forgotLink.id = 'forgot-password-link';
+            forgotLink.className = 'auth-links';
+            forgotLink.style.marginTop = '16px';
+            forgotLink.innerHTML = `
+                <a href="#" onclick="showScreen('forgot-password-screen'); return false;">
+                    Şifremi Unuttum
+                </a>
+            `;
+
+            // Login butonundan sonra ekle
+            const loginBtn = loginForm.querySelector('button[type="submit"]');
+            loginBtn.insertAdjacentElement('afterend', forgotLink);
+        }
+    }
+}
+
+// Sayfa yüklendiğinde linki ekle
+window.addEventListener('DOMContentLoaded', addForgotPasswordLink);
 
 console.log('✅ Tarif-e hazır! Kullanmaya başla');
