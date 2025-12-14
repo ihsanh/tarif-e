@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Haftalık Menü Planlayıcısı - Tarif-e</title>
-    <link rel="stylesheet" href="css/menu-planner.css">
+    <link rel="stylesheet" href="/static/css/menu-planner.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        // Token yoksa login'e yönlendir
+        if (!localStorage.getItem('access_token')) {
+            window.location.href = '/login.html';
+        }
+    </script>
 </head>
 <body>
     <!-- Navigation -->
@@ -16,10 +23,8 @@
                 <span>Tarif-e</span>
             </div>
             <div class="nav-menu">
-                <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
-                <a href="favoriler.html"><i class="fas fa-heart"></i> Favoriler</a>
-                <a href="menu-planner.html" class="active"><i class="fas fa-calendar-alt"></i> Menü Planlayıcı</a>
-                <a href="alisveris.html"><i class="fas fa-shopping-cart"></i> Alışveriş</a>
+                <a href="/index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a href="/menu-planner.html" class="active"><i class="fas fa-calendar-alt"></i> Menü Planlayıcı</a>
                 <button id="logoutBtn" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Çıkış
                 </button>
@@ -234,6 +239,6 @@
     <!-- Toast Notifications -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <script src="js/menu-planner.js"></script>
+    <script src="/static/js/menu-planner.js"></script>
 </body>
 </html>

@@ -146,6 +146,7 @@ async def tarif_favori_ekle(
         )
 
 
+@router.get("/favoriler")
 @router.get("/favoriler/liste")
 async def tarif_favoriler(
     current_user: User = Depends(get_current_user),

@@ -7,7 +7,6 @@ NOT: Bu sadece besin değerlerini database'e kaydetmek istersen gerekli.
 """
 
 from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime, String, JSON
-from sqlalchemy.orm import relationship
 from datetime import datetime
 from .base import Base
 

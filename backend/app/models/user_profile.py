@@ -5,7 +5,7 @@ backend/app/models/user_profile.py
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, JSON
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from app.models.base import Base
+from app.database import Base
 
 
 class UserProfile(Base):

@@ -1,7 +1,7 @@
 // Menu Planner JavaScript
 // ✅ API: /api/menu-plans endpoints
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = window.location.origin;
 let currentMenuId = null;
 let currentMenuData = null;
 let allRecipes = [];
@@ -18,16 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkAuth() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
-        window.location.href = 'login.html';
+        window.location.href = '/login.html';
         return;
     }
 }
 
 function getAuthHeaders() {
     return {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
         'Content-Type': 'application/json'
     };
 }
@@ -327,15 +327,34 @@ async function toggleMealComplete(itemId) {
 async function loadRecipes() {
     try {
         // Load from favori_tarifler
+        console.log('Loading recipes from:', `${API_BASE}/api/favoriler`);
         const response = await fetch(`${API_BASE}/api/favoriler`, {
             headers: getAuthHeaders()
         });
-        
+
+        console.log('Response status:', response.status);
+
         if (response.ok) {
-            allRecipes = await response.json();
+            const data = await response.json();
+            console.log('Loaded recipes data:', data);
+
+            // Backend returns { success: true, favoriler: [...] }
+            if (data.favoriler && Array.isArray(data.favoriler)) {
+                allRecipes = data.favoriler;
+            } else if (Array.isArray(data)) {
+                allRecipes = data;
+            } else {
+                allRecipes = [];
+            }
+
+            console.log('All recipes count:', allRecipes.length);
+        } else {
+            console.error('Failed to load recipes:', response.status, response.statusText);
+            allRecipes = [];
         }
     } catch (error) {
         console.error('Error loading recipes:', error);
+        allRecipes = [];
     }
 }
 
@@ -809,14 +828,16 @@ function getNextMonday(date) {
 
 function displayRecipeList(recipes) {
     const listDiv = document.getElementById('recipeList');
-    
-    if (recipes.length === 0) {
-        listDiv.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 2rem;">Henüz favori tarif yok</p>';
+
+    console.log('Displaying recipes:', recipes);
+
+    if (!recipes || recipes.length === 0) {
+        listDiv.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 2rem;">Henüz favori tarif yok. Ana sayfadan favori ekleyin.</p>';
         return;
     }
-    
+
     listDiv.innerHTML = '';
-    
+
     recipes.forEach(recipe => {
         const item = document.createElement('div');
         item.className = 'recipe-item';
@@ -824,7 +845,7 @@ function displayRecipeList(recipes) {
             <h4>${recipe.baslik}</h4>
             <p>${recipe.kategori || 'Kategori yok'} ${recipe.sure ? `• ${recipe.sure} dk` : ''}</p>
         `;
-        
+
         item.addEventListener('click', () => {
             // Deselect all
             document.querySelectorAll('.recipe-item').forEach(i => i.classList.remove('selected'));
@@ -832,14 +853,22 @@ function displayRecipeList(recipes) {
             item.classList.add('selected');
             document.getElementById('selectedRecipeId').value = recipe.id;
         });
-        
+
         listDiv.appendChild(item);
     });
 }
 
 function filterRecipes() {
     const searchTerm = document.getElementById('recipeSearch').value.toLowerCase();
-    const filtered = allRecipes.filter(recipe => 
+
+    // Ensure allRecipes is an array
+    if (!Array.isArray(allRecipes)) {
+        console.error('allRecipes is not an array:', allRecipes);
+        displayRecipeList([]);
+        return;
+    }
+
+    const filtered = allRecipes.filter(recipe =>
         recipe.baslik.toLowerCase().includes(searchTerm) ||
         (recipe.kategori && recipe.kategori.toLowerCase().includes(searchTerm))
     );
@@ -936,8 +965,11 @@ function showToast(message, type = 'info') {
 }
 
 function logout() {
-    localStorage.removeItem('token');
-    window.location.href = 'login.html';
+    if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+        window.location.href = '/login.html';
+    }
 }
 
 // ============================================================

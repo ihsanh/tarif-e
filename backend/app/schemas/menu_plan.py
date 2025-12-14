@@ -48,7 +48,7 @@ class DayOfWeekEnum(int, Enum):
 
 class MenuItemBase(BaseModel):
     """Menu Item - Base Schema"""
-    recipe_id: int = Field(..., gt=0, description="Tarif ID")
+    tarif_id: Optional[int] = Field(None, gt=0, description="Tarif ID (favori_tarifler)")
     day_of_week: int = Field(..., ge=0, le=6, description="Gün (0=Pazartesi, 6=Pazar)")
     meal_type: MealTypeEnum
     portions: int = Field(default=1, gt=0, description="Porsiyon sayısı")
@@ -62,7 +62,7 @@ class MenuItemCreate(MenuItemBase):
 
 class MenuItemUpdate(BaseModel):
     """Menu Item - Update"""
-    recipe_id: Optional[int] = Field(None, gt=0)
+    tarif_id: Optional[int] = Field(None, gt=0)
     day_of_week: Optional[int] = Field(None, ge=0, le=6)
     meal_type: Optional[MealTypeEnum] = None
     portions: Optional[int] = Field(None, gt=0)
@@ -77,11 +77,11 @@ class MenuItemResponse(MenuItemBase):
     is_completed: bool
     completed_at: Optional[datetime]
     created_at: datetime
-    
-    # Recipe bilgileri (nested)
-    recipe_name: Optional[str] = None
-    recipe_image: Optional[str] = None
-    recipe_prep_time: Optional[int] = None
+
+    # Tarif bilgileri (nested)
+    tarif_baslik: Optional[str] = None
+    tarif_sure: Optional[int] = None
+    tarif_kategori: Optional[str] = None
     
     class Config:
         from_attributes = True

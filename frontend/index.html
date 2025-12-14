@@ -192,6 +192,9 @@
                 <button class="btn" style="background: #4299E1; color: white;" onclick="loadSharedLists(); showScreen('shared-lists-screen');">
                     👥 Paylaşılan Listeler
                 </button>
+                <button class="btn" style="background: linear-gradient(135deg, #FC8181 0%, #F56565 100%); color: white;" onclick="window.location.href='/menu-planner.html';">
+                    📅 Menü Planlayıcı
+                </button>
             </div>
 
             <div class="status-bar">
@@ -317,11 +320,28 @@
         <div id="my-ingredients-screen" class="screen">
             <button class="btn-back" onclick="goBack()">← Geri</button>
 
-            <h2>Malzemelerim</h2>
+            <div class="section-header">
+                <h2>Malzemelerim</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn" style="background: #667eea; color: white; padding: 8px 15px;" onclick="selectAllIngredients()">
+                        ✓ Tümünü Seç
+                    </button>
+                    <button class="btn" style="background: #718096; color: white; padding: 8px 15px;" onclick="deselectAllIngredients()">
+                        ✗ Tümünü Kaldır
+                    </button>
+                </div>
+            </div>
+
             <div id="my-ingredients-list" class="ingredients-list"></div>
 
+            <div style="margin-top: 20px; padding: 15px; background: #EDF2F7; border-radius: 8px;">
+                <p id="selected-ingredients-count" style="margin: 0; color: #4A5568; font-weight: 600;">
+                    0 malzeme seçildi
+                </p>
+            </div>
+
             <button class="btn btn-success" onclick="getTarifFromMyIngredients()">
-                🍽️ Bu Malzemelerden Tarif Öner
+                🍽️ Seçili Malzemelerden Tarif Öner
             </button>
         </div>
 

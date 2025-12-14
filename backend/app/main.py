@@ -23,7 +23,8 @@ from app.routes import (
     tarif_router,
     alisveris_router,
     auth_router,
-    profile_router
+    profile_router,
+    menu_plans_router
 )
 from app.routes.alisveris_extended import router as alisveris_extended_router
 from app.routes.paylasim import router as paylasim_router
@@ -59,6 +60,7 @@ app.include_router(alisveris_router)
 app.include_router(alisveris_extended_router)
 app.include_router(paylasim_router)
 app.include_router(profile_router)
+app.include_router(menu_plans_router)
 
 # HTML Pages (API route'larından sonra)
 @app.get("/login.html")
@@ -133,6 +135,15 @@ async def profile_page():
     if profile_path.exists():
         return FileResponse(profile_path)
     return {"error": "Profil sayfası bulunamadı", "path": str(profile_path)}
+
+
+@app.get("/menu-planner.html")
+async def menu_planner_page():
+    """Haftalık menü planlayıcı sayfası"""
+    menu_planner_path = frontend_path / "menu-planner.html"
+    if menu_planner_path.exists():
+        return FileResponse(menu_planner_path)
+    return {"error": "Menü planlayıcı sayfası bulunamadı", "path": str(menu_planner_path)}
 
 
 @app.on_event("startup")

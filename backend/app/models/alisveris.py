@@ -4,7 +4,7 @@ backend/app/models/alisveris.py
 """
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Enum
 from sqlalchemy.orm import relationship
-from .base import Base
+from app.database import Base
 from datetime import datetime
 import enum
 

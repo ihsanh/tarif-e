@@ -9,6 +9,7 @@ from .auth import router as auth_router
 from .alisveris_extended import router as alısveris_extended_router
 from .paylasim import router as paslasim_router
 from .profile import router as profile_router
+from .menu_plans import router as menu_plans_router
 
 __all__ = [
     "malzeme_router",
@@ -17,5 +18,6 @@ __all__ = [
     "health_router",
     "auth_router",
     "alısveris_extended_router",
-    "paslasim_router"
+    "paslasim_router",
+    "menu_plans_router"
 ]

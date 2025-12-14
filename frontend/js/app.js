@@ -481,8 +481,16 @@ async function loadMyIngredients() {
         data.malzemeler.forEach(item => {
             html += `
                 <div class="ingredient-item">
-                    <span class="ingredient-name">${item.name}</span>
-                    <span class="ingredient-amount">${item.miktar} ${item.birim}</span>
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;">
+                        <input type="checkbox"
+                               class="ingredient-checkbox"
+                               data-ingredient-name="${item.name}"
+                               data-ingredient-id="${item.id}"
+                               onchange="updateSelectedCount()"
+                               checked>
+                        <span class="ingredient-name">${item.name}</span>
+                        <span class="ingredient-amount">${item.miktar} ${item.birim}</span>
+                    </label>
                     <div class="ingredient-actions">
                         <button class="btn-edit" onclick="editIngredient(${item.id}, '${item.name}', ${item.miktar}, '${item.birim}')">
                             ✏️ Düzenle
@@ -496,6 +504,7 @@ async function loadMyIngredients() {
         });
 
         container.innerHTML = html;
+        updateSelectedCount();
 
     } catch (error) {
         console.error('❌ Error loading ingredients:', error);
@@ -583,8 +592,16 @@ document.addEventListener('click', (e) => {
 
 // Malzemelerimden tarif öner
 function getTarifFromMyIngredients() {
-    // TODO: Gerçek malzemeleri al
-    currentIngredients = ['domates', 'biber', 'soğan'];
+    // Seçili malzemeleri al
+    const selectedIngredients = getSelectedIngredients();
+
+    if (selectedIngredients.length === 0) {
+        alert('Lütfen en az bir malzeme seçin!');
+        return;
+    }
+
+    console.log('🍽️ Seçili malzemeler:', selectedIngredients);
+    currentIngredients = selectedIngredients;
     getTarifOnerisi();
 }
 
@@ -592,35 +609,23 @@ async function getTarifOnerisi() {
     showLoading(true);
 
     try {
-
-        const response = await fetchWithAuth(`${API_BASE}/api/malzeme/liste`, {
-            headers: {
-
-            }
-        });
-        const data = await response.json();
-
-        if (!data.malzemeler || data.malzemeler.length === 0) {
-            alert('Lütfen önce malzeme ekleyin');
+        // currentIngredients zaten getTarifFromMyIngredients'ta set edilmiş
+        if (!currentIngredients || currentIngredients.length === 0) {
+            alert('Lütfen önce malzeme seçin');
             showLoading(false);
             return;
         }
 
-        // Sadece malzeme isimlerini al
-        const malzemeIsimleri = data.malzemeler.map(m => m.name);
-        currentIngredients = malzemeIsimleri;
-
-        console.log('🍽️ Tarif isteniyor, malzemeler:', malzemeIsimleri);
+        console.log('🍽️ Tarif isteniyor, malzemeler:', currentIngredients);
 
         // Tarif iste
-
         const tarifResponse = await fetchWithAuth(`${API_BASE}/api/tarif/oner`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                malzemeler: malzemeIsimleri
+                malzemeler: currentIngredients
             })
         });
 
@@ -3052,5 +3057,35 @@ function addForgotPasswordLink() {
 
 // Sayfa yüklendiğinde linki ekle
 window.addEventListener('DOMContentLoaded', addForgotPasswordLink);
+
+// ============================================================
+// MALZEME SEÇİMİ FONKSİYONLARI
+// ============================================================
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+    const selected = Array.from(checkboxes).filter(cb => cb.checked);
+    const countElement = document.getElementById('selected-ingredients-count');
+    if (countElement) {
+        countElement.textContent = `${selected.length} malzeme seçildi`;
+    }
+}
+
+function selectAllIngredients() {
+    const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+    checkboxes.forEach(cb => cb.checked = true);
+    updateSelectedCount();
+}
+
+function deselectAllIngredients() {
+    const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+    updateSelectedCount();
+}
+
+function getSelectedIngredients() {
+    const checkboxes = document.querySelectorAll('.ingredient-checkbox:checked');
+    return Array.from(checkboxes).map(cb => cb.getAttribute('data-ingredient-name'));
+}
 
 console.log('✅ Tarif-e hazır! Kullanmaya başla');

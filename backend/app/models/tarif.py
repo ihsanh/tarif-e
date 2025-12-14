@@ -5,12 +5,12 @@ backend/app/models/tarif.py
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from .base import Base
+from app.database import Base
 
 
 class FavoriTarif(Base):
     """Favori tarifler tablosu"""
-    __tablename__ = "favoriler"  # ✅ DÜZELTİLDİ: "favori_tarifler" yerine "favoriler"
+    __tablename__ = "favori_tarifler"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -33,8 +33,9 @@ class FavoriTarif(Base):
     # RELATIONSHIP
     # ============================================
 
-    # User ile ilişki
     user = relationship("User", back_populates="favoriler")
+    menu_items = relationship("MenuItem", back_populates="tarif")
+
 
     def __repr__(self):
         return f"<FavoriTarif(id={self.id}, baslik='{self.baslik}', user_id={self.user_id})>"

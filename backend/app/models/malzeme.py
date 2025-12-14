@@ -4,7 +4,7 @@ backend/app/models/malzeme.py
 """
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from .base import Base
+from app.database import Base
 from datetime import datetime
 import enum
 
@@ -32,7 +32,7 @@ class Malzeme(Base):
     name = Column(String(100), nullable=False, index=True)
     miktar = Column(Float, default=0)
     birim = Column(String(20), default="adet")
-    kategori = Column(Enum(MalzemeKategorisi), default=MalzemeKategorisi.DIGER)  # ✅ YENİ
+    kategori = Column(Enum(MalzemeKategorisi), default=MalzemeKategorisi.DIGER)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     eklenme_tarihi = Column(DateTime, default=datetime.utcnow)
     son_guncelleme = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -47,7 +47,7 @@ class KullaniciMalzeme(Base):
     Not: Malzeme tablosu ile aynı - geriye dönük uyumluluk için
     """
     __tablename__ = "kullanici_malzeme"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False, index=True)
     miktar = Column(Float, default=0)
@@ -56,6 +56,6 @@ class KullaniciMalzeme(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     eklenme_tarihi = Column(DateTime, default=datetime.utcnow)
     son_guncelleme = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # İlişkiler
     owner = relationship("User", foreign_keys=[user_id])

@@ -1441,3 +1441,28 @@ header h1 {
         font-size: 1.5rem;
     }
 }
+
+/* Malzeme Seçimi - Checkbox Stilleri */
+.ingredient-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.ingredient-item label {
+    user-select: none;
+}
+
+.ingredient-item label:hover {
+    background: #F7FAFC;
+    border-radius: 8px;
+    padding: 5px;
+    margin: -5px;
+}
+
+#selected-ingredients-count {
+    text-align: center;
+    font-size: 1.1em;
+}
+

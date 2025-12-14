@@ -5,7 +5,7 @@ backend/app/models/user.py
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from app.models.base import Base
+from app.database import Base
 from datetime import datetime, timedelta
 
 
@@ -58,6 +58,8 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan"
     )
+
+    menu_plans = relationship("WeeklyMenuPlan", back_populates="user")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, username={self.username})>"

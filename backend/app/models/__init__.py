@@ -2,12 +2,13 @@
 Models Package - Tüm modelleri export et
 backend/app/models/__init__.py
 """
-from .base import Base
+from app.database import Base
 from .user import User
 from .malzeme import Malzeme, MalzemeKategorisi, KullaniciMalzeme
 from .alisveris import AlisverisListesi, AlisverisUrunu, ListePaylasim, PaylaşımRolü
 from .tarif import FavoriTarif
 from .user_profile import UserProfile
+from .menu_plan import WeeklyMenuPlan, MenuItem, MenuShoppingListItem
 
 
 __all__ = [
@@ -21,5 +22,8 @@ __all__ = [
     "ListePaylasim",
     "PaylaşımRolü",
     "FavoriTarif",
-    "UserProfile"
+    "UserProfile",
+    "WeeklyMenuPlan",
+    "MenuItem",
+    "MenuShoppingListItem"
 ]

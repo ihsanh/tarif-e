@@ -5,14 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v24 - şifre unuttum özellliği eklendi">
-      <change afterPath="$PROJECT_DIR$/backend/tests/integration/test_password_reset_integration.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/add_menu_planning_tables.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/models/menu_plan.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/routes/menu_plans.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/app/schemas/menu_plan.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/css/menu-planner.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/js/menu-planner.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/menu-planner.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TODO.TXT" beforeDir="false" afterPath="$PROJECT_DIR$/TODO.TXT" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/conftest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_password_reset_integration.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_password_reset_unit.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/unit/test_password_reset_unit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/alisveris.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/malzeme.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/nutrition.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/nutrition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/tarif.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models/user_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user_profile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routes/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,19 +71,20 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/tests",
+    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/frontend",
     "settings.editor.selected.configurable": "File.Encoding"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests" />
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\migrations" />
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\models" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\js" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\css" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\routes" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\schemas" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests\unit" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests\integrations" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend" />
@@ -350,7 +362,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765633761589</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="v24 - şifre unuttum özellliği eklendi">
+      <option name="closed" value="true" />
+      <created>1765716765546</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1765716765546</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -400,14 +420,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/app/utils/__init__.py</url>
+          <url>file://$PROJECT_DIR$/backend/app/routes/__init__.py</url>
           <line>3</line>
-          <option name="timeStamp" value="3" />
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/app/models/__init__.py</url>
-          <line>4</line>
-          <option name="timeStamp" value="4" />
+          <url>file://$PROJECT_DIR$/backend/app/routes/malzeme.py</url>
+          <line>134</line>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
