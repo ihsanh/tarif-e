@@ -4,20 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v23 - dokumantasyon düzenlendi">
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/services/email_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/utils/token_generator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/migrations/add_reset_token.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/migrations/add_reset_token_columns.py" afterDir="false" />
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v24 - şifre unuttum özellliği eklendi">
+      <change afterPath="$PROJECT_DIR$/backend/tests/integration/test_password_reset_integration.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TODO.TXT" beforeDir="false" afterPath="$PROJECT_DIR$/TODO.TXT" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/conftest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_password_reset_integration.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_password_reset_unit.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/unit/test_password_reset_unit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,19 +60,21 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/migrations",
+    "last_opened_file_path": "C:/Users/hanif/Documents/PythonProjects/Tarif-e/backend/tests",
     "settings.editor.selected.configurable": "File.Encoding"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\migrations" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\app\models" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\js" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\css" />
-      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests\unit" />
+      <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\backend\tests\integrations" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend" />
       <recent name="C:\Users\hanif\Documents\PythonProjects\Tarif-e\frontend\static" />
     </key>
@@ -337,8 +334,27 @@
       <option name="project" value="LOCAL" />
       <updated>1764713313853</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="v24 - şifre unuttum özellliği eklendi">
+      <option name="closed" value="true" />
+      <created>1765633739449</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1765633739449</updated>
+    </task>
+    <task id="LOCAL-00028" summary="v24 - şifre unuttum özellliği eklendi">
+      <option name="closed" value="true" />
+      <created>1765633761589</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1765633761589</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -353,7 +369,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="v2" />
     <MESSAGE value="v3 - Alışveriş listesi oluşturma" />
     <MESSAGE value="v4 - Alışveriş listesi oluşturma düzeltme" />
     <MESSAGE value="v5 - Alışveriş listesi oluşturma düzeltme" />
@@ -378,7 +393,8 @@
     <MESSAGE value="v21 - başlık düzeltme" />
     <MESSAGE value="v22 - gelişmiş tarif filtresi eklendi" />
     <MESSAGE value="v23 - dokumantasyon düzenlendi" />
-    <option name="LAST_COMMIT_MESSAGE" value="v23 - dokumantasyon düzenlendi" />
+    <MESSAGE value="v24 - şifre unuttum özellliği eklendi" />
+    <option name="LAST_COMMIT_MESSAGE" value="v24 - şifre unuttum özellliği eklendi" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

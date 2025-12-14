@@ -1,25 +1,7 @@
-	✅ TAMAMLANANLAR
-	1. Authentication Sistemi ✅
-
-	 User modeli (email, username, password hash)
-	 Register endpoint
-	 Login endpoint (email veya username ile)
-	 JWT token oluşturma/doğrulama
-	 get_current_user dependency
-	 Frontend login/logout sayfaları
-	 Token storage (localStorage)
-	 Protected routes (frontend + backend)
-	 Auth testleri
-	 Token'da sub string olarak düzeltildi
-	 Tüm route'larda current_user.id kullanımı
-
-
 	🔄 DEVAM EDENLER
 	2. AI Entegrasyonu (Gemini) 🟡
 
 	 Temel AI service yapısı var
-	 Malzeme tanıma çalışıyor
-	 Tarif önerme çalışıyor
 	 İyileştirmeler:
 
 	 Prompt engineering (daha iyi sonuçlar)
@@ -58,16 +40,6 @@
 
 
 
-
-	📋 YENİ ÖZELLİKLER (Öncelik Sırasına Göre)
-	5. Kullanıcı Profili & Ayarlar 🔴
-
-	 Profil sayfası
-	 Şifre değiştirme
-	 Email değiştirme
-	 Profil fotoğrafı
-	 Tercihler (diyet, alerji, vb.)
-	 Bildirim ayarları
 
 	6. Tarif Detaylandırma 🔴
 
@@ -200,3 +172,64 @@ Admin panel
 Analytics
 Bildirimler
 
+
+💡 Eklenebilecek Yeni Özellikler
+1️⃣ Tarif Puanlama & Yorum Sistemi
+
+⭐ 1-5 yıldız puanlama
+💬 Kullanıcı yorumları
+📊 Ortalama puan gösterimi
+
+2️⃣ Porsiyon Hesaplama & Ölçekleme
+
+🔢 Porsiyon sayısı değiştirme
+📏 Malzeme miktarlarını otomatik ölçekleme
+🧮 Dinamik besin değerleri
+
+3️⃣ Mutfak Zamanlayıcısı
+
+⏱️ Her tarif için timer
+🔔 Bildirimler
+⏯️ Duraklat/Devam
+
+4️⃣ Haftalık Menü Planlama
+
+📅 7 günlük menü oluşturma
+🛒 Otomatik alışveriş listesi
+📊 Haftalık besin değerleri özeti
+
+5️⃣ Tarif Kategorileri & Etiketler
+
+🏷️ Ana yemek, tatlı, çorba, vb.
+🔖 #vegan #glutensiz #hızlı
+🔍 Kategoriye göre filtreleme
+
+6️⃣ AI Görsel ile Tarif Oluşturma
+
+📸 Bitmiş yemek fotoğrafı çek
+🤖 AI tariften malzeme/tarif çıkarsın
+💾 Favorilere ekle
+
+7️⃣ Sesli Asistan
+
+🎤 Sesli komutlar
+🔊 Tarifleri oku
+👨‍🍳 Eller meşgulken kullan
+
+8️⃣ Tarif İstatistikleri
+
+📊 En çok yapılan tarifler
+📈 Aylık pişirme istatistikleri
+🏆 Başarım rozeti sistemi
+
+9️⃣ Malzeme Envanteri
+
+🏠 Evdeki malzemeleri kaydet
+✅ Eksikleri göster
+🔔 Bitmek üzere uyarıları
+
+🔟 Sosyal Özellikler
+
+👥 Arkadaşlarla tarif paylaşımı
+💬 Tarif üzerinde mesajlaşma
+📱 Sosyal feed
