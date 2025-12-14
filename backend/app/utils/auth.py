@@ -13,8 +13,12 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import get_db
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing - bcrypt 4.0+ compatibility
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__ident="2b"  # Force bcrypt 2b variant (compatible with bcrypt 4.0+)
+)
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -30,18 +34,46 @@ logger = logging.getLogger(__name__)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Şifreyi doğrula"""
-    # Bcrypt max 72 byte kabul eder
-    if len(plain_password.encode('utf-8')) > 72:
-        plain_password = plain_password[:72]
+    # Bcrypt max 72 byte kabul eder - byte seviyesinde kes
+    password_bytes = plain_password.encode('utf-8')
+    if len(password_bytes) > 72:
+        # Byte seviyesinde kes ve geri decode et
+        password_bytes = password_bytes[:72]
+        # Geçerli UTF-8 karakterine kadar geri git
+        while password_bytes:
+            try:
+                plain_password = password_bytes.decode('utf-8')
+                break
+            except UnicodeDecodeError:
+                password_bytes = password_bytes[:-1]
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
     """Şifreyi hashle"""
-    # Bcrypt max 72 byte kabul eder, fazlasını kes
-    if len(password.encode('utf-8')) > 72:
-        password = password[:72]
-    return pwd_context.hash(password)
+    # Bcrypt max 72 byte kabul eder - byte seviyesinde kes
+    password_bytes = password.encode('utf-8')
+    logger.debug(f"[AUTH] Password length: {len(password_bytes)} bytes")
+
+    if len(password_bytes) > 72:
+        # Byte seviyesinde kes ve geri decode et
+        password_bytes = password_bytes[:72]
+        # Geçerli UTF-8 karakterine kadar geri git
+        while password_bytes:
+            try:
+                password = password_bytes.decode('utf-8')
+                logger.debug(f"[AUTH] Password truncated to: {len(password_bytes)} bytes")
+                break
+            except UnicodeDecodeError:
+                password_bytes = password_bytes[:-1]
+
+    try:
+        return pwd_context.hash(password)
+    except Exception as e:
+        logger.error(f"[ERROR] Failed to hash password: {e}")
+        # Son çare olarak: şifreyi byte limitine tam olarak kes
+        password = password.encode('utf-8')[:72].decode('utf-8', errors='ignore')
+        return pwd_context.hash(password)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

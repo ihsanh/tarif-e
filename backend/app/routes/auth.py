@@ -84,7 +84,7 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
 
     except Exception as e:
         db.rollback()
-        logger.error(f"Kullanıcı oluşturulurken hata: {e}")
+        logger.error(f"[ERROR] User creation failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Kullanıcı oluşturulurken bir hata oluştu"
@@ -189,9 +189,9 @@ async def forgot_password(
             # Development'ta: http://localhost:8000/reset-password?token=...
             reset_link = f"http://localhost:8000/login.html?token={reset_token}"
 
-            # ✅ BU 3 SATIRI EKLE (email servisi yerine)
+            # [DEV] Print reset link for development
             print("\n" + "=" * 60)
-            print(f"🔗 RESET LİNK: {reset_link}")
+            print(f"[RESET LINK] {reset_link}")
             print("=" * 60 + "\n")
 
             # Email gönder
@@ -201,10 +201,10 @@ async def forgot_password(
                 username=user.username
             )
 
-            logger.info(f"✅ Password reset requested for: {user.email}")
+            logger.info(f"[INFO] Password reset requested for: {user.email}")
         else:
             # Güvenlik: Email bulunamadı bile bilgisini verme
-            logger.warning(f"⚠️ Password reset requested for non-existent email: {request.email}")
+            logger.warning(f"[WARN] Password reset requested for non-existent email: {request.email}")
 
         # Her zaman başarılı döner (email enumeration önleme)
         return PasswordResetResponse(
@@ -213,7 +213,7 @@ async def forgot_password(
         )
 
     except Exception as e:
-        logger.error(f"❌ Forgot password error: {e}")
+        logger.error(f"[ERROR] Forgot password error: {e}")
         raise HTTPException(
             status_code=500,
             detail="Şifre sıfırlama işlemi sırasında hata oluştu"
@@ -265,7 +265,7 @@ async def reset_password(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Reset password error: {e}")
+        logger.error(f"[ERROR] Reset password error: {e}")
         raise HTTPException(
             status_code=500,
             detail="Şifre güncelleme sırasında hata oluştu"

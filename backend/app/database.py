@@ -23,12 +23,12 @@ if TESTING:
     # Test için ayrı database - ABSOLUTE PATH
     DB_PATH = DATA_DIR / "test_tarif_e.db"
     SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
-    print(f"⚠️  TEST DATABASE kullanılıyor: {DB_PATH}")
+    print(f"[TEST] DATABASE: {DB_PATH}")
 else:
     # Production database - ABSOLUTE PATH
     DB_PATH = DATA_DIR / "tarif_e.db"
     SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
-    print(f"✅ PRODUCTION DATABASE kullanılıyor: {DB_PATH}")
+    print(f"[PROD] DATABASE: {DB_PATH}")
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

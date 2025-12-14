@@ -7,12 +7,14 @@ Evdeki malzemelerden tarif bulan, favori tariflerinizi saklayan ve akıllı alı
 ### 🎯 Ana Özellikler
 - 📸 **Fotoğraf ile malzeme tanıma** (Google Gemini AI)
 - ✍️ **Manuel malzeme girişi**
+- ✅ **Seçimli malzeme sistemi** (İstediğiniz malzemelerle tarif önerisi)
 - 🍽️ **Akıllı tarif önerileri** (Diyet tercihlerine uygun)
 - ❤️ **Favori tarifler** (Kaydet, düzenle, sil)
 - 🔍 **Gelişmiş filtre sistemi** (Malzeme, süre, zorluk, porsiyon, kalori)
 - 📊 **Besin değerleri hesaplama** (AI destekli, 10+ besin değeri)
 - 🔗 **Tarif paylaşma** (WhatsApp, Twitter, Facebook, Telegram, Email, Link)
 - 🛒 **Otomatik alışveriş listesi** (Paylaşılabilir, takım işbirliği)
+- 📅 **Haftalık menü planlayıcı** (Öğün bazlı planlama, otomatik alışveriş listesi)
 - 👤 **Kullanıcı profili** (Diyet tercihleri, alerjiler, tema)
 - ⚙️ **Kullanıcı kontrollü AI kullanımı**
 
@@ -127,16 +129,24 @@ http://localhost:8000/docs
 3. Manuel düzenleme yapabilirsiniz
 
 ### 3️⃣ Tarif Önerisi
-1. "Tarif Öner" butonuna basın
-2. AI diyet tercihlerinize uygun tarif önerir
-3. Besin değerlerini görüntüleyin
+1. Malzemelerinizden istediğinizi seçin (✓ Tümünü Seç / ✗ Tümünü Kaldır)
+2. "Seçili Malzemelerden Tarif Öner" butonuna basın
+3. AI diyet tercihlerinize uygun tarif önerir
+4. Besin değerlerini görüntüleyin
 
 ### 4️⃣ Favori Yönetimi
 1. Beğendiğiniz tarifi favorilere ekleyin
 2. Gelişmiş filtre ile tariflerinizi arayın
 3. Paylaş butonuyla sosyal medyada paylaşın
 
-### 5️⃣ Alışveriş Listesi
+### 5️⃣ Haftalık Menü Planlama
+1. "📅 Menü Planlayıcı" sayfasına gidin
+2. Her gün için öğün ekleyin (Kahvaltı, Öğle, Akşam)
+3. Favori tariflerinizden seçin veya arama yapın
+4. Otomatik alışveriş listesi oluşturun
+5. Haftanın tüm ihtiyacını bir kerede planlayın
+
+### 6️⃣ Alışveriş Listesi
 1. Eksik malzemeler için liste oluşturun
 2. Arkadaşlarınızla paylaşın
 3. Birlikte düzenleyin
@@ -159,7 +169,8 @@ tarif-e/
 │   │   │   ├── tarif.py            # FavoriTarif modeli
 │   │   │   ├── nutrition.py        # Besin değerleri (opsiyonel)
 │   │   │   ├── malzeme.py          # Malzeme modeli
-│   │   │   └── alisveris.py        # Alışveriş listesi
+│   │   │   ├── alisveris.py        # Alışveriş listesi
+│   │   │   └── menu_plan.py        # Haftalık menü planı
 │   │   │
 │   │   ├── routes/                 # API endpoints
 │   │   │   ├── __init__.py
@@ -167,7 +178,8 @@ tarif-e/
 │   │   │   ├── tarif.py            # Tarif işlemleri
 │   │   │   ├── malzeme.py          # Malzeme yönetimi
 │   │   │   ├── alisveris.py        # Alışveriş listesi
-│   │   │   └── profile.py          # Profil yönetimi
+│   │   │   ├── profile.py          # Profil yönetimi
+│   │   │   └── menu_plans.py       # Menü planlama
 │   │   │
 │   │   ├── schemas/                # Pydantic modelleri
 │   │   │   ├── __init__.py
@@ -198,18 +210,21 @@ tarif-e/
 │
 ├── frontend/
 │   ├── index.html                  # Ana sayfa
+│   ├── menu-planner.html           # Haftalık menü planlayıcı
 │   │
 │   ├── css/
 │   │   ├── style.css               # Ana stiller
 │   │   ├── filters.css             # Filtre modal stilleri
 │   │   ├── nutrition.css           # Besin değerleri stilleri
-│   │   └── share.css               # Paylaşma stilleri
+│   │   ├── share.css               # Paylaşma stilleri
+│   │   └── menu-planner.css        # Menü planlayıcı stilleri
 │   │
 │   ├── js/
 │   │   ├── app.js                  # Ana JavaScript
 │   │   ├── filters.js              # Gelişmiş filtre sistemi
 │   │   ├── nutrition.js            # Besin değerleri
-│   │   └── share.js                # Paylaşma fonksiyonları
+│   │   ├── share.js                # Paylaşma fonksiyonları
+│   │   └── menu-planner.js         # Menü planlayıcı fonksiyonları
 │   │
 │   └── assets/
 │       ├── images/
@@ -272,7 +287,32 @@ tarif-e/
 | POST | `/api/profile/password` | Şifre değiştir |
 | POST | `/api/profile/photo` | Profil fotoğrafı |
 
+### Menü Planlama
+| Method | Endpoint | Açıklama |
+|--------|----------|----------|
+| POST | `/api/menu-plans` | Yeni menü planı oluştur |
+| GET | `/api/menu-plans/weekly` | Haftalık menü planı |
+| PUT | `/api/menu-plans/{id}` | Plan güncelle |
+| DELETE | `/api/menu-plans/{id}` | Plan sil |
+| POST | `/api/menu-plans/{id}/meal` | Öğün ekle |
+| POST | `/api/menu-plans/{id}/shopping-list` | Alışveriş listesi oluştur |
+
 ## 🎨 Özellik Detayları
+
+### ✅ Seçimli Malzeme Sistemi
+- **Checkbox ile seçim:** Her malzeme için ayrı checkbox
+- **Toplu işlemler:** "Tümünü Seç" ve "Tümünü Kaldır" butonları
+- **Seçim sayacı:** Kaç malzeme seçildiğini görüntüleme
+- **Akıllı öneriler:** Sadece seçili malzemelerle tarif önerisi
+- **Kullanıcı dostu:** Çok malzeme olsa bile kontrol sizde
+
+### 📅 Haftalık Menü Planlayıcı
+- **7 günlük planlama:** Pazartesi-Pazar arası
+- **3 öğün:** Kahvaltı, Öğle Yemeği, Akşam Yemeği
+- **Favori tarifler:** Doğrudan favorilerinizden seçin
+- **Arama özelliği:** Tarif ismiyle hızlı arama
+- **Otomatik alışveriş:** Haftanın tüm malzemeleri tek listede
+- **Görsel planlama:** Drag & drop destekli (gelecek)
 
 ### 🔍 Gelişmiş Filtre Sistemi
 - **Malzemeler:** Çoklu malzeme arama (fuzzy matching)
@@ -352,13 +392,13 @@ gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 
 | Kategori | Dosya Sayısı | Kod Satırı |
 |----------|--------------|------------|
-| Python (Backend) | 25+ | ~3500+ |
-| JavaScript (Frontend) | 4 | ~1200+ |
-| HTML | 1 | ~400 |
-| CSS | 4 | ~1000+ |
+| Python (Backend) | 27+ | ~4000+ |
+| JavaScript (Frontend) | 5 | ~1800+ |
+| HTML | 2 | ~800 |
+| CSS | 5 | ~1400+ |
 | Tests | 15+ | ~800+ |
-| Docs | 5 | ~600+ |
-| **TOPLAM** | **50+** | **~7500+** |
+| Docs | 5 | ~700+ |
+| **TOPLAM** | **59+** | **~9500+** |
 
 ## 🔐 Güvenlik
 
@@ -372,14 +412,19 @@ gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 
 ## 🎯 Roadmap
 
-### v1.1 (Yakında)
+### v1.1 (Tamamlandı) ✅
+- [x] Haftalık menü planlama
+- [x] Seçimli malzeme sistemi
+- [x] Otomatik alışveriş listesi (menüden)
+
+### v1.2 (Yakında)
 - [ ] Fiş okuma (OCR) - Fiyat takibi
 - [ ] Barkod tarama
-- [ ] Haftalık menü planlama
 - [ ] Kampanya bildirimleri
 - [ ] PWA manifest (offline mode)
+- [ ] Menüde drag & drop
 
-### v1.2 (Gelecek)
+### v1.3 (Gelecek)
 - [ ] Multi-language support
 - [ ] Recipe rating system
 - [ ] Social features (takip, yorum)

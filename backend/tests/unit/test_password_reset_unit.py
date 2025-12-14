@@ -64,13 +64,15 @@ class TestTokenSerializer:
     
     def test_verify_expired_token(self):
         """Süresi dolmuş token reddedilmeli"""
+        import time
         serializer = TokenSerializer(secret_key="test-secret-key")
-        
+
         # Token üret
         data = {"user_id": 123}
         token = serializer.generate_token(data)
-        
-        # max_age=0 ile hemen süresiz yap
+
+        # 1 saniye bekle ve max_age=0 ile kontrol et (token 1 saniye önce oluşturuldu)
+        time.sleep(1)
         verified_data = serializer.verify_token(token, max_age=0)
         assert verified_data is None
     

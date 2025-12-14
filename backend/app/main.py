@@ -150,15 +150,15 @@ async def menu_planner_page():
 async def startup_event():
     """Uygulama başlarken"""
     print("=" * 50)
-    print(f"🍳 {settings.APP_NAME} başlatılıyor...")
-    print(f"📊 Debug modu: {settings.DEBUG}")
-    print(f"🤖 AI aktif: {settings.AI_MODE != 'off'}")
-    print(f"⚙️  AI modu: {settings.AI_MODE}")
-    print(f"🌐 Server: http://{settings.HOST}:{settings.PORT}")
-    print(f"📚 Docs: http://{settings.HOST}:{settings.PORT}/docs")
-    print(f"🔐 Login: http://{settings.HOST}:{settings.PORT}/login.html")
-    print(f"🧪 Token Test: http://{settings.HOST}:{settings.PORT}/token_test.html")
-    print(f"📁 Frontend: {frontend_path}")
+    print(f"[APP] {settings.APP_NAME} starting...")
+    print(f"[DEBUG] Debug mode: {settings.DEBUG}")
+    print(f"[AI] AI active: {settings.AI_MODE != 'off'}")
+    print(f"[AI] AI mode: {settings.AI_MODE}")
+    print(f"[SERVER] http://{settings.HOST}:{settings.PORT}")
+    print(f"[DOCS] http://{settings.HOST}:{settings.PORT}/docs")
+    print(f"[LOGIN] http://{settings.HOST}:{settings.PORT}/login.html")
+    print(f"[TEST] http://{settings.HOST}:{settings.PORT}/token_test.html")
+    print(f"[FRONTEND] {frontend_path}")
     print("=" * 50)
 
 

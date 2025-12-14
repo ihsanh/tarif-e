@@ -1,12 +1,12 @@
 """
 Integration Tests - Password Reset API Endpoints (FIXED)
 Test complete password reset flow end-to-end
-✅ FIXED: API endpoint responses and validations
+[FIXED] API endpoint responses and validations
 """
 import pytest
 from fastapi.testclient import TestClient
 from datetime import datetime, timedelta
-from app.database import SessionLocal
+from tests.conftest import TestingSessionLocal  # Use test session, not production
 from app.models.user import User
 from app.utils.auth import get_password_hash, verify_password
 from app.utils.token_generator import generate_reset_token
@@ -60,7 +60,7 @@ class TestForgotPasswordEndpoint:
         assert response.status_code == 200
 
         # Database'den kullanıcıyı kontrol et
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
 
@@ -81,7 +81,7 @@ class TestVerifyResetTokenEndpoint:
 
     def test_verify_valid_token(self, client, test_user):
         """Geçerli token doğrulanıyor mu?"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
 
@@ -111,7 +111,7 @@ class TestVerifyResetTokenEndpoint:
 
     def test_verify_expired_token(self, client, test_user):
         """Süresi dolmuş token reddediliyor mu?"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
 
@@ -136,7 +136,7 @@ class TestResetPasswordEndpoint:
 
     def test_reset_password_success(self, client, test_user):
         """Başarılı şifre sıfırlama"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
 
@@ -174,7 +174,7 @@ class TestResetPasswordEndpoint:
 
     def test_reset_password_expired_token(self, client, test_user):
         """Süresi dolmuş token ile şifre sıfırlama"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
 
@@ -198,7 +198,7 @@ class TestResetPasswordEndpoint:
 
     def test_reset_password_short_password(self, client, test_user):
         """Kısa şifre validasyonu"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
             token = generate_reset_token()
@@ -220,7 +220,7 @@ class TestResetPasswordEndpoint:
 
     def test_reset_password_token_cleared_after_use(self, client, test_user):
         """Token kullanıldıktan sonra temizleniyor mu?"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
             token = generate_reset_token()
@@ -246,7 +246,7 @@ class TestResetPasswordEndpoint:
 
     def test_reset_password_updates_database(self, client, test_user):
         """Şifre database'de güncelleniyor mu?"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
             old_hashed_password = user.hashed_password
@@ -299,7 +299,7 @@ class TestPasswordResetFlow:
         assert forgot_response.status_code == 200
 
         # 3. Database'den token al
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == user_data["email"]).first()
             token = user.reset_token
@@ -339,7 +339,7 @@ class TestPasswordResetFlow:
 
     def test_token_single_use(self, client, test_user):
         """Token tek kullanımlık mı?"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             user = db.query(User).filter(User.email == test_user["email"]).first()
             token = generate_reset_token()
@@ -368,7 +368,7 @@ class TestPasswordResetEdgeCases:
 
     def test_multiple_forgot_password_requests(self, client, test_user):
         """Birden fazla forgot password talebi - token güncellensin"""
-        db = SessionLocal()
+        db = TestingSessionLocal()
         try:
             # İlk talep
             response1 = client.post(

@@ -18,11 +18,13 @@ pydantic-settings==2.1.0
 
 # Development
 pytest==7.4.3
+pytest-cov==7.0.0
 httpx==0.25.2
 
 # Authentication
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt<4.0  # Pin to 3.x for passlib compatibility
 python-multipart==0.0.6
 email-validator==2.1.0
 

@@ -1,7 +1,7 @@
 """
 Pytest Configuration - Windows SQLite Lock Fix
-✅ FIXED: Database lock issues on Windows
-✅ FIXED: Connection pooling issues
+[FIXED] Database lock issues on Windows
+[FIXED] Connection pooling issues
 """
 import pytest
 import sys
@@ -22,7 +22,7 @@ from app.database import Base, get_db
 # Test database - Windows için StaticPool kullan
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///./test_tarif_e.db"
 
-# ✅ Windows için özel konfigürasyon
+# [CONFIG] Windows için özel konfigürasyon
 engine = create_engine(
     SQLALCHEMY_TEST_DATABASE_URL,
     connect_args={
@@ -47,7 +47,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 def db_session() -> Generator[Session, None, None]:
     """
     Test database session
-    ✅ FIXED: Proper cleanup to avoid locks
+    [FIXED] Proper cleanup to avoid locks
     """
     # Tabloları oluştur
     Base.metadata.create_all(bind=engine)
@@ -58,17 +58,17 @@ def db_session() -> Generator[Session, None, None]:
     try:
         yield session
     finally:
-        # ✅ ÖNEMLİ: Önce session'ı kapat
+        # [IMPORTANT] Önce session'ı kapat
         session.close()
 
-        # ✅ Tüm connection'ları kapat
+        # [CLEANUP] Tüm connection'ları kapat
         engine.dispose()
 
-        # ✅ Tabloları sil
+        # [CLEANUP] Tabloları sil
         try:
             Base.metadata.drop_all(bind=engine)
         except Exception as e:
-            print(f"⚠️ Drop tables warning: {e}")
+            print(f"[WARN] Drop tables warning: {e}")
 
 
 @pytest.fixture(scope="function")
@@ -109,7 +109,7 @@ def test_user(client: TestClient, test_user_data: dict):
     response = client.post("/api/auth/register", json=test_user_data)
 
     if response.status_code not in [200, 201]:
-        print(f"⚠️ Register failed: {response.status_code}")
+        print(f"[WARN] Register failed: {response.status_code}")
         print(f"Response: {response.json()}")
 
     assert response.status_code in [200, 201], f"Registration failed: {response.json()}"
@@ -191,36 +191,36 @@ def pytest_sessionstart(session):
     if os.path.exists(test_db_path):
         try:
             os.remove(test_db_path)
-            print(f"\n🧹 Cleaned old test database: {test_db_path}")
+            print(f"\n[CLEANUP] Cleaned old test database: {test_db_path}")
         except Exception as e:
-            print(f"\n⚠️ Could not remove old test database: {e}")
+            print(f"\n[WARN] Could not remove old test database: {e}")
 
 
 def pytest_sessionfinish(session, exitstatus):
     """
     Test session bittiğinde
-    ✅ FIXED: Proper cleanup
+    [FIXED] Proper cleanup
     """
-    # ✅ Engine'i kapat
+    # [CLEANUP] Engine'i kapat
     engine.dispose()
 
-    # ✅ Biraz bekle (Windows için)
+    # [CLEANUP] Biraz bekle (Windows için)
     import time
     time.sleep(0.5)
 
-    # ✅ Test database'i sil
+    # [CLEANUP] Test database'i sil
     test_db_path = "./test_tarif_e.db"
     if os.path.exists(test_db_path):
         max_attempts = 3
         for attempt in range(max_attempts):
             try:
                 os.remove(test_db_path)
-                print(f"\n✅ Test database cleaned up: {test_db_path}")
+                print(f"\n[SUCCESS] Test database cleaned up: {test_db_path}")
                 break
             except Exception as e:
                 if attempt < max_attempts - 1:
-                    print(f"\n⚠️ Cleanup attempt {attempt + 1} failed, retrying...")
+                    print(f"\n[WARN] Cleanup attempt {attempt + 1} failed, retrying...")
                     time.sleep(1)
                 else:
-                    print(f"\n⚠️ Could not remove test database after {max_attempts} attempts")
+                    print(f"\n[WARN] Could not remove test database after {max_attempts} attempts")
                     print(f"   You may need to manually delete: {test_db_path}")

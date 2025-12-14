@@ -5,25 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v24 - şifre unuttum özellliği eklendi">
-      <change afterPath="$PROJECT_DIR$/backend/add_menu_planning_tables.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/models/menu_plan.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/routes/menu_plans.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/app/schemas/menu_plan.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/css/menu-planner.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/js/menu-planner.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/menu-planner.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/alisveris.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/alisveris.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/malzeme.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/malzeme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/nutrition.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/nutrition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/tarif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/models/user_profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models/user_profile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/routes/tarif.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routes/tarif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
