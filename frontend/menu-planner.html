@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haftalık Menü Planlayıcısı - Tarif-e</title>
+    <link rel="stylesheet" href="css/menu-planner.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-utensils"></i>
+                <span>Tarif-e</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a href="favoriler.html"><i class="fas fa-heart"></i> Favoriler</a>
+                <a href="menu-planner.html" class="active"><i class="fas fa-calendar-alt"></i> Menü Planlayıcı</a>
+                <a href="alisveris.html"><i class="fas fa-shopping-cart"></i> Alışveriş</a>
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Çıkış
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-left">
+                <h1><i class="fas fa-calendar-week"></i> Haftalık Menü Planlayıcısı</h1>
+                <p class="subtitle">Haftanın her günü için yemek planı oluştur</p>
+            </div>
+            <div class="header-right">
+                <button id="createMenuBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Yeni Menü Oluştur
+                </button>
+                <button id="viewMenusBtn" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Menülerim
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Menu Info -->
+        <div id="activeMenuInfo" class="menu-info-card" style="display: none;">
+            <div class="menu-info-header">
+                <div>
+                    <h3 id="activeMenuName"></h3>
+                    <p id="activeMenuDates"></p>
+                </div>
+                <div class="menu-info-actions">
+                    <button id="editMenuBtn" class="btn-icon" title="Düzenle">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button id="deleteMenuBtn" class="btn-icon" title="Sil">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week View -->
+        <div id="weekView" class="week-view">
+            <!-- Days will be dynamically generated -->
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button id="viewShoppingListBtn" class="action-card" disabled>
+                <i class="fas fa-shopping-basket"></i>
+                <div class="action-content">
+                    <h3>Alışveriş Listesi</h3>
+                    <p>Haftalık malzeme listesi</p>
+                </div>
+            </button>
+            
+            <button id="viewNutritionBtn" class="action-card" disabled>
+                <i class="fas fa-chart-pie"></i>
+                <div class="action-content">
+                    <h3>Besin Değerleri</h3>
+                    <p>Haftalık kalori özeti</p>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Create Menu -->
+    <div id="createMenuModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Yeni Menü Oluştur</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createMenuForm">
+                    <div class="form-group">
+                        <label for="menuName">Menü Adı *</label>
+                        <input type="text" id="menuName" required placeholder="örn: 15-21 Ocak Menüm">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="weekStart">Başlangıç Tarihi (Pazartesi) *</label>
+                            <input type="date" id="weekStart" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="weekEnd">Bitiş Tarihi (Pazar) *</label>
+                            <input type="date" id="weekEnd" required readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menuDescription">Açıklama</label>
+                        <textarea id="menuDescription" rows="3" placeholder="Bu hafta için notlar..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="setActive" checked>
+                            <span>Aktif menü olarak ayarla</span>
+                        </label>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary close-modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">Oluştur</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Meal -->
+    <div id="addMealModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Öğün Ekle</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addMealForm">
+                    <input type="hidden" id="mealDay">
+                    <input type="hidden" id="mealType">
+                    
+                    <div class="form-group">
+                        <label>Tarif Seç *</label>
+                        <div class="recipe-search">
+                            <input type="text" id="recipeSearch" placeholder="Tarif ara...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div id="recipeList" class="recipe-list"></div>
+                        <input type="hidden" id="selectedRecipeId">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="portions">Porsiyon Sayısı</label>
+                        <input type="number" id="portions" min="1" value="2">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mealNotes">Notlar</label>
+                        <textarea id="mealNotes" rows="2" placeholder="Ekstra notlar..."></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary close-modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">Ekle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Shopping List -->
+    <div id="shoppingListModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Alışveriş Listesi</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shopping-list-header">
+                    <p class="shopping-list-info">Haftalık menü için gerekli malzemeler</p>
+                    <button id="regenerateListBtn" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-sync"></i> Yeniden Oluştur
+                    </button>
+                </div>
+                <div id="shoppingListContent" class="shopping-list-content">
+                    <!-- Shopping items will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Nutrition -->
+    <div id="nutritionModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Besin Değerleri Özeti</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="nutritionContent" class="nutrition-content">
+                    <!-- Nutrition data will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Menu List -->
+    <div id="menuListModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Menülerim</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="menuListContent" class="menu-list-content">
+                    <!-- Menu list will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/menu-planner.js"></script>
+</body>
+</html>
