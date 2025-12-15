@@ -116,6 +116,57 @@
         </div>
     </div>
 
+    <!-- Subscription Card -->
+    <div class="subscription-card" id="subscription-section" style="display: none;">
+        <div class="subscription-header">
+            <div class="subscription-tier-badge" id="subscription-tier-badge">
+                <span id="subscription-tier-text">PRO</span>
+            </div>
+            <div class="subscription-details">
+                <h3 id="subscription-title">Pro Paket</h3>
+                <p id="subscription-desc">Sınırsız tarif önerisi ve daha fazlası</p>
+            </div>
+        </div>
+
+        <div class="subscription-usage" id="subscription-usage-section" style="display: none;">
+            <div class="usage-stats">
+                <div class="usage-label">Bugün Kullanılan</div>
+                <div class="usage-value">
+                    <span id="usage-used">0</span>/<span id="usage-limit">3</span> tarif
+                </div>
+            </div>
+            <div class="usage-progress-bar">
+                <div class="usage-progress-fill" id="usage-progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="usage-remaining" id="usage-remaining-text">3 tarif hakkınız kaldı</div>
+        </div>
+
+        <div class="subscription-info">
+            <div class="info-row">
+                <span class="info-label">Durum:</span>
+                <span class="info-value" id="subscription-status">Aktif</span>
+            </div>
+            <div class="info-row" id="subscription-end-date-row" style="display: none;">
+                <span class="info-label">Bitiş Tarihi:</span>
+                <span class="info-value" id="subscription-end-date">-</span>
+            </div>
+            <div class="info-row" id="subscription-billing-row" style="display: none;">
+                <span class="info-label">Faturalandırma:</span>
+                <span class="info-value" id="subscription-billing">Aylık</span>
+            </div>
+            <div class="info-row" id="subscription-auto-renew-row" style="display: none;">
+                <span class="info-label">Otomatik Yenileme:</span>
+                <span class="info-value" id="subscription-auto-renew">Aktif</span>
+            </div>
+        </div>
+
+        <div class="subscription-actions" id="subscription-upgrade-section" style="display: none;">
+            <button class="btn btn-premium" onclick="showUpgradeModal()">
+                Yükselt Pro Pakete
+            </button>
+        </div>
+    </div>
+
     <!-- Tab Navigasyon -->
     <div class="settings-tabs">
         <button class="tab-btn active" onclick="showSettingsTab('personal')">

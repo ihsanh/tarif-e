@@ -50,6 +50,12 @@ class Settings(BaseSettings):
     # Frontend URL (reset link için)
     FRONTEND_URL: str = "http://localhost:8000"
 
+    # Subscription settings
+    STANDARD_DAILY_RECIPE_LIMIT: int = 3  # Standart paket günlük tarif limiti
+    PRO_MONTHLY_PRICE: float = 99.90  # Pro paket aylık ücret (TL)
+    PRO_YEARLY_PRICE: float = 999.90  # Pro paket yıllık ücret (TL)
+    DEFAULT_SUBSCRIPTION_TIER: str = "standard"  # Yeni kullanıcılar için varsayılan paket
+
     class Config:
         env_file = ".env"
         case_sensitive = True

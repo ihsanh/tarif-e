@@ -43,7 +43,7 @@ async function loadProfileSettings() {
 }
 
 function displayProfile(data) {
-    const { user, profile } = data;
+    const { user, profile, subscription, usage } = data;
 
     // Kullanıcı bilgileri
     document.getElementById('profile-username').textContent = user.username;
@@ -64,6 +64,145 @@ function displayProfile(data) {
     // Tema
     if (profile.theme) {
         document.querySelector(`input[name="theme"][value="${profile.theme}"]`).checked = true;
+    }
+
+    // Abonelik bilgilerini göster
+    if (subscription) {
+        displaySubscription(subscription, usage);
+    }
+}
+
+// ============================================
+// ABONELIK GÖSTERIMI
+// ============================================
+
+function displaySubscription(subscription, usage) {
+    const subscriptionSection = document.getElementById('subscription-section');
+    const tierBadge = document.getElementById('subscription-tier-badge');
+    const tierText = document.getElementById('subscription-tier-text');
+    const subscriptionTitle = document.getElementById('subscription-title');
+    const subscriptionDesc = document.getElementById('subscription-desc');
+    const subscriptionStatus = document.getElementById('subscription-status');
+
+    // Abonelik bölümünü göster
+    subscriptionSection.style.display = 'block';
+
+    // Tier bilgisini göster
+    const isPro = subscription.tier === 'pro';
+    tierText.textContent = isPro ? 'PRO' : 'STANDARD';
+    tierBadge.className = `subscription-tier-badge ${subscription.tier}`;
+
+    subscriptionTitle.textContent = isPro ? 'Pro Paket' : 'Standard Paket';
+    subscriptionDesc.textContent = isPro
+        ? 'Sınırsız tarif önerisi ve daha fazlası'
+        : 'Günlük ' + usage.limit + ' tarif önerisi';
+
+    // Durum
+    const statusMap = {
+        'active': 'Aktif',
+        'expired': 'Süresi Dolmuş',
+        'cancelled': 'İptal Edildi'
+    };
+    subscriptionStatus.textContent = statusMap[subscription.status] || subscription.status;
+    subscriptionStatus.className = 'info-value status-' + subscription.status;
+
+    // Kullanım istatistikleri (sadece standard için)
+    const usageSection = document.getElementById('subscription-usage-section');
+    if (!isPro && usage.limit > 0) {
+        usageSection.style.display = 'block';
+
+        document.getElementById('usage-used').textContent = usage.used_today;
+        document.getElementById('usage-limit').textContent = usage.limit;
+
+        const percentage = usage.percentage_used;
+        document.getElementById('usage-progress-fill').style.width = percentage + '%';
+
+        const remaining = usage.remaining;
+        const remainingText = document.getElementById('usage-remaining-text');
+        if (remaining > 0) {
+            remainingText.textContent = `${remaining} tarif hakkınız kaldı`;
+            remainingText.className = 'usage-remaining';
+        } else {
+            remainingText.textContent = 'Günlük limitinize ulaştınız';
+            remainingText.className = 'usage-remaining limit-reached';
+        }
+    } else {
+        usageSection.style.display = 'none';
+    }
+
+    // Bitiş tarihi
+    const endDateRow = document.getElementById('subscription-end-date-row');
+    if (subscription.end_date) {
+        endDateRow.style.display = 'flex';
+        const endDate = new Date(subscription.end_date);
+        document.getElementById('subscription-end-date').textContent =
+            endDate.toLocaleDateString('tr-TR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+    } else {
+        endDateRow.style.display = 'none';
+    }
+
+    // Faturalandırma
+    const billingRow = document.getElementById('subscription-billing-row');
+    if (isPro) {
+        billingRow.style.display = 'flex';
+        const billingMap = {
+            'monthly': 'Aylık',
+            'yearly': 'Yıllık'
+        };
+        document.getElementById('subscription-billing').textContent =
+            billingMap[subscription.billing_cycle] || subscription.billing_cycle;
+    } else {
+        billingRow.style.display = 'none';
+    }
+
+    // Otomatik yenileme
+    const autoRenewRow = document.getElementById('subscription-auto-renew-row');
+    if (isPro) {
+        autoRenewRow.style.display = 'flex';
+        document.getElementById('subscription-auto-renew').textContent =
+            subscription.auto_renew ? 'Aktif' : 'Pasif';
+    } else {
+        autoRenewRow.style.display = 'none';
+    }
+
+    // Yükseltme butonu (sadece standard için)
+    const upgradeSection = document.getElementById('subscription-upgrade-section');
+    if (!isPro) {
+        upgradeSection.style.display = 'block';
+    } else {
+        upgradeSection.style.display = 'none';
+    }
+}
+
+function showUpgradeModal() {
+    // İleride modal ile yükseltme ekranı gösterilebilir
+    if (confirm('Pro pakete yükseltmek ister misiniz?\n\n✓ Sınırsız tarif önerisi\n✓ Reklamsız deneyim\n✓ Öncelikli destek')) {
+        upgradeToPro();
+    }
+}
+
+async function upgradeToPro() {
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/subscription/upgrade`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('Pro pakete başarıyla yükseltildiniz!', 'success');
+            // Profili yeniden yükle
+            loadProfileSettings();
+        } else {
+            showNotification('Yükseltme başarısız oldu', 'error');
+        }
+    } catch (error) {
+        console.error('Upgrade error:', error);
+        showNotification('Bir hata oluştu', 'error');
     }
 }
 

@@ -17,6 +17,7 @@ import logging
 import traceback
 from sqlalchemy.exc import IntegrityError
 from app.utils.auth import get_current_user
+from app.utils.rate_limiter import check_recipe_limit, log_recipe_usage
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,26 @@ async def tarif_oner(
 ):
     """Malzemelerden tarif öner - Kullanıcı tercihleri dahil"""
     logger.info(f"Kullanıcı {current_user.id} önerme isteği aldı.")
+
+    # Rate limiting kontrolü
+    limit_check = check_recipe_limit(current_user, db)
+
+    if not limit_check["allowed"]:
+        logger.warning(
+            f"User {current_user.id} exceeded daily recipe limit: "
+            f"{limit_check['used_today']}/{limit_check['limit']}"
+        )
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "message": f"Günlük tarif önerisi limitinize ulaştınız ({limit_check['limit']} tarif/gün). "
+                           f"Pro pakete geçerek sınırsız tarif önerisi alabilirsiniz.",
+                "tier": limit_check["tier"],
+                "used_today": limit_check["used_today"],
+                "limit": limit_check["limit"],
+                "remaining": limit_check["remaining"]
+            }
+        )
 
     if not ai_service.enabled:
         logger.warning("AI servisi aktif değil.")
@@ -77,11 +98,23 @@ async def tarif_oner(
         # AI'dan tarif iste
         tarif = ai_service.tarif_oner(request.malzemeler, preferences)
 
-        logger.info(f"AI tarafından başarıyla tarif önerildi.")
+        # Başarılı tarif önerisini logla
+        log_recipe_usage(current_user, db)
+
+        logger.info(f"AI tarafından başarıyla tarif önerildi ve kullanım loglandı.")
+
+        # Güncel kullanım bilgisini de döndür
+        updated_limit_check = check_recipe_limit(current_user, db)
 
         return {
             "success": True,
-            "tarif": tarif
+            "tarif": tarif,
+            "usage": {
+                "tier": updated_limit_check["tier"],
+                "used_today": updated_limit_check["used_today"],
+                "limit": updated_limit_check["limit"],
+                "remaining": updated_limit_check["remaining"]
+            }
         }
     except Exception as e:
         logger.error(f"Tarif önerme sırasında hata: {e}\n{traceback.format_exc()}")

@@ -77,6 +77,16 @@
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
+/* Pro Badge Animation */
+@keyframes pulse-gold {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+    }
+}
+
     </style>
 
     <script>
@@ -112,14 +122,44 @@
     <!-- User Info & Logout -->
     <div style="display: flex; align-items: center; gap: 15px;">
         <!-- Kullanıcı Bilgisi -->
-        <div id="user-display" style="
-            background: rgba(255,255,255,0.2);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-        "></div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="user-display" style="
+                background: rgba(255,255,255,0.2);
+                color: white;
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-weight: 600;
+                backdrop-filter: blur(10px);
+            "></div>
+
+            <!-- Pro Badge -->
+            <div id="subscription-badge" style="display: none;">
+                <span id="pro-badge" style="
+                    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+                    color: #333;
+                    padding: 6px 12px;
+                    border-radius: 15px;
+                    font-weight: 700;
+                    font-size: 12px;
+                    letter-spacing: 0.5px;
+                    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+                    animation: pulse-gold 2s infinite;
+                    display: none;
+                ">✨ PRO</span>
+
+                <span id="standard-badge" style="
+                    background: rgba(255, 255, 255, 0.3);
+                    color: white;
+                    padding: 6px 12px;
+                    border-radius: 15px;
+                    font-weight: 600;
+                    font-size: 12px;
+                    letter-spacing: 0.5px;
+                    border: 1px solid rgba(255, 255, 255, 0.4);
+                    display: none;
+                ">STANDARD</span>
+            </div>
+        </div>
 
         <!-- Profil Butonu -->
         <button onclick="window.location.href='/profile.html'" style="

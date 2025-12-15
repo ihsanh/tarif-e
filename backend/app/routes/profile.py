@@ -7,7 +7,10 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
 from app.models.user_profile import UserProfile
+from app.models.subscription import Subscription
 from app.utils.auth import get_current_user, get_password_hash, verify_password
+from app.utils.rate_limiter import get_usage_stats
+from app.config import settings
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 import logging
@@ -56,7 +59,7 @@ async def get_profile(
     db: Session = Depends(get_db)
 ):
     """Kullanıcının profil bilgilerini getir"""
-    
+
     # Profil yoksa oluştur
     profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
     if not profile:
@@ -71,7 +74,25 @@ async def get_profile(
         db.add(profile)
         db.commit()
         db.refresh(profile)
-    
+
+    # Abonelik bilgisini getir (yoksa oluştur)
+    subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
+    if not subscription:
+        subscription = Subscription(
+            user_id=current_user.id,
+            tier=settings.DEFAULT_SUBSCRIPTION_TIER,
+            billing_cycle="monthly",
+            status="active",
+            auto_renew=True
+        )
+        subscription.calculate_end_date()
+        db.add(subscription)
+        db.commit()
+        db.refresh(subscription)
+
+    # Kullanım istatistiklerini getir
+    usage_stats = get_usage_stats(current_user, db)
+
     return {
         "success": True,
         "user": {
@@ -89,6 +110,22 @@ async def get_profile(
             "dislikes": profile.dislikes or [],
             "theme": profile.theme,
             "language": profile.language
+        },
+        "subscription": {
+            "tier": subscription.tier,
+            "billing_cycle": subscription.billing_cycle,
+            "status": subscription.status,
+            "start_date": subscription.start_date.isoformat() if subscription.start_date else None,
+            "end_date": subscription.end_date.isoformat() if subscription.end_date else None,
+            "auto_renew": subscription.auto_renew,
+            "is_active": subscription.is_active()
+        },
+        "usage": {
+            "tier": usage_stats["tier"],
+            "used_today": usage_stats["used_today"],
+            "limit": usage_stats["limit"],
+            "remaining": usage_stats["remaining"],
+            "percentage_used": usage_stats["percentage_used"]
         }
     }
 

@@ -9,6 +9,8 @@ from .alisveris import AlisverisListesi, AlisverisUrunu, ListePaylasim, PaylaÅŸÄ
 from .tarif import FavoriTarif
 from .user_profile import UserProfile
 from .menu_plan import WeeklyMenuPlan, MenuItem, MenuShoppingListItem
+from .subscription import Subscription
+from .usage_log import UsageLog
 
 
 __all__ = [
@@ -25,5 +27,7 @@ __all__ = [
     "UserProfile",
     "WeeklyMenuPlan",
     "MenuItem",
-    "MenuShoppingListItem"
+    "MenuShoppingListItem",
+    "Subscription",
+    "UsageLog"
 ]

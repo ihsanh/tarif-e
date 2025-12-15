@@ -62,3 +62,9 @@ secrets/
 
 backend/test_tarif_e.db
 *.db-journal
+.claude/settings.local.json
+
+# Windows system files
+nul
+Thumbs.db
+desktop.ini

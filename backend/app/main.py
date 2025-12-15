@@ -28,6 +28,7 @@ from app.routes import (
 )
 from app.routes.alisveris_extended import router as alisveris_extended_router
 from app.routes.paylasim import router as paylasim_router
+from app.routes.subscription import router as subscription_router
 
 # Veritabanını başlat
 Base.metadata.create_all(bind=engine)
@@ -61,6 +62,7 @@ app.include_router(alisveris_extended_router)
 app.include_router(paylasim_router)
 app.include_router(profile_router)
 app.include_router(menu_plans_router)
+app.include_router(subscription_router)
 
 # HTML Pages (API route'larından sonra)
 @app.get("/login.html")

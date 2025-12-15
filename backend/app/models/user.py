@@ -61,6 +61,21 @@ class User(Base):
 
     menu_plans = relationship("WeeklyMenuPlan", back_populates="user")
 
+    # Subscription relationship
+    subscription = relationship(
+        "Subscription",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    # Usage logs relationship
+    usage_logs = relationship(
+        "UsageLog",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, username={self.username})>"
 

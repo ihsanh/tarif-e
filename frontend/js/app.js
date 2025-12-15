@@ -141,6 +141,53 @@ window.handleLogout = async function handleLogout(confirm = true) {
     }
 }
 
+// ============================================
+// SUBSCRIPTION & RATE LIMITING
+// ============================================
+
+// Rate limit hatası göster
+function handleRateLimitError(errorDetail) {
+    showLoading(false);
+
+    let message = 'Günlük tarif önerisi limitinize ulaştınız.';
+    let upgradeBtnText = 'Pro Pakete Geç';
+
+    if (errorDetail && typeof errorDetail === 'object') {
+        if (errorDetail.message) {
+            message = errorDetail.message;
+        }
+    } else if (typeof errorDetail === 'string') {
+        message = errorDetail;
+    }
+
+    // Modal veya alert göster
+    if (confirm(message + '\n\nPro pakete geçmek ister misiniz?')) {
+        window.location.href = '/profile.html';
+    }
+}
+
+// Kullanım bilgisini göster
+function showUsageInfo(usage) {
+    if (!usage || usage.tier === 'pro') {
+        // Pro kullanıcılar için bilgi gösterme
+        return;
+    }
+
+    // Standard kullanıcılar için kalan tarif sayısını göster
+    const remaining = usage.remaining;
+
+    if (remaining <= 2) {
+        const message = remaining === 0
+            ? `Son tarifınızı kullandınız! Daha fazla tarif için Pro pakete geçebilirsiniz.`
+            : `${remaining} tarif hakkınız kaldı!`;
+
+        // Toast bildirim göster (eğer varsa)
+        setTimeout(() => {
+            alert(message);
+        }, 1000);
+    }
+}
+
 // Kullanıcı bilgisini göster
 function displayUserInfo() {
     const userStr = localStorage.getItem('user');
@@ -155,8 +202,48 @@ function displayUserInfo() {
         if (userDisplay) {
             userDisplay.textContent = `Merhaba, ${user.username}!`;
         }
+
+        // Abonelik badge'ini yükle
+        loadSubscriptionBadge();
     } catch (e) {
         console.error('User parse error:', e);
+    }
+}
+
+// Abonelik badge'ini yükle ve göster
+async function loadSubscriptionBadge() {
+    try {
+        const response = await fetchWithAuth(`${API_BASE}/api/subscription/status`);
+
+        if (!response.ok) {
+            console.warn('Subscription status yüklenemedi');
+            return;
+        }
+
+        const subscription = await response.json();
+
+        // Badge elementlerini bul
+        const subscriptionBadge = document.getElementById('subscription-badge');
+        const proBadge = document.getElementById('pro-badge');
+        const standardBadge = document.getElementById('standard-badge');
+
+        if (!subscriptionBadge || !proBadge || !standardBadge) return;
+
+        // Badge container'ı göster
+        subscriptionBadge.style.display = 'block';
+
+        // Tier'a göre ilgili badge'i göster
+        if (subscription.tier === 'pro') {
+            proBadge.style.display = 'inline-block';
+            standardBadge.style.display = 'none';
+        } else {
+            proBadge.style.display = 'none';
+            standardBadge.style.display = 'inline-block';
+        }
+
+        console.log('✅ Subscription badge yüklendi:', subscription.tier.toUpperCase());
+    } catch (error) {
+        console.error('Subscription badge yüklenemedi:', error);
     }
 }
 
@@ -629,11 +716,23 @@ async function getTarifOnerisi() {
             })
         });
 
+        // Rate limit kontrolü
+        if (tarifResponse.status === 429) {
+            const errorData = await tarifResponse.json();
+            handleRateLimitError(errorData.detail);
+            return;
+        }
+
         const tarifData = await tarifResponse.json();
         console.log('📖 Tarif geldi:', tarifData);
 
         if (tarifData.success && tarifData.tarif) {
             currentRecipe = tarifData.tarif;
+
+            // Kullanım bilgisini göster (eğer varsa)
+            if (tarifData.usage) {
+                showUsageInfo(tarifData.usage);
+            }
 
             // Önce ekranı göster, sonra içeriği doldur
             showScreen('recipe-screen');
