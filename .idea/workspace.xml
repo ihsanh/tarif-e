@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v24 - şifre unuttum özellliği eklendi">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-    </list>
+    <list default="true" id="a1585f81-5407-4ff5-8bcd-7a647bb757d2" name="Changes" comment="v24 - şifre unuttum özellliği eklendi" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

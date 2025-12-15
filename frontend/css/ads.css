@@ -1,0 +1,214 @@
+/**
+ * Ad Styles - Reklam container'ları için stil dosyası
+ * Google AdSense entegrasyonu için optimize edilmiştir
+ */
+
+/* Ad Container - Genel stil */
+.ad-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 0;
+    text-align: center;
+    background: transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+/* Ad Label - "Reklam" etiketi (yasal gereklilik) */
+.ad-label {
+    font-size: 10px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    text-align: center;
+    opacity: 0.6;
+}
+
+/* Top Banner Ad - Ana sayfa üst banner */
+#ad-top-banner {
+    margin: 30px 0;
+    min-height: 90px; /* Tipik banner yüksekliği */
+}
+
+/* Sidebar Ad - Yan panel reklamları */
+.ad-sidebar {
+    margin: 20px 0;
+    min-height: 250px; /* Tipik rectangle ad */
+}
+
+/* Inline Ad - İçerik arası reklamlar */
+.ad-inline {
+    margin: 30px 0;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+/* Bottom Ad - Sayfa altı reklam */
+.ad-bottom {
+    margin: 40px 0 20px 0;
+    min-height: 90px;
+}
+
+/* AdSense ins element */
+.adsbygoogle {
+    display: block;
+    min-height: 50px;
+}
+
+/* Loading state - Reklam yüklenirken */
+.ad-container.loading::before {
+    content: "Reklam yükleniyor...";
+    display: block;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e3e9f0 100%);
+    color: #999;
+    font-size: 13px;
+    border-radius: 8px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Pro User - Reklamlar gizli */
+.pro-user .ad-container {
+    display: none !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .ad-container {
+        margin: 15px 0;
+    }
+
+    #ad-top-banner {
+        margin: 20px 0;
+    }
+
+    .ad-inline {
+        margin: 20px 0;
+        padding: 15px 0;
+    }
+}
+
+/* Ad Error State - Reklam yüklenemezse */
+.ad-container.error {
+    display: none;
+}
+
+/* Ad Wrapper - Ekstra kontrol için */
+.ad-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Sticky Ad - Sabit pozisyon */
+.ad-sticky {
+    position: sticky;
+    top: 80px; /* Header yüksekliği + biraz boşluk */
+    z-index: 100;
+}
+
+/* Ad Close Button - İleride reklam kapatma özelliği için */
+.ad-close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none; /* Şimdilik gizli */
+    z-index: 10;
+}
+
+.ad-close-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Upgrade Prompt - Pro'ya geç mesajı */
+.ad-upgrade-prompt {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px 20px;
+    text-align: center;
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    margin: 30px 0;
+}
+
+.ad-upgrade-prompt h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.ad-upgrade-prompt p {
+    font-size: 14px;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.ad-upgrade-prompt button {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.ad-upgrade-prompt button:hover {
+    transform: translateY(-2px);
+}
+
+/* Test/Development - Placeholder ad */
+.ad-placeholder {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border: 2px dashed #999;
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 8px;
+    color: #666;
+    font-size: 14px;
+}
+
+.ad-placeholder-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.ad-placeholder-subtitle {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+    .ad-label {
+        color: #666;
+    }
+
+    .ad-inline {
+        border-color: #333;
+    }
+
+    .ad-placeholder {
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        border-color: #4a5568;
+        color: #a0aec0;
+    }
+}

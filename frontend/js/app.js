@@ -282,6 +282,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Kullanıcı bilgisini göster
         displayUserInfo();
 
+        // Reklamları başlat (subscription check edip otomatik gösterir/gizler)
+        initializeAds();
+
         // Diğer başlangıç işlemleri
         loadMyIngredients();
         updatePhotoUIForDevice();
@@ -294,6 +297,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 100); // 100ms gecikme - localStorage'ın flush olmasını bekle
 });
+
+// ============================================
+// AD MANAGEMENT
+// ============================================
+
+/**
+ * Reklamları başlat
+ * Standard kullanıcılara reklam gösterir, Pro kullanıcılara göstermez
+ */
+async function initializeAds() {
+    if (!window.adManager) {
+        console.warn('[Ads] AdManager not loaded');
+        return;
+    }
+
+    try {
+        // AdManager otomatik olarak subscription check yapacak
+        await window.adManager.initializeAds();
+
+        // Test amaçlı placeholder reklamlar göster
+        // Gerçek AdSense için bu satırları kaldırıp showAd() kullanın
+        if (window.adManager.adsEnabled) {
+            console.log('[Ads] Showing placeholder ads for Standard user');
+
+            // Ana sayfa banner reklamı (placeholder)
+            window.adManager.showPlaceholderAd('ad-top-banner', 'Top Banner - 728x90 Leaderboard');
+
+            // Gerçek AdSense reklamı göstermek için:
+            // window.adManager.showAd('ad-top-banner', 'YOUR_AD_SLOT_ID', 'auto', true);
+        } else {
+            console.log('[Ads] Pro user - ads disabled');
+        }
+    } catch (error) {
+        console.error('[Ads] Error initializing ads:', error);
+    }
+}
 
 // ============================================
 // UTILITY FUNCTIONS

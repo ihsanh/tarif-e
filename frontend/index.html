@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/static/css/nutrition.css">
     <link rel="stylesheet" href="/static/css/mobile.css">
     <link rel="stylesheet" href="/static/css/filters.css">
+    <link rel="stylesheet" href="/static/css/ads.css">
 
     <style>
         /* Modern Yumuşak Arka Plan */
@@ -235,6 +236,11 @@
                 <button class="btn" style="background: linear-gradient(135deg, #FC8181 0%, #F56565 100%); color: white;" onclick="window.location.href='/menu-planner.html';">
                     📅 Menü Planlayıcı
                 </button>
+            </div>
+
+            <!-- Top Banner Ad -->
+            <div id="ad-top-banner" class="ad-container" data-ad-container style="display: none; margin-top: 30px;">
+                <!-- AdSense will be injected here -->
             </div>
 
             <div class="status-bar">
@@ -589,6 +595,9 @@ fetch('http://localhost:8000/api/malzeme/liste', {
     }
 }).then(r => r.json()).then(d => console.log('Sonuç:', d));
 </script>
+
+<!-- Ad Manager -->
+<script src="/static/js/ad-manager.js"></script>
 
 </body>
 </html>

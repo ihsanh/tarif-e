@@ -56,6 +56,10 @@ class Settings(BaseSettings):
     PRO_YEARLY_PRICE: float = 999.90  # Pro paket yıllık ücret (TL)
     DEFAULT_SUBSCRIPTION_TIER: str = "standard"  # Yeni kullanıcılar için varsayılan paket
 
+    # Ads settings
+    ADS_ENABLED: bool = True  # Reklamları aktif et/kapat
+    GOOGLE_ADSENSE_CLIENT_ID: Optional[str] = "ca-pub-5031698187492956"  # Google AdSense Publisher ID (ca-pub-XXXXXXXX)
+
     class Config:
         env_file = ".env"
         case_sensitive = True
